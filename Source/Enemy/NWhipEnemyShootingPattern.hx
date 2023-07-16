@@ -8,7 +8,7 @@ import haxe.Timer;
 
 class NWhipEnemyShootingPattern extends EnemyShootingPattern {
 	private var whipFullAngle:Float = 90; // The full angle of the whip
-	private var numberOfWhips:Int = 1; // The number of whips to fire
+	private var numberOfWhips:Int = 5; // The number of whips to fire
 
 	private var baseAngle:Float = 0;
 
@@ -50,6 +50,7 @@ class NWhipEnemyShootingPattern extends EnemyShootingPattern {
 
 			angleToFire += baseAngle; // Increase the angle to fire at
 		}
+		angleToFire = (90 - (numberOfBullets/2 * salt)) - (0.5 * (numberOfWhips - 1)) * baseAngle; // Reset the angle to fire at
 	}
 
 	private function spawnEnemyBullet():Void {
@@ -57,7 +58,6 @@ class NWhipEnemyShootingPattern extends EnemyShootingPattern {
 	
 		function spawnNextBullet():Void {
 			if (currentIndex < numberOfBullets) {
-				angleToFire = (90 - (numberOfBullets/2 * salt)) - (0.5 * (numberOfWhips - 1)) * baseAngle; // Reset the angle to fire at
 				angleToFire += currentIndex * salt; // Add the salt to the angle to fire at
 				spawnWhipRow();
 				baseBulletSpeed += speedChange; // Increase the speed of the bullet
