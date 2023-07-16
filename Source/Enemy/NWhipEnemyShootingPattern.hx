@@ -10,7 +10,6 @@ class NWhipEnemyShootingPattern extends EnemyShootingPattern {
 	private var whipFullAngle:Float = 90; // The full angle of the whip
 	private var numberOfWhips:Int = 1; // The number of whips to fire
 
-	// debug the angle, it's not centered for some reason
 	private var baseAngle:Float = 0;
 
 	private var numberOfBullets:Int = 8; // The number of bullets to fire in each whip
