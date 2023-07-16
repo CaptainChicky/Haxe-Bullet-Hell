@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<meta title="BulletHell" package="me.theaviary.BulletHell" version="1.0.0" company="CCP" />
+	
+	<!-- Added app configuration -->
+	<app main="Main" path="Export" file="BulletHell"></app>
+
+	<source path="Source" />
+	
+	<haxelib name="openfl" />
+	
+	<assets path="Assets" rename="assets" />
+	
+	<windows fps="60" autoSize="true" />
+</project>
