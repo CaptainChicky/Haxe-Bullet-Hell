@@ -19,6 +19,9 @@ class Enemy extends Sprite {
 	private var maxHealth:Int;
 	private var currentHealth:Int;
 
+	// Reference to shooting pattern
+	private var shootingPattern:EnemyShootingPattern;
+
 	public function new(health:Int = 1) {
 		super();
 
@@ -42,6 +45,10 @@ class Enemy extends Sprite {
 		addEventListener(Event.ENTER_FRAME, everyFrame);
 	}
 
+	public function setShootingPattern(pattern:EnemyShootingPattern):Void {
+		this.shootingPattern = pattern;
+	}
+
 	public function takeDamage(damage:Int):Void {
 		currentHealth -= damage;
 		trace("Enemy hit! Health: " + currentHealth + "/" + maxHealth);
@@ -61,6 +68,12 @@ class Enemy extends Sprite {
 
 	private function die():Void {
 		trace("Enemy destroyed!");
+
+		// Stop the shooting pattern
+		if (shootingPattern != null) {
+			shootingPattern.stopShooting();
+		}
+
 		removeEventListener(Event.ENTER_FRAME, everyFrame);
 		if (parent != null) {
 			parent.removeChild(this);

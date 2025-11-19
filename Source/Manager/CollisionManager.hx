@@ -80,13 +80,18 @@ class CollisionManager extends Sprite {
 		for (bullet in enemyBullets) {
 			if (bullet.parent == null) continue; // Bullet already removed
 
-			// Distance-based collision for precise circular hitbox
+			// Check if bullet sprite overlaps with player hitbox circle
+			// We need to account for the bullet's size
+			var bulletRadius:Float = Math.max(bullet.width, bullet.height) / 2;
+			var collisionDistance:Float = PLAYER_HITBOX_RADIUS + bulletRadius;
+
 			var dx:Float = bullet.x - playerCenterX;
 			var dy:Float = bullet.y - playerCenterY;
 			var distanceSquared:Float = dx * dx + dy * dy;
 
-			if (distanceSquared < PLAYER_HITBOX_RADIUS * PLAYER_HITBOX_RADIUS) {
+			if (distanceSquared < collisionDistance * collisionDistance) {
 				// Player hit!
+				trace("COLLISION DETECTED! Bullet at (" + bullet.x + ", " + bullet.y + ") hit player at (" + playerCenterX + ", " + playerCenterY + ")");
 				player.takeDamage(1);
 
 				// Remove the bullet
@@ -119,6 +124,26 @@ class CollisionManager extends Sprite {
 	}
 
 	public function reset():Void {
+		playerBullets = new Array<BulletPlayer>();
+		enemyBullets = new Array<BulletEnemy>();
+	}
+
+	public function clearAllBullets():Void {
+		// Remove all player bullets from display
+		for (bullet in playerBullets) {
+			if (bullet.parent != null) {
+				bullet.parent.removeChild(bullet);
+			}
+		}
+
+		// Remove all enemy bullets from display
+		for (bullet in enemyBullets) {
+			if (bullet.parent != null) {
+				bullet.parent.removeChild(bullet);
+			}
+		}
+
+		// Clear arrays
 		playerBullets = new Array<BulletPlayer>();
 		enemyBullets = new Array<BulletEnemy>();
 	}

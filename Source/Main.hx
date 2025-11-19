@@ -27,6 +27,7 @@ class Main extends Sprite {
 	private var player:Player;
 	private var currentGameState:GameState;
 	private var messageField:TextField;
+	private var messageFormat:TextFormat;
 
 	private var playerShootingPattern:PlayerShootingPattern;
 
@@ -59,6 +60,7 @@ class Main extends Sprite {
 		player = new Player(stageWidth, stageHeight);
 		player.x = stageWidth / 2;
 		player.y = stageHeight - player.height / 2 - 10;
+		player.setSpawnPosition(player.x, player.y);
 		addChild(player);
 
 		// Create level manager
@@ -75,15 +77,18 @@ class Main extends Sprite {
 		// Set player death callback
 		player.setOnDeathCallback(onPlayerDeath);
 
-		var messageFormat:TextFormat = new TextFormat("Verdana", 18, 0xbbbbbb, true);
+		messageFormat = new TextFormat("Verdana", 18, 0xbbbbbb, true);
 		messageFormat.align = TextFormatAlign.CENTER;
 		messageField = new TextField();
 		addChild(messageField);
 		messageField.width = 500;
+		messageField.height = 100;
 		messageField.y = stageHeight / 2 - messageField.height / 2;
 		messageField.x = stageWidth / 2 - messageField.width / 2;
 		messageField.defaultTextFormat = messageFormat;
 		messageField.selectable = false;
+		messageField.multiline = true;
+		messageField.wordWrap = true;
 		messageField.text = "Press SPACE to start\nUse ARROW KEYS to move";
 
 		setGameState(Paused);
@@ -103,6 +108,15 @@ class Main extends Sprite {
 			messageField.alpha = 1;
 		} else {
 			messageField.alpha = 0;
+
+			// Respawn player if they were dead
+			if (!player.isAlive()) {
+				player.respawn();
+			}
+
+			// Clear everything when restarting
+			collisionManager.clearAllBullets();
+			enemyManager.clearAllEnemies();
 
 			// Start the level!
 			levelManager.loadLevel("assets/levels/level1.json");
@@ -145,16 +159,21 @@ class Main extends Sprite {
 		trace("GAME OVER!");
 		setGameState(Paused);
 
-		// Update message field
+		// Update message field - reapply format after changing text
 		messageField.text = "GAME OVER\n\nPress SPACE to restart";
+		messageField.setTextFormat(messageFormat);
 		messageField.alpha = 1;
 
-		// Stop level and clear bullets
-		levelManager.stopLevel();
-		collisionManager.reset();
+		// Stop all enemy shooting but keep them visible
+		enemyManager.stopAllShooting();
+
+		// Keep bullets on screen (don't clear them)
 
 		// Stop player shooting
 		playerShootingPattern.stopShooting();
+
+		// Stop the level timer (but don't clear enemies)
+		levelManager.stopLevel();
 	}
 
 	private function everyFrame(event:Event):Void {
