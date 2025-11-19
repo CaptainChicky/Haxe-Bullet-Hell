@@ -9,7 +9,7 @@
           "x": 200,
           "y": 100,
           "pattern": "spiral",
-          "health": 40,
+          "health": 4,
           "patternConfig": {
             "bulletSpawnInterval": 0.01
           }
