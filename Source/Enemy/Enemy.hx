@@ -6,6 +6,7 @@ import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
 import openfl.Assets;
+import enemy.MovementScript;
 
 class Enemy extends Sprite {
 	public static inline final ROTATION_SPEED:Float = -40.0; // Rotation speed in degrees per second
@@ -21,6 +22,11 @@ class Enemy extends Sprite {
 
 	// Reference to shooting pattern
 	private var shootingPattern:EnemyShootingPattern;
+
+	// Movement system
+	private var velocityX:Float = 0;
+	private var velocityY:Float = 0;
+	private var movementScript:MovementScript;
 
 	public function new(health:Int = 1) {
 		super();
@@ -47,6 +53,15 @@ class Enemy extends Sprite {
 
 	public function setShootingPattern(pattern:EnemyShootingPattern):Void {
 		this.shootingPattern = pattern;
+	}
+
+	public function setVelocity(vx:Float, vy:Float):Void {
+		this.velocityX = vx;
+		this.velocityY = vy;
+	}
+
+	public function setMovementScript(script:MovementScript):Void {
+		this.movementScript = script;
 	}
 
 	public function takeDamage(damage:Int):Void {
@@ -81,6 +96,15 @@ class Enemy extends Sprite {
 	}
 
 	private function everyFrame(event:Event):Void {
+		// Update movement script if it exists
+		if (movementScript != null) {
+			movementScript.update();
+		}
+
+		// Update movement
+		x += velocityX;
+		y += velocityY;
+
 		// Update the enemy's rotation based on the elapsed time since the last frame
 		// will rotate based on spawn time
 		var currentTime:Int = Lib.getTimer();

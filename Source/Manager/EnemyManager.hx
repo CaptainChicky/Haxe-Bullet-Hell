@@ -1,6 +1,7 @@
 package manager;
 
 import enemy.*;
+import enemy.MovementScript;
 import openfl.display.Sprite;
 import openfl.events.Event;
 
@@ -14,10 +15,11 @@ class EnemyManager extends Sprite {
 		enemyPatterns = new Array<EnemyShootingPattern>();
 	}
 
-	public function spawnEnemy(x:Float, y:Float, patternType:String, patternConfig:Dynamic, health:Int = 1):Enemy {
+	public function spawnEnemy(x:Float, y:Float, patternType:String, patternConfig:Dynamic, health:Int = 1, velocityX:Float = 0, velocityY:Float = 0, movementScriptData:Dynamic = null):Enemy {
 		var enemy:Enemy = new Enemy(health);
 		enemy.x = x;
 		enemy.y = y;
+		enemy.setVelocity(velocityX, velocityY);
 		addChild(enemy);
 		enemies.push(enemy);
 
@@ -36,6 +38,15 @@ class EnemyManager extends Sprite {
 
 			// Auto-start shooting
 			pattern.startShooting();
+		}
+
+		// Create and attach movement script if provided
+		if (movementScriptData != null) {
+			var movementScript:MovementScript = createMovementScript(enemy, movementScriptData);
+			if (movementScript != null) {
+				enemy.setMovementScript(movementScript);
+				movementScript.start();
+			}
 		}
 
 		return enemy;
@@ -61,6 +72,40 @@ class EnemyManager extends Sprite {
 				trace("Unknown pattern type: " + patternType);
 				return null;
 		}
+	}
+
+	private function createMovementScript(enemy:Enemy, scriptData:Dynamic):MovementScript {
+		if (scriptData == null || scriptData.actions == null) {
+			return null;
+		}
+
+		var loop:Bool = scriptData.loop != null ? scriptData.loop : false;
+		var script:MovementScript = new MovementScript(enemy, loop);
+
+		// Parse each action
+		var actions:Array<Dynamic> = scriptData.actions;
+		for (actionData in actions) {
+			var actionType:String = actionData.type;
+
+			switch (actionType) {
+				case "SetVelocity":
+					var vx:Float = actionData.vx != null ? actionData.vx : 0;
+					var vy:Float = actionData.vy != null ? actionData.vy : 0;
+					script.addAction(SetVelocity(vx, vy));
+
+				case "Wait":
+					var frames:Int = actionData.frames != null ? actionData.frames : 0;
+					script.addAction(Wait(frames));
+
+				case "Stop":
+					script.addAction(Stop);
+
+				default:
+					trace("Unknown movement action type: " + actionType);
+			}
+		}
+
+		return script;
 	}
 
 	public function removeEnemy(enemy:Enemy):Void {
