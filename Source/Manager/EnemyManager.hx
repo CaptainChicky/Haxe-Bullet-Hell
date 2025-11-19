@@ -8,11 +8,13 @@ import openfl.events.Event;
 class EnemyManager extends Sprite {
 	private var enemies:Array<Enemy>;
 	private var enemyPatterns:Array<EnemyShootingPattern>;
+	private var movementScripts:Array<MovementScript>;
 
 	public function new() {
 		super();
 		enemies = new Array<Enemy>();
 		enemyPatterns = new Array<EnemyShootingPattern>();
+		movementScripts = new Array<MovementScript>();
 	}
 
 	public function spawnEnemy(x:Float, y:Float, patternType:String, patternConfig:Dynamic, health:Int = 1, velocityX:Float = 0, velocityY:Float = 0, movementScriptData:Dynamic = null):Enemy {
@@ -44,6 +46,7 @@ class EnemyManager extends Sprite {
 		if (movementScriptData != null) {
 			var movementScript:MovementScript = createMovementScript(enemy, movementScriptData);
 			if (movementScript != null) {
+				movementScripts.push(movementScript);
 				enemy.setMovementScript(movementScript);
 				movementScript.start();
 			}
@@ -128,6 +131,12 @@ class EnemyManager extends Sprite {
 			pattern.stopShooting();
 		}
 		enemyPatterns = new Array<EnemyShootingPattern>();
+
+		// Stop all movement scripts
+		for (script in movementScripts) {
+			script.stop();
+		}
+		movementScripts = new Array<MovementScript>();
 	}
 
 	public function getEnemyCount():Int {
@@ -153,6 +162,20 @@ class EnemyManager extends Sprite {
 		// Stop all enemy patterns from shooting without removing enemies
 		for (pattern in enemyPatterns) {
 			pattern.stopShooting();
+		}
+	}
+
+	public function pauseAllMovementScripts():Void {
+		// Pause all movement scripts (stops enemy movement)
+		for (script in movementScripts) {
+			script.pause();
+		}
+	}
+
+	public function resumeAllMovementScripts():Void {
+		// Resume all movement scripts
+		for (script in movementScripts) {
+			script.resume();
 		}
 	}
 }
