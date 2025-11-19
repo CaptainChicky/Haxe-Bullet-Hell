@@ -6,13 +6,67 @@ I probably will not finish this anytime soon. If anyone wants to help, feel free
 # How to run
 Compile into html5 using `openfl build html5 -release -clean` or `openfl test html5`.
 
+# Architecture (UPDATED!)
+The codebase has been completely refactored to be data-driven and scalable!
+
+## New Manager System
+- **EnemyManager** - Handles spawning, lifecycle, and cleanup of all enemies
+- **LevelManager** - Parses JSON level files and triggers enemy spawns at the correct times
+- **Player** - Now fully self-contained with its own movement, boundaries, and controls
+
+## Creating New Levels
+Levels are defined as JSON files in `Assets/levels/`. Here's the format:
+
+```json
+{
+  "name": "Level Name",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 400,
+          "y": 100,
+          "pattern": "nwhip",
+          "patternConfig": {
+            "bulletSpawnInterval": 1.0
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Level Structure
+- **name** - Level display name
+- **waves** - Array of wave definitions
+  - **startTime** - When the wave starts (seconds since level start)
+  - **enemies** - Array of enemy spawns in this wave
+    - **spawnTime** - When to spawn relative to wave start (seconds)
+    - **x, y** - Spawn position
+    - **pattern** - Pattern type: "spiral" or "nwhip"
+    - **patternConfig** - Pattern-specific settings
+      - **bulletSpawnInterval** - Time between bullet spawns (seconds)
+
+### Example Levels
+- `Assets/levels/level1.json` - Introductory level with progressive difficulty
+- `Assets/levels/level2.json` - Chaotic multi-enemy patterns
+
+### Switching Levels
+In Main.hx:96, change the level file:
+```haxe
+levelManager.loadLevel("assets/levels/level2.json");
+```
+
 # To-Do
-1. Make a class "EnemyShootingLevel" or something which encapsulates enemy patterns into a level.
+1. ~~Make a class "EnemyShootingLevel" or something which encapsulates enemy patterns into a level.~~ ✅ DONE!
 2. Implement health system.
 3. Implement point system. The higher the player's points, the better the payer shooting pattern.
-4. Encapsulate player speed controls and movement into the player class perhaps(?)
-5. Implement enemy movement and targetting. Currently, I'm just spawning an enemy on the canvas in the main class.
-6. Implement enemy spawning and spawning patterns.
+4. ~~Encapsulate player speed controls and movement into the player class perhaps(?)~~ ✅ DONE!
+5. Implement enemy movement and targetting.
+6. ~~Implement enemy spawning and spawning patterns.~~ ✅ DONE!
 
 # Dependencies
 Openfl for now and lime. Check https://github.com/CaptainChicky/Haxe-Pong to install them. 

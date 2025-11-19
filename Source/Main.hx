@@ -1,8 +1,7 @@
 package;
 
-import enemy.*;
+import manager.*;
 import player.PlayerShootingPattern;
-import enemy.Enemy;
 import player.Player;
 import openfl.ui.Keyboard;
 import openfl.events.KeyboardEvent;
@@ -25,25 +24,14 @@ class Main extends Sprite {
 	private var stageHeight:Int;
 
 	private var player:Player;
-	private var enemy:Enemy;
-
 	private var currentGameState:GameState;
 	private var messageField:TextField;
 
-	private var arrowKeyUp:Bool;
-	private var arrowKeyDown:Bool;
-	private var arrowKeyLeft:Bool;
-	private var arrowKeyRight:Bool;
-
-	private var playerAxisSpeed:Int;
-
-	private var previousTime:Int = 0;
-	private var currentTime:Int;
-	private var deltaTime:Float;
-
-	private var spiralEnemyShootingPattern:SpiralEnemyShootingPattern;
-	private var nWhipEnemyShootingPattern:NWhipEnemyShootingPattern;
 	private var playerShootingPattern:PlayerShootingPattern;
+
+	// Managers
+	private var enemyManager:EnemyManager;
+	private var levelManager:LevelManager;
 
 	/* ENTRY POINT */
 	function resize(e) {
@@ -61,15 +49,19 @@ class Main extends Sprite {
 		stageWidth = Lib.current.stage.stageWidth;
 		stageHeight = Lib.current.stage.stageHeight;
 
-		player = new Player();
+		// Create managers
+		enemyManager = new EnemyManager();
+		addChild(enemyManager); // Add to display tree so enemies are rendered
+
+		// Create player with stage dimensions
+		player = new Player(stageWidth, stageHeight);
 		player.x = stageWidth / 2;
 		player.y = stageHeight - player.height / 2 - 10;
 		addChild(player);
 
-		enemy = new Enemy();
-		enemy.x = stageWidth / 2;
-		enemy.y = 10 + enemy.height / 2;
-		addChild(enemy);
+		// Create level manager
+		levelManager = new LevelManager(enemyManager);
+		addChild(levelManager);
 
 		var messageFormat:TextFormat = new TextFormat("Verdana", 18, 0xbbbbbb, true);
 		messageFormat.align = TextFormatAlign.CENTER;
@@ -87,12 +79,6 @@ class Main extends Sprite {
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 
-		arrowKeyUp = false;
-		arrowKeyDown = false;
-		arrowKeyLeft = false;
-		arrowKeyRight = false;
-
-		playerAxisSpeed = 5;
 		playerShootingPattern = new PlayerShootingPattern(player);
 
 		this.addEventListener(Event.ENTER_FRAME, everyFrame);
@@ -106,31 +92,22 @@ class Main extends Sprite {
 		} else {
 			messageField.alpha = 0;
 
-			enemyShootSequence();
+			// Start the level!
+			levelManager.loadLevel("assets/levels/level2.json");
 		}
-	}
-
-	private function enemyShootSequence():Void {
-		spiralEnemyShootingPattern = new SpiralEnemyShootingPattern(enemy);
-		nWhipEnemyShootingPattern = new NWhipEnemyShootingPattern(enemy);
-		// start shooting
-		//spiralEnemyShootingPattern.startShooting();
-		
-		nWhipEnemyShootingPattern.setBulletSpawnInterval(1);
-		nWhipEnemyShootingPattern.startShooting();
 	}
 
 	private function keyDown(event:KeyboardEvent):Void {
 		if (currentGameState == Paused && event.keyCode == Keyboard.SPACE) {
 			setGameState(Playing);
 		} else if (event.keyCode == Keyboard.UP) {
-			arrowKeyUp = true;
+			player.setMoveUp(true);
 		} else if (event.keyCode == Keyboard.DOWN) {
-			arrowKeyDown = true;
+			player.setMoveDown(true);
 		} else if (event.keyCode == Keyboard.LEFT) {
-			arrowKeyLeft = true;
+			player.setMoveLeft(true);
 		} else if (event.keyCode == Keyboard.RIGHT) {
-			arrowKeyRight = true;
+			player.setMoveRight(true);
 		} else if (event.keyCode == 90) { // "z" key
 			if (currentGameState == Playing) {
 				playerShootingPattern.startShooting();
@@ -140,13 +117,13 @@ class Main extends Sprite {
 
 	private function keyUp(event:KeyboardEvent):Void {
 		if (event.keyCode == 38) { // Up
-			arrowKeyUp = false;
+			player.setMoveUp(false);
 		} else if (event.keyCode == 40) { // Down
-			arrowKeyDown = false;
+			player.setMoveDown(false);
 		} else if (event.keyCode == 37) { // Left
-			arrowKeyLeft = false;
+			player.setMoveLeft(false);
 		} else if (event.keyCode == 39) { // Right
-			arrowKeyRight = false;
+			player.setMoveRight(false);
 		} else if (event.keyCode == 90) { // "z" key
 			playerShootingPattern.stopShooting();
 		}
@@ -154,37 +131,8 @@ class Main extends Sprite {
 
 	private function everyFrame(event:Event):Void {
 		if (currentGameState == Playing) {
-			if (arrowKeyUp) {
-				player.y -= playerAxisSpeed;
-			}
-
-			if (arrowKeyDown) {
-				player.y += playerAxisSpeed;
-			}
-
-			if (arrowKeyLeft) {
-				player.x -= playerAxisSpeed;
-			}
-
-			if (arrowKeyRight) {
-				player.x += playerAxisSpeed;
-			}
-
-			if (player.y < player.height / 2) {
-				player.y = player.height / 2;
-			}
-
-			if (player.y > stageHeight - player.height / 2 - 10) {
-				player.y = stageHeight - player.height / 2 - 10;
-			}
-
-			if (player.x < player.width / 2) {
-				player.x = player.width / 2;
-			}
-
-			if (player.x > stageWidth - player.width / 2 - 10) {
-				player.x = stageWidth - player.width / 2 - 10;
-			}
+			// Player handles its own movement and boundaries
+			player.updateMovement();
 		}
 	}
 

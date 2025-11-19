@@ -1,0 +1,101 @@
+{
+  "name": "Level 2 - Chaos",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 200,
+          "y": 100,
+          "pattern": "spiral",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.01
+          }
+        },
+        {
+          "spawnTime": 0,
+          "x": 400,
+          "y": 100,
+          "pattern": "nwhip",
+          "patternConfig": {
+            "bulletSpawnInterval": 1.2
+          }
+        },
+        {
+          "spawnTime": 0,
+          "x": 600,
+          "y": 100,
+          "pattern": "spiral",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.01
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 10,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 300,
+          "y": 80,
+          "pattern": "nwhip",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.8
+          }
+        },
+        {
+          "spawnTime": 0.5,
+          "x": 500,
+          "y": 80,
+          "pattern": "nwhip",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.8
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 18,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 150,
+          "y": 100,
+          "pattern": "spiral",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.012
+          }
+        },
+        {
+          "spawnTime": 0,
+          "x": 400,
+          "y": 100,
+          "pattern": "spiral",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.012
+          }
+        },
+        {
+          "spawnTime": 0,
+          "x": 650,
+          "y": 100,
+          "pattern": "spiral",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.012
+          }
+        },
+        {
+          "spawnTime": 3,
+          "x": 400,
+          "y": 50,
+          "pattern": "nwhip",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.7
+          }
+        }
+      ]
+    }
+  ]
+}

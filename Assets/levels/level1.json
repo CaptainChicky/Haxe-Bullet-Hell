@@ -1,0 +1,74 @@
+{
+  "name": "Level 1 - Introduction",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 400,
+          "y": 100,
+          "pattern": "nwhip",
+          "patternConfig": {
+            "bulletSpawnInterval": 1.5
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 8,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 300,
+          "y": 100,
+          "pattern": "spiral",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.01
+          }
+        },
+        {
+          "spawnTime": 0,
+          "x": 500,
+          "y": 100,
+          "pattern": "spiral",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.01
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 16,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 400,
+          "y": 100,
+          "pattern": "nwhip",
+          "patternConfig": {
+            "bulletSpawnInterval": 1.0
+          }
+        },
+        {
+          "spawnTime": 2,
+          "x": 250,
+          "y": 100,
+          "pattern": "spiral",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.015
+          }
+        },
+        {
+          "spawnTime": 2,
+          "x": 550,
+          "y": 100,
+          "pattern": "spiral",
+          "patternConfig": {
+            "bulletSpawnInterval": 0.015
+          }
+        }
+      ]
+    }
+  ]
+}
