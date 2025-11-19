@@ -32,6 +32,9 @@ class Player extends Sprite {
 	private var health:Int = 1;
 	private var alive:Bool = true;
 
+	// God mode
+	private var godMode:Bool = false;
+
 	// Callback for game over
 	private var onDeathCallback:Void->Void;
 
@@ -78,6 +81,18 @@ class Player extends Sprite {
 		this.onDeathCallback = callback;
 	}
 
+	public function toggleGodMode():Void {
+		godMode = !godMode;
+		trace("God mode: " + (godMode ? "ENABLED" : "DISABLED"));
+
+		// Visual feedback - change alpha when in god mode
+		this.alpha = godMode ? 0.5 : 1.0;
+	}
+
+	public function isGodMode():Bool {
+		return godMode;
+	}
+
 	public function setSpawnPosition(x:Float, y:Float):Void {
 		this.spawnX = x;
 		this.spawnY = y;
@@ -104,6 +119,10 @@ class Player extends Sprite {
 
 	public function takeDamage(damage:Int):Void {
 		if (!alive) return;
+		if (godMode) {
+			trace("Player hit but god mode is active!");
+			return;
+		}
 
 		health -= damage;
 		trace("Player hit! Health: " + health);

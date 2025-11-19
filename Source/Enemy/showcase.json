@@ -1,0 +1,913 @@
+{
+  "name": "Pattern Showcase - All Features",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 5, "direction": 180},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "Fire"},
+                    {"type": "Wait", "frames": 30}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 10,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "spiral",
+          "health": 100,
+          "patternConfig": {
+            "bulletSpawnInterval": 0.02,
+            "bulletSpeed": 6,
+            "rotationChange": 12
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 20,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 8, "direction": 0},
+                {"type": "SetPosition", "distance": 50, "bearing": 0},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "Radial", "radialCount": 12},
+                    {"type": "AddBearing", "delta": 10},
+                    {"type": "Wait", "frames": 30}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 30,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 7, "direction": 180},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "NWay", "nwayCount": 5, "angle": 120},
+                    {"type": "AddDirection", "delta": 15},
+                    {"type": "Wait", "frames": 25}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 40,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 6, "direction": 180},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "Radial", "radialCount": 16},
+                    {"type": "AddDirection", "delta": 7.5},
+                    {"type": "Wait", "frames": 20}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 50,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 8, "direction": 180},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "Line", "lineCount": 10, "speedChange": 0.8},
+                    {"type": "AddDirection", "delta": 20},
+                    {"type": "Wait", "frames": 40}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 60,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "RandomSpeed", "min": 4, "max": 10},
+                    {"type": "RandomDirection", "min": 120, "max": 240},
+                    {"type": "Fire"},
+                    {"type": "Wait", "frames": 15}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 70,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 9, "direction": 0},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "Aim"},
+                    {"type": "NWay", "nwayCount": 3, "angle": 30},
+                    {"type": "Wait", "frames": 35}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 80,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 8, "direction": 180},
+                {
+                  "type": "Parallel",
+                  "threads": [
+                    [
+                      {
+                        "type": "Loop",
+                        "actions": [
+                          {"type": "Radial", "radialCount": 8},
+                          {"type": "AddDirection", "delta": 10},
+                          {"type": "Wait", "frames": 5}
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "type": "Loop",
+                        "actions": [
+                          {"type": "Radial", "radialCount": 6},
+                          {"type": "AddDirection", "delta": -12},
+                          {"type": "Wait", "frames": 6}
+                        ]
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 90,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 6, "direction": 0},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {
+                      "type": "Radial",
+                      "radialCount": 8,
+                      "subActions": [
+                        {"type": "Wait", "frames": 20},
+                        {"type": "SetVelocity", "speed": 3, "direction": 180},
+                        {"type": "Fire"},
+                        {"type": "Wait", "frames": 20},
+                        {"type": "Fire"}
+                      ]
+                    },
+                    {"type": "Wait", "frames": 60}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 100,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 7, "direction": 180},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {
+                      "type": "Radial",
+                      "radialCount": 12,
+                      "subActions": [
+                        {"type": "Fire", "bind": true}
+                      ]
+                    },
+                    {"type": "Wait", "frames": 180},
+                    {
+                      "type": "Radial",
+                      "radialCount": 12,
+                      "subActions": [
+                        {"type": "Fire", "bind": true},
+                        {"type": "Wait", "frames": 30},
+                        {"type": "Vanish"}
+                      ]
+                    },
+                    {"type": "Wait", "frames": 120}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 110,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 6, "direction": 0},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "Radial", "radialCount": 8},
+                    {"type": "Wait", "frames": 20},
+                    {"type": "Fire"},
+                    {"type": "Vanish"},
+                    {"type": "Wait", "frames": 10}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 120,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVar", "name": "angle", "value": 0},
+                {"type": "SetVelocity", "speed": 7, "direction": 180},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "SetDirectionVar", "varName": "angle"},
+                    {"type": "Radial", "radialCount": 10},
+                    {"type": "AddVar", "name": "angle", "delta": 12},
+                    {"type": "Wait", "frames": 15}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 130,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 3, "direction": 180},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "Radial", "radialCount": 8},
+                    {"type": "TweenSpeed", "targetSpeed": 12, "frames": 60},
+                    {"type": "Wait", "frames": 10},
+                    {"type": "TweenSpeed", "targetSpeed": 3, "frames": 60},
+                    {"type": "Wait", "frames": 10}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 140,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 8, "direction": 180},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "Radial", "radialCount": 12},
+                    {"type": "RotatePattern", "angle": 15},
+                    {"type": "Wait", "frames": 8},
+                    {"type": "ScalePattern", "factor": 1.1},
+                    {"type": "Radial", "radialCount": 12},
+                    {"type": "Wait", "frames": 8},
+                    {"type": "ScalePattern", "factor": 0.909}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 150,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "nwhip",
+          "health": 100,
+          "patternConfig": {
+            "bulletSpawnInterval": 1.2,
+            "numberOfWhips": 3,
+            "numberOfBullets": 8,
+            "baseBulletSpeed": 4,
+            "speedChange": 0.8
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 160,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "nwhip",
+          "health": 100,
+          "patternConfig": {
+            "bulletSpawnInterval": 1.0,
+            "numberOfWhips": 7,
+            "numberOfBullets": 10,
+            "baseBulletSpeed": 3,
+            "speedChange": 1.2
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 170,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 12, "direction": 180},
+                {
+                  "type": "Parallel",
+                  "threads": [
+                    [
+                      {
+                        "type": "Loop",
+                        "actions": [
+                          {"type": "Radial", "radialCount": 10},
+                          {"type": "AddDirection", "delta": 8},
+                          {"type": "Wait", "frames": 4}
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "type": "Loop",
+                        "actions": [
+                          {"type": "Radial", "radialCount": 4},
+                          {"type": "AddDirection", "delta": 4},
+                          {"type": "Wait", "frames": 2}
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "type": "Loop",
+                        "actions": [
+                          {"type": "Radial", "radialCount": 4},
+                          {"type": "AddDirection", "delta": -4},
+                          {"type": "Wait", "frames": 2}
+                        ]
+                      }
+                    ]
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 180,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "RandomSpeed", "min": 6, "max": 9},
+                    {"type": "RandomAngleGrouping", "range": 90},
+                    {"type": "AddDirection", "delta": 90},
+                    {"type": "Fire"},
+                    {"type": "Wait", "frames": 30},
+                    {"type": "RandomSpeed", "min": 6, "max": 9},
+                    {"type": "RandomAngleGrouping", "range": 90},
+                    {"type": "AddDirection", "delta": 270},
+                    {"type": "Fire"},
+                    {"type": "Wait", "frames": 30}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 190,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 5, "direction": 180},
+                {"type": "SetPosition", "distance": 60, "bearing": 0},
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {
+                      "type": "Rep",
+                      "count": 4,
+                      "actions": [
+                        {"type": "Radial", "radialCount": 12},
+                        {"type": "AddBearing", "delta": 90},
+                        {"type": "Wait", "frames": 15}
+                      ]
+                    },
+                    {"type": "Wait", "frames": 60}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 200,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {"type": "SetVelocity", "speed": 4, "direction": 180},
+                {"type": "SetPosition", "distance": 80, "bearing": 180},
+                {
+                  "type": "Dup",
+                  "count": 32,
+                  "ranges": {
+                    "shotBearingRange": {"start": 0, "end": 360},
+                    "shotDirectionRange": {"start": 0, "end": 360}
+                  },
+                  "actions": [
+                    {"type": "AddDirection", "delta": 90},
+                    {"type": "NWay", "nwayCount": 9, "angle": 90}
+                  ]
+                },
+                {"type": "Wait", "frames": 300}
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 210,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 300,
+          "pattern": "script",
+          "health": 100,
+          "patternConfig": {
+            "shootingScript": {
+              "actions": [
+                {
+                  "type": "Loop",
+                  "actions": [
+                    {"type": "SetVelocity", "speed": 10, "direction": 0},
+                    {"type": "Aim"},
+                    {"type": "Line", "lineCount": 12, "speedChange": 0.6},
+                    {"type": "Wait", "frames": 45}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 300},
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225}
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -15,6 +15,7 @@ class MovementScript {
 	private var currentActionIndex:Int = 0;
 	private var waitFramesRemaining:Int = 0;
 	private var isActive:Bool = false;
+	private var isPaused:Bool = false;
 	private var loop:Bool = false;
 
 	public function new(enemy:Enemy, loop:Bool = false) {
@@ -37,8 +38,33 @@ class MovementScript {
 		isActive = false;
 	}
 
+	public function pause():Void {
+		isPaused = true;
+		// Stop enemy movement when pausing
+		enemy.setVelocity(0, 0);
+	}
+
+	public function resume():Void {
+		isPaused = false;
+		// Re-execute current action to restore velocity if needed
+		if (isActive && currentActionIndex < actions.length) {
+			var action = actions[currentActionIndex];
+			if (waitFramesRemaining == 0) {
+				// Only restore velocity if not in the middle of a Wait
+				switch (action) {
+					case SetVelocity(vx, vy):
+						enemy.setVelocity(vx, vy);
+					case Stop:
+						enemy.setVelocity(0, 0);
+					case Wait(_):
+						// Don't restore velocity during wait
+				}
+			}
+		}
+	}
+
 	public function update():Void {
-		if (!isActive || actions.length == 0) return;
+		if (!isActive || isPaused || actions.length == 0) return;
 
 		// If we're waiting, count down
 		if (waitFramesRemaining > 0) {

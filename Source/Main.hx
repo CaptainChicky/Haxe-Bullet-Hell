@@ -36,6 +36,9 @@ class Main extends Sprite {
 	private var levelManager:LevelManager;
 	private var collisionManager:CollisionManager;
 
+	// God mode key sequence tracking
+	private var keySequence:String = "";
+
 	/* ENTRY POINT */
 	function resize(e) {
 		if (!inited)
@@ -124,6 +127,23 @@ class Main extends Sprite {
 	}
 
 	private function keyDown(event:KeyboardEvent):Void {
+		// Track number keys for god mode sequence
+		if (event.keyCode >= 48 && event.keyCode <= 57) { // Number keys 0-9
+			var digit:String = String.fromCharCode(event.keyCode);
+			keySequence += digit;
+
+			// Keep only last 4 characters
+			if (keySequence.length > 4) {
+				keySequence = keySequence.substr(keySequence.length - 4);
+			}
+
+			// Check for god mode sequence "6969"
+			if (keySequence == "6969") {
+				player.toggleGodMode();
+				keySequence = ""; // Reset after activating
+			}
+		}
+
 		if (currentGameState == Paused && event.keyCode == Keyboard.SPACE) {
 			setGameState(Playing);
 		} else if (event.keyCode == Keyboard.UP) {
@@ -166,6 +186,9 @@ class Main extends Sprite {
 
 		// Stop all enemy shooting but keep them visible
 		enemyManager.stopAllShooting();
+
+		// Pause all enemy movement scripts
+		enemyManager.pauseAllMovementScripts();
 
 		// Keep bullets on screen (don't clear them)
 

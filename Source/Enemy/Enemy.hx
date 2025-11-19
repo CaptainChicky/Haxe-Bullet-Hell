@@ -105,6 +105,18 @@ class Enemy extends Sprite {
 		x += velocityX;
 		y += velocityY;
 
+		// Get the width and height of the stage (window screen)
+		var stageWidth:Int = Lib.current.stage.stageWidth;
+		var stageHeight:Int = Lib.current.stage.stageHeight;
+
+		// Check if the enemy is out of the stage boundaries
+		if (x < -100 || x > stageWidth + 100 || y < -100 || y > stageHeight + 100) {
+			// Remove the enemy from the stage
+			trace("Enemy moved off-screen, removing...");
+			die();
+			return;
+		}
+
 		// Update the enemy's rotation based on the elapsed time since the last frame
 		// will rotate based on spawn time
 		var currentTime:Int = Lib.getTimer();
