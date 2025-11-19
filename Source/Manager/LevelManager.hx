@@ -129,20 +129,25 @@ class LevelManager extends Sprite {
 
 	private function spawnEnemy(spawnData:EnemySpawnData):Void {
 		var health:Int = (spawnData.health != null) ? spawnData.health : 1;
-		trace("Spawning enemy at (" + spawnData.x + ", " + spawnData.y + ") with pattern: " + spawnData.pattern + ", health: " + health);
+		var vx:Float = (spawnData.velocityX != null) ? spawnData.velocityX : 0;
+		var vy:Float = (spawnData.velocityY != null) ? spawnData.velocityY : 0;
+		trace("Spawning enemy at (" + spawnData.x + ", " + spawnData.y + ") with pattern: " + spawnData.pattern + ", health: " + health + ", velocity: (" + vx + ", " + vy + ")");
 		enemyManager.spawnEnemy(
 			spawnData.x,
 			spawnData.y,
 			spawnData.pattern,
 			spawnData.patternConfig,
-			health
+			health,
+			vx,
+			vy,
+			spawnData.movementScript
 		);
 	}
 
 	public function stopLevel():Void {
 		isLevelActive = false;
 		pendingSpawns = new Array();
-		enemyManager.clearAllEnemies();
+		// Don't clear enemies - just stop wave progression
 	}
 
 	public function isActive():Bool {

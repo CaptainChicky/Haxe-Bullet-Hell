@@ -27,7 +27,7 @@ class Player extends Sprite {
 	// Spawn position
 	private var spawnX:Float;
 	private var spawnY:Float;
- 
+
 	// Health system
 	private var health:Int = 1;
 	private var alive:Bool = true;
@@ -82,15 +82,15 @@ class Player extends Sprite {
 		this.spawnX = x;
 		this.spawnY = y;
 	}
- 
+
 	public function respawn():Void {
 		trace("Player respawned!");
 		health = 1;
 		alive = true;
- 
+
 		// Make player visible again
 		this.visible = true;
- 
+
 		// Reset to spawn position
 		this.x = spawnX;
 		this.y = spawnY;
