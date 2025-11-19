@@ -26,6 +26,9 @@ class EnemyManager extends Sprite {
 		if (pattern != null) {
 			enemyPatterns.push(pattern);
 
+			// Link the pattern to the enemy
+			enemy.setShootingPattern(pattern);
+
 			// Set bullet spawn interval if provided
 			if (patternConfig.bulletSpawnInterval != null) {
 				pattern.setBulletSpawnInterval(patternConfig.bulletSpawnInterval);
@@ -98,6 +101,13 @@ class EnemyManager extends Sprite {
 				enemies.splice(i, 1);
 			}
 			i--;
+		}
+	}
+
+	public function stopAllShooting():Void {
+		// Stop all enemy patterns from shooting without removing enemies
+		for (pattern in enemyPatterns) {
+			pattern.stopShooting();
 		}
 	}
 }

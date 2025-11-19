@@ -24,6 +24,10 @@ class Player extends Sprite {
 	private var stageWidth:Int;
 	private var stageHeight:Int;
 
+	// Spawn position
+	private var spawnX:Float;
+	private var spawnY:Float;
+ 
 	// Health system
 	private var health:Int = 1;
 	private var alive:Bool = true;
@@ -74,6 +78,30 @@ class Player extends Sprite {
 		this.onDeathCallback = callback;
 	}
 
+	public function setSpawnPosition(x:Float, y:Float):Void {
+		this.spawnX = x;
+		this.spawnY = y;
+	}
+ 
+	public function respawn():Void {
+		trace("Player respawned!");
+		health = 1;
+		alive = true;
+ 
+		// Make player visible again
+		this.visible = true;
+ 
+		// Reset to spawn position
+		this.x = spawnX;
+		this.y = spawnY;
+
+		// Reset movement flags
+		moveUp = false;
+		moveDown = false;
+		moveLeft = false;
+		moveRight = false;
+	}
+
 	public function takeDamage(damage:Int):Void {
 		if (!alive) return;
 
@@ -92,6 +120,15 @@ class Player extends Sprite {
 	private function die():Void {
 		trace("Player died!");
 		alive = false;
+
+		// Make player invisible
+		this.visible = false;
+
+		// Reset movement flags to prevent stuck inputs
+		moveUp = false;
+		moveDown = false;
+		moveLeft = false;
+		moveRight = false;
 
 		// Trigger game over callback
 		if (onDeathCallback != null) {
