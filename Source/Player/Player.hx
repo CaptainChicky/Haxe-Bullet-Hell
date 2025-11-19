@@ -24,6 +24,13 @@ class Player extends Sprite {
 	private var stageWidth:Int;
 	private var stageHeight:Int;
 
+	// Health system
+	private var health:Int = 1;
+	private var alive:Bool = true;
+
+	// Callback for game over
+	private var onDeathCallback:Void->Void;
+
 	public function new(stageWidth:Int, stageHeight:Int) {
 		super();
 
@@ -63,7 +70,38 @@ class Player extends Sprite {
 		moveRight = value;
 	}
 
+	public function setOnDeathCallback(callback:Void->Void):Void {
+		this.onDeathCallback = callback;
+	}
+
+	public function takeDamage(damage:Int):Void {
+		if (!alive) return;
+
+		health -= damage;
+		trace("Player hit! Health: " + health);
+
+		if (health <= 0) {
+			die();
+		}
+	}
+
+	public function isAlive():Bool {
+		return alive;
+	}
+
+	private function die():Void {
+		trace("Player died!");
+		alive = false;
+
+		// Trigger game over callback
+		if (onDeathCallback != null) {
+			onDeathCallback();
+		}
+	}
+
 	public function updateMovement():Void {
+		if (!alive) return; // Can't move if dead
+
 		if (moveUp) {
 			y -= moveSpeed;
 		}

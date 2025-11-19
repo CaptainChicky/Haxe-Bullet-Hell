@@ -1,6 +1,7 @@
 package enemy;
 
 import bullet.BulletEnemy;
+import manager.CollisionManager;
 import openfl.events.Event;
 import openfl.display.Sprite;
 import openfl.Lib;
@@ -18,6 +19,20 @@ abstract class EnemyShootingPattern extends Sprite {
 	//private var currentRotation:Float = 0.0; // Initial rotation for the first shot
 
 	private var isShooting:Bool = false;
+
+	// Collision manager for registering bullets
+	private static var collisionManager:CollisionManager;
+
+	public static function setCollisionManager(manager:CollisionManager):Void {
+		collisionManager = manager;
+	}
+
+	// Helper method for subclasses to register bullets
+	private function registerBullet(bullet:BulletEnemy):Void {
+		if (collisionManager != null) {
+			collisionManager.registerEnemyBullet(bullet);
+		}
+	}
 
 	public function new(enemy:Enemy) {
 		super();

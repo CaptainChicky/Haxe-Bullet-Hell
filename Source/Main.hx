@@ -1,6 +1,7 @@
 package;
 
 import manager.*;
+import enemy.*;
 import player.PlayerShootingPattern;
 import player.Player;
 import openfl.ui.Keyboard;
@@ -32,6 +33,7 @@ class Main extends Sprite {
 	// Managers
 	private var enemyManager:EnemyManager;
 	private var levelManager:LevelManager;
+	private var collisionManager:CollisionManager;
 
 	/* ENTRY POINT */
 	function resize(e) {
@@ -63,6 +65,16 @@ class Main extends Sprite {
 		levelManager = new LevelManager(enemyManager);
 		addChild(levelManager);
 
+		// Create collision manager
+		collisionManager = new CollisionManager(player, enemyManager);
+		addChild(collisionManager);
+
+		// Set collision manager for enemy patterns
+		EnemyShootingPattern.setCollisionManager(collisionManager);
+
+		// Set player death callback
+		player.setOnDeathCallback(onPlayerDeath);
+
 		var messageFormat:TextFormat = new TextFormat("Verdana", 18, 0xbbbbbb, true);
 		messageFormat.align = TextFormatAlign.CENTER;
 		messageField = new TextField();
@@ -79,7 +91,7 @@ class Main extends Sprite {
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 
-		playerShootingPattern = new PlayerShootingPattern(player);
+		playerShootingPattern = new PlayerShootingPattern(player, collisionManager);
 
 		this.addEventListener(Event.ENTER_FRAME, everyFrame);
 	}
@@ -93,7 +105,7 @@ class Main extends Sprite {
 			messageField.alpha = 0;
 
 			// Start the level!
-			levelManager.loadLevel("assets/levels/level2.json");
+			levelManager.loadLevel("assets/levels/level1.json");
 		}
 	}
 
@@ -127,6 +139,22 @@ class Main extends Sprite {
 		} else if (event.keyCode == 90) { // "z" key
 			playerShootingPattern.stopShooting();
 		}
+	}
+
+	private function onPlayerDeath():Void {
+		trace("GAME OVER!");
+		setGameState(Paused);
+
+		// Update message field
+		messageField.text = "GAME OVER\n\nPress SPACE to restart";
+		messageField.alpha = 1;
+
+		// Stop level and clear bullets
+		levelManager.stopLevel();
+		collisionManager.reset();
+
+		// Stop player shooting
+		playerShootingPattern.stopShooting();
 	}
 
 	private function everyFrame(event:Event):Void {

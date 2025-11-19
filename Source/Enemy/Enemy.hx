@@ -15,8 +15,15 @@ class Enemy extends Sprite {
 	// Add a random salt to the rotation speed to make the enemy's rotation less uniform from other enemies
 	private var salt:Float = Math.random() * 20; // gives a decimal between 0 inclusive and 10 exclusive
 
-	public function new() {
+	// Health system
+	private var maxHealth:Int;
+	private var currentHealth:Int;
+
+	public function new(health:Int = 1) {
 		super();
+
+		this.maxHealth = health;
+		this.currentHealth = health;
 
 		// Load the image from the assets folder
 		var bitmapData:BitmapData = Assets.getBitmapData("assets/Enemy.png");
@@ -35,6 +42,31 @@ class Enemy extends Sprite {
 		addEventListener(Event.ENTER_FRAME, everyFrame);
 	}
 
+	public function takeDamage(damage:Int):Void {
+		currentHealth -= damage;
+		trace("Enemy hit! Health: " + currentHealth + "/" + maxHealth);
+
+		if (currentHealth <= 0) {
+			die();
+		}
+	}
+
+	public function getHealth():Int {
+		return currentHealth;
+	}
+
+	public function isAlive():Bool {
+		return currentHealth > 0;
+	}
+
+	private function die():Void {
+		trace("Enemy destroyed!");
+		removeEventListener(Event.ENTER_FRAME, everyFrame);
+		if (parent != null) {
+			parent.removeChild(this);
+		}
+	}
+
 	private function everyFrame(event:Event):Void {
 		// Update the enemy's rotation based on the elapsed time since the last frame
 		// will rotate based on spawn time
@@ -44,6 +76,6 @@ class Enemy extends Sprite {
 		// Rotate the player
 		// the salt adds between 0 and 10 degrees to the initial rotational position
 		// delta position updates betwene every frame
-		rotation = salt + (ROTATION_SPEED * deltaTime); 
+		rotation = salt + (ROTATION_SPEED * deltaTime);
 	}
 }

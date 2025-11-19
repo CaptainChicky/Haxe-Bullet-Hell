@@ -9,6 +9,7 @@
           "x": 200,
           "y": 100,
           "pattern": "spiral",
+          "health": 4,
           "patternConfig": {
             "bulletSpawnInterval": 0.01
           }
@@ -18,6 +19,7 @@
           "x": 400,
           "y": 100,
           "pattern": "nwhip",
+          "health": 6,
           "patternConfig": {
             "bulletSpawnInterval": 1.2
           }
@@ -27,6 +29,7 @@
           "x": 600,
           "y": 100,
           "pattern": "spiral",
+          "health": 4,
           "patternConfig": {
             "bulletSpawnInterval": 0.01
           }
@@ -41,6 +44,7 @@
           "x": 300,
           "y": 80,
           "pattern": "nwhip",
+          "health": 7,
           "patternConfig": {
             "bulletSpawnInterval": 0.8
           }
@@ -50,6 +54,7 @@
           "x": 500,
           "y": 80,
           "pattern": "nwhip",
+          "health": 7,
           "patternConfig": {
             "bulletSpawnInterval": 0.8
           }
@@ -64,6 +69,7 @@
           "x": 150,
           "y": 100,
           "pattern": "spiral",
+          "health": 5,
           "patternConfig": {
             "bulletSpawnInterval": 0.012
           }
@@ -73,6 +79,7 @@
           "x": 400,
           "y": 100,
           "pattern": "spiral",
+          "health": 5,
           "patternConfig": {
             "bulletSpawnInterval": 0.012
           }
@@ -82,6 +89,7 @@
           "x": 650,
           "y": 100,
           "pattern": "spiral",
+          "health": 5,
           "patternConfig": {
             "bulletSpawnInterval": 0.012
           }
@@ -91,6 +99,7 @@
           "x": 400,
           "y": 50,
           "pattern": "nwhip",
+          "health": 10,
           "patternConfig": {
             "bulletSpawnInterval": 0.7
           }

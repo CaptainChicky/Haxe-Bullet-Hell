@@ -128,12 +128,14 @@ class LevelManager extends Sprite {
 	}
 
 	private function spawnEnemy(spawnData:EnemySpawnData):Void {
-		trace("Spawning enemy at (" + spawnData.x + ", " + spawnData.y + ") with pattern: " + spawnData.pattern);
+		var health:Int = (spawnData.health != null) ? spawnData.health : 1;
+		trace("Spawning enemy at (" + spawnData.x + ", " + spawnData.y + ") with pattern: " + spawnData.pattern + ", health: " + health);
 		enemyManager.spawnEnemy(
 			spawnData.x,
 			spawnData.y,
 			spawnData.pattern,
-			spawnData.patternConfig
+			spawnData.patternConfig,
+			health
 		);
 	}
 

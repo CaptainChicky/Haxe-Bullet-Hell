@@ -32,5 +32,6 @@ class SpiralEnemyShootingPattern extends EnemyShootingPattern {
 		bullet.velocityY = bulletVelocityY;
 
 		Lib.current.addChild(bullet); // Add the bullet to the stage
+		registerBullet(bullet); // Register with collision manager
 	}
 }
