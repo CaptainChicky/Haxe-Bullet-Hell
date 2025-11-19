@@ -18,4 +18,5 @@ typedef EnemySpawnData = {
 	var y:Float;
 	var pattern:String; // "spiral", "nwhip", etc.
 	var patternConfig:Dynamic; // Configuration for the pattern
+	@:optional var health:Int; // Enemy health (defaults to 1 if not specified)
 }

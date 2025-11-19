@@ -1,6 +1,7 @@
 package player;
 
 import bullet.BulletPlayer;
+import manager.CollisionManager;
 import openfl.events.Event;
 import openfl.display.Sprite;
 import openfl.Lib;
@@ -8,10 +9,12 @@ import openfl.Lib;
 class PlayerShootingPattern extends Sprite {
 	private var player:Player; // Reference to the player that uses this shooting pattern
 	private var isShooting:Bool = false;
+	private var collisionManager:CollisionManager;
 
-	public function new(player:Player) {
+	public function new(player:Player, collisionManager:CollisionManager) {
 		super();
 		this.player = player;
+		this.collisionManager = collisionManager;
 	}
 
 	private function spawnPlayerBullet():Void {
@@ -28,6 +31,11 @@ class PlayerShootingPattern extends Sprite {
 		bullet.velocityY = bulletVelocityY;
 
 		Lib.current.addChild(bullet); // Add the bullet to the stage
+
+		// Register bullet with collision manager
+		if (collisionManager != null) {
+			collisionManager.registerPlayerBullet(bullet);
+		}
 	}
 
 	private function everyFrame(event:Event):Void {

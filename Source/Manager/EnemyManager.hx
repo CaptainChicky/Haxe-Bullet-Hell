@@ -14,8 +14,8 @@ class EnemyManager extends Sprite {
 		enemyPatterns = new Array<EnemyShootingPattern>();
 	}
 
-	public function spawnEnemy(x:Float, y:Float, patternType:String, patternConfig:Dynamic):Enemy {
-		var enemy:Enemy = new Enemy();
+	public function spawnEnemy(x:Float, y:Float, patternType:String, patternConfig:Dynamic, health:Int = 1):Enemy {
+		var enemy:Enemy = new Enemy(health);
 		enemy.x = x;
 		enemy.y = y;
 		addChild(enemy);
@@ -84,5 +84,20 @@ class EnemyManager extends Sprite {
 
 	public function getEnemyCount():Int {
 		return enemies.length;
+	}
+
+	public function getEnemies():Array<Enemy> {
+		return enemies;
+	}
+
+	public function cleanupDeadEnemies():Void {
+		// Remove dead enemies from tracking
+		var i:Int = enemies.length - 1;
+		while (i >= 0) {
+			if (!enemies[i].isAlive()) {
+				enemies.splice(i, 1);
+			}
+			i--;
+		}
 	}
 }

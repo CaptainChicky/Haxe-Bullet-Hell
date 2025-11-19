@@ -47,6 +47,7 @@ Levels are defined as JSON files in `Assets/levels/`. Here's the format:
     - **spawnTime** - When to spawn relative to wave start (seconds)
     - **x, y** - Spawn position
     - **pattern** - Pattern type: "spiral" or "nwhip"
+    - **health** - Enemy health (number of player bullets to destroy, optional, defaults to 1)
     - **patternConfig** - Pattern-specific settings
       - **bulletSpawnInterval** - Time between bullet spawns (seconds)
 
@@ -60,9 +61,18 @@ In Main.hx:96, change the level file:
 levelManager.loadLevel("assets/levels/level2.json");
 ```
 
+# Health System
+- **Player**: Has 1 health. One enemy bullet hit = game over!
+  - Hitbox: Small circular area (3px radius) centered on player sprite
+  - Press SPACE to restart after death
+- **Enemies**: Configurable health per enemy (set in level JSON)
+  - Hitbox: Full sprite bounds
+  - Requires multiple player bullets to destroy (based on health value)
+  - Example: Enemy with health=5 needs 5 player bullet hits to destroy
+
 # To-Do
 1. ~~Make a class "EnemyShootingLevel" or something which encapsulates enemy patterns into a level.~~ ✅ DONE!
-2. Implement health system.
+2. ~~Implement health system.~~ ✅ DONE!
 3. Implement point system. The higher the player's points, the better the payer shooting pattern.
 4. ~~Encapsulate player speed controls and movement into the player class perhaps(?)~~ ✅ DONE!
 5. Implement enemy movement and targetting.

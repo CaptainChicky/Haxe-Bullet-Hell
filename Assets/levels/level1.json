@@ -9,6 +9,7 @@
           "x": 400,
           "y": 100,
           "pattern": "nwhip",
+          "health": 3,
           "patternConfig": {
             "bulletSpawnInterval": 1.5
           }
@@ -23,6 +24,7 @@
           "x": 300,
           "y": 100,
           "pattern": "spiral",
+          "health": 2,
           "patternConfig": {
             "bulletSpawnInterval": 0.01
           }
@@ -32,6 +34,7 @@
           "x": 500,
           "y": 100,
           "pattern": "spiral",
+          "health": 2,
           "patternConfig": {
             "bulletSpawnInterval": 0.01
           }
@@ -46,6 +49,7 @@
           "x": 400,
           "y": 100,
           "pattern": "nwhip",
+          "health": 5,
           "patternConfig": {
             "bulletSpawnInterval": 1.0
           }
@@ -55,6 +59,7 @@
           "x": 250,
           "y": 100,
           "pattern": "spiral",
+          "health": 3,
           "patternConfig": {
             "bulletSpawnInterval": 0.015
           }
@@ -64,6 +69,7 @@
           "x": 550,
           "y": 100,
           "pattern": "spiral",
+          "health": 3,
           "patternConfig": {
             "bulletSpawnInterval": 0.015
           }

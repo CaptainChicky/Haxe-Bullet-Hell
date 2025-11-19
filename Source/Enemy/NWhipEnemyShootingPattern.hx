@@ -47,6 +47,7 @@ class NWhipEnemyShootingPattern extends EnemyShootingPattern {
 			bullet.velocityY = bulletVelocityY;
 
 			Lib.current.addChild(bullet); // Add the bullet to the stage
+			registerBullet(bullet); // Register with collision manager
 
 			angleToFire += baseAngle; // Increase the angle to fire at
 		}
