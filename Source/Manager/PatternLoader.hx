@@ -133,6 +133,29 @@ class PatternLoader {
 				var speed:Float = resolveValue(actionData.speed, paramMap);
 				return NWay(count, angle, speed);
 
+			case "SetOffset":
+				var distance:Float = resolveValue(actionData.distance, paramMap);
+				var angle:Float = resolveValue(actionData.angle, paramMap);
+				return SetOffset(distance, angle);
+
+			case "AddOffset":
+				var distanceDelta:Float = resolveValue(actionData.distanceDelta, paramMap);
+				var angleDelta:Float = resolveValue(actionData.angleDelta, paramMap);
+				return AddOffset(distanceDelta, angleDelta);
+
+			case "RandomSpeed":
+				var min:Float = resolveValue(actionData.min, paramMap);
+				var max:Float = resolveValue(actionData.max, paramMap);
+				return RandomSpeed(min, max);
+
+			case "RandomAngle":
+				var min:Float = resolveValue(actionData.min, paramMap);
+				var max:Float = resolveValue(actionData.max, paramMap);
+				return RandomAngle(min, max);
+
+			case "AimAtPlayer":
+				return AimAtPlayer;
+
 			default:
 				trace("Unknown control type: " + control);
 				return null;

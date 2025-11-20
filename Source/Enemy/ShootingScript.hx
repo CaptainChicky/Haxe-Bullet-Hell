@@ -1,9 +1,10 @@
 package enemy;
 
 import bullet.BulletEnemy;
+import player.Player;
 import openfl.Lib;
 
-// Simple shooting actions
+// Shooting actions with position, random, and aiming support
 enum ShootingAction {
 	Fire(angle:Float, speed:Float);
 	Wait(frames:Int);
@@ -13,24 +14,30 @@ enum ShootingAction {
 	AddAngle(delta:Float);
 	SetSpeed(value:Float);
 	AddSpeed(delta:Float);
+	SetOffset(distance:Float, angle:Float); // Set spawn offset from enemy
+	AddOffset(distanceDelta:Float, angleDelta:Float); // Add to spawn offset
+	RandomSpeed(min:Float, max:Float); // Randomize speed
+	RandomAngle(min:Float, max:Float); // Randomize angle
+	AimAtPlayer; // Set angle toward player
 	Radial(count:Int, speed:Float);
 	NWay(count:Int, angle:Float, speed:Float);
 }
 
-// Script state - tracks current angle and speed
+// Script state - tracks current angle, speed, and spawn offset
 class ScriptState {
 	public var currentAngle:Float = 0;
 	public var currentSpeed:Float = 5;
+	public var offsetDistance:Float = 0; // Distance from enemy center to spawn bullet
+	public var offsetAngle:Float = 0; // Angle (bearing) for the offset position
 
 	public function new() {}
 }
 
 // Execution context for nested Loop/Rep structures
-// This represents a single "frame" on the execution stack
 class ExecutionContext {
-	public var actions:Array<ShootingAction>; // The actions to execute in this context
-	public var currentIndex:Int = 0; // Which action we're currently on
-	public var iterationCount:Int = 0; // How many times have we iterated
+	public var actions:Array<ShootingAction>;
+	public var currentIndex:Int = 0;
+	public var iterationCount:Int = 0;
 	public var maxIterations:Int; // -1 for infinite Loop, N for Rep
 
 	public function new(actions:Array<ShootingAction>, maxIterations:Int) {
@@ -39,13 +46,12 @@ class ExecutionContext {
 	}
 }
 
-// Main script executor with proper stack-based execution
-// NO array mutation - uses a stack of execution contexts
+// Main script executor with position, random, and aiming support
 class ShootingScript {
 	private var enemy:Enemy;
 	private var collisionManager:Dynamic;
-	private var contextStack:Array<ExecutionContext>; // Stack of execution contexts
-	private var state:ScriptState; // Shared state (angle, speed)
+	private var contextStack:Array<ExecutionContext>;
+	private var state:ScriptState;
 	private var waitFrames:Int = 0;
 	private var isActive:Bool = true;
 
@@ -157,6 +163,34 @@ class ShootingScript {
 				state.currentSpeed += delta;
 				ctx.currentIndex++;
 
+			case SetOffset(distance, angle):
+				state.offsetDistance = distance;
+				state.offsetAngle = angle;
+				ctx.currentIndex++;
+
+			case AddOffset(distanceDelta, angleDelta):
+				state.offsetDistance += distanceDelta;
+				state.offsetAngle += angleDelta;
+				ctx.currentIndex++;
+
+			case RandomSpeed(min, max):
+				state.currentSpeed = min + Math.random() * (max - min);
+				ctx.currentIndex++;
+
+			case RandomAngle(min, max):
+				state.currentAngle = min + Math.random() * (max - min);
+				ctx.currentIndex++;
+
+			case AimAtPlayer:
+				// Calculate angle from enemy to player
+				var player:Player = getPlayer();
+				if (player != null) {
+					var dx = player.x - enemy.x;
+					var dy = player.y - enemy.y;
+					state.currentAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+				}
+				ctx.currentIndex++;
+
 			case Radial(count, speed):
 				fireRadial(count, speed);
 				ctx.currentIndex++;
@@ -169,8 +203,19 @@ class ShootingScript {
 
 	private function fireBullet(angle:Float, speed:Float):Void {
 		var bullet = new BulletEnemy();
-		bullet.x = enemy.x;
-		bullet.y = enemy.y;
+
+		// Calculate spawn position with offset
+		var spawnX = enemy.x;
+		var spawnY = enemy.y;
+
+		if (state.offsetDistance > 0) {
+			var offsetRad = state.offsetAngle * Math.PI / 180;
+			spawnX += Math.cos(offsetRad) * state.offsetDistance;
+			spawnY += Math.sin(offsetRad) * state.offsetDistance;
+		}
+
+		bullet.x = spawnX;
+		bullet.y = spawnY;
 
 		var angleRad = angle * Math.PI / 180;
 		bullet.velocityX = Math.cos(angleRad) * speed;
@@ -202,6 +247,14 @@ class ShootingScript {
 			var angle = startAngle + (i * angleStep);
 			fireBullet(angle, useSpeed);
 		}
+	}
+
+	private function getPlayer():Player {
+		// Get player from collision manager
+		if (collisionManager != null && Reflect.hasField(collisionManager, "getPlayer")) {
+			return Reflect.callMethod(collisionManager, Reflect.field(collisionManager, "getPlayer"), []);
+		}
+		return null;
 	}
 
 	public function pause():Void {
