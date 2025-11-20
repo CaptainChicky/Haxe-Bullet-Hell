@@ -14,40 +14,24 @@
             "patternScript": {
               "actions": [
                 {"control": "SetAngle", "value": 90},
-                {"control": "SetSpeed", "value": 3},
+                {"control": "SetSpeed", "value": 5},
                 {
                   "control": "Loop",
                   "actions": [
-                    {"control": "Fire", "angle": 0, "speed": 0},
-                    {"control": "Wait", "frames": 0.25}
-                  ]
-                }
-              ]
-            }
-          },
-          "movementScript": {
-            "loop": false,
-            "actions": [
-              {"type": "Stop"}
-            ]
-          }
-        },
-        {
-          "spawnTime": 0,
-          "x": 800,
-          "y": 300,
-          "pattern": "custom_inline",
-          "health": 999,
-          "patternConfig": {
-            "patternScript": {
-              "actions": [
-                {"control": "SetAngle", "value": 90},
-                {"control": "SetSpeed", "value": 3},
-                {
-                  "control": "Loop",
-                  "actions": [
-                    {"control": "Fire", "angle": 0, "speed": 0},
-                    {"control": "Wait", "frames": 1}
+                    {"control": "NWay", "count": 10, "angle": 90, "speed": 0},
+                    {"control": "Wait", "frames": 60},
+                    {"control": "Radial", "count": 30, "speed": 0},
+                    {"control": "Wait", "frames": 60},
+                    {
+                      "control": "Rep",
+                      "count": 12,
+                      "actions": [
+                        {"control": "Fire", "angle": 0, "speed": 0},
+                        {"control": "AddSpeed", "delta": -0.25}
+                      ]
+                    },
+                    {"control": "SetSpeed", "value": 5},
+                    {"control": "Wait", "frames": 60}
                   ]
                 }
               ]

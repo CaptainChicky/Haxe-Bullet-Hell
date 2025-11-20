@@ -122,7 +122,7 @@ class Main extends Sprite {
 			enemyManager.clearAllEnemies();
 
 			// Start the level!
-			levelManager.loadLevel("assets/levels/showcase.json");
+			levelManager.loadLevel("assets/levels/testing.json");
 		}
 	}
 
