@@ -37,7 +37,7 @@ class ScriptThread {
 	public var actions:Array<ShootingAction>;
 	public var currentIndex:Int = 0;
 	public var waitFrames:Int = 0;
-	public var repCount:Int = 0;
+	public var repStack:Array<Int> = [];
 	public var isActive:Bool = true;
 	public var state:ScriptState;
 
@@ -97,28 +97,42 @@ class ShootingScript {
 				thread.currentIndex++;
 
 			case Loop(actions):
-				// Inject loop actions at current position
+				// Only append a new Loop AFTER the current iteration finishes
 				var loopActions = actions.copy();
-				loopActions.push(Loop(actions)); // Re-add loop to continue
 				thread.actions = thread.actions.slice(0, thread.currentIndex)
 					.concat(loopActions)
+					.concat([Loop(actions)]) // append loop as a single item
 					.concat(thread.actions.slice(thread.currentIndex + 1));
-				// Don't increment - execute first action of loop
 
 			case Rep(count, actions):
-				if (thread.repCount < count) {
-					thread.repCount++;
-					// Inject rep actions
-					var repActions = actions.copy();
-					if (thread.repCount < count) {
-						repActions.push(Rep(count, actions)); // Continue repeating
+				// If this is the FIRST time entering this Rep instruction, attach a counter to it.
+				if (!Reflect.hasField(action, "___counter")) {
+					Reflect.setField(action, "___counter", 0);
+				}
+
+				var current = Reflect.field(action, "___counter");
+
+				if (current < count) {
+					// Increase counter
+					Reflect.setField(action, "___counter", current + 1);
+
+					// Build injected list
+					var injected = actions.copy();
+
+					// If more loops remain, append THIS SAME Rep action again
+					if (current + 1 < count) {
+						injected.push(action);
 					}
+
+					// Replace this Rep with injected sequence
 					thread.actions = thread.actions.slice(0, thread.currentIndex)
-						.concat(repActions)
+						.concat(injected)
 						.concat(thread.actions.slice(thread.currentIndex + 1));
-					// Don't increment - execute first action
+
+					// Important: do NOT advance index
 				} else {
-					thread.repCount = 0;
+					// Finished the Rep — delete its counter and move on
+					Reflect.deleteField(action, "___counter");
 					thread.currentIndex++;
 				}
 
