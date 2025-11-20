@@ -4,7 +4,7 @@
   "parameters": {
     "bulletSpeed": {
       "type": "float",
-      "default": 8,
+      "default": 15,
       "description": "Bullet speed"
     },
     "burstCount": {
@@ -14,12 +14,12 @@
     },
     "burstDelay": {
       "type": "int",
-      "default": 3,
+      "default": 1,
       "description": "Frames between bullets in burst"
     },
     "orbitDistance": {
       "type": "float",
-      "default": 60,
+      "default": 200,
       "description": "Distance from enemy to spawn bullets"
     },
     "patternDelay": {
@@ -29,21 +29,25 @@
     }
   },
   "script": [
-    {"control": "SetSpeed", "value": "$bulletSpeed"},
     {
       "control": "Loop",
       "actions": [
+        {"control": "SetSpeed", "value": "$bulletSpeed"},
+        {"control": "SetOffset", "distance": 0, "angle": 0},
         {"control": "RandomAngle", "min": 0, "max": 360},
-        {"control": "SetOffset", "distance": "$orbitDistance", "angle": 0},
+        {"control": "CopyAngleToOffset"},
+        {"control": "AddOffset", "distanceDelta": "$orbitDistance", "angleDelta": 0},
         {"control": "AimAtPlayer"},
         {
           "control": "Rep",
           "count": "$burstCount",
           "actions": [
             {"control": "Fire", "angle": 0, "speed": 0},
+            {"control": "AddSpeed", "delta": -1.0},
             {"control": "Wait", "frames": "$burstDelay"}
           ]
         },
+        {"control": "SetOffset", "distance": 0, "angle": 0},
         {"control": "Wait", "frames": "$patternDelay"}
       ]
     }

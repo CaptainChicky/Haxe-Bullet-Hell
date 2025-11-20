@@ -143,6 +143,9 @@ class PatternLoader {
 				var angleDelta:Float = resolveValue(actionData.angleDelta, paramMap);
 				return AddOffset(distanceDelta, angleDelta);
 
+			case "CopyAngleToOffset":
+				return CopyAngleToOffset;
+
 			case "RandomSpeed":
 				var min:Float = resolveValue(actionData.min, paramMap);
 				var max:Float = resolveValue(actionData.max, paramMap);
@@ -166,9 +169,15 @@ class PatternLoader {
 	private static function resolveValue(value:Dynamic, paramMap:Map<String, Dynamic>):Dynamic {
 		if (value == null) return 0;
 
-		// Check if it's a string parameter reference like "$bulletSpeed"
+		// Check if it's a string parameter reference or expression
 		if (Std.isOfType(value, String)) {
 			var str:String = cast value;
+
+			// Check for arithmetic expressions with + or -
+			if (str.indexOf("+") != -1 || str.indexOf("-") != -1) {
+				return evaluateExpression(str, paramMap);
+			}
+
 			if (str.charAt(0) == "$") {
 				var paramName = str.substr(1);
 
@@ -190,5 +199,125 @@ class PatternLoader {
 
 		// Return literal value
 		return value;
+	}
+
+	private static function evaluateExpression(expr:String, paramMap:Map<String, Dynamic>):Float {
+		// Simple expression evaluator supporting +, -, *, /
+		expr = StringTools.replace(expr, " ", ""); // Remove whitespace
+
+		// First handle * and / (higher precedence)
+		var terms:Array<String> = [];
+		var currentTerm:String = "";
+
+		var i = 0;
+		while (i < expr.length) {
+			var char = expr.charAt(i);
+
+			if (char == "+" || char == "-") {
+				if (currentTerm.length > 0) {
+					terms.push(currentTerm);
+					currentTerm = "";
+				}
+				terms.push(char);
+				i++;
+			} else {
+				currentTerm += char;
+				i++;
+			}
+		}
+		if (currentTerm.length > 0) {
+			terms.push(currentTerm);
+		}
+
+		// Evaluate each term (which may contain * or /)
+		var evaluatedTerms:Array<Float> = [];
+		for (term in terms) {
+			if (term == "+" || term == "-") {
+				evaluatedTerms.push(Math.NaN); // Use NaN as operator marker
+			} else {
+				evaluatedTerms.push(evaluateTerm(term, paramMap));
+			}
+		}
+
+		// Now process + and - from left to right
+		var result:Float = 0;
+		var operation:String = "+";
+
+		for (value in evaluatedTerms) {
+			if (Math.isNaN(value)) {
+				// This shouldn't happen in well-formed expressions
+				continue;
+			}
+			result = (operation == "+") ? result + value : result - value;
+
+			// Check if next is an operator
+			var idx = evaluatedTerms.indexOf(value);
+			if (idx + 1 < evaluatedTerms.length) {
+				var next = evaluatedTerms[idx + 1];
+				if (Math.isNaN(next)) {
+					// Determine operation from terms array
+					if (idx + 1 < terms.length && (terms[idx + 1] == "+" || terms[idx + 1] == "-")) {
+						operation = terms[idx + 1];
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	private static function evaluateTerm(term:String, paramMap:Map<String, Dynamic>):Float {
+		// Evaluate a term that may contain * or /
+		var factors:Array<String> = [];
+		var currentFactor:String = "";
+
+		var i = 0;
+		while (i < term.length) {
+			var char = term.charAt(i);
+
+			if (char == "*" || char == "/") {
+				if (currentFactor.length > 0) {
+					factors.push(currentFactor);
+					currentFactor = "";
+				}
+				factors.push(char);
+				i++;
+			} else {
+				currentFactor += char;
+				i++;
+			}
+		}
+		if (currentFactor.length > 0) {
+			factors.push(currentFactor);
+		}
+
+		// If no operators, just resolve the value
+		if (factors.length == 1) {
+			var val = resolveValue(factors[0], paramMap);
+			return (val is Float) ? val : Std.parseFloat(Std.string(val));
+		}
+
+		// Evaluate * and / from left to right
+		var result:Float = 0;
+		var operation:String = "*";
+		var firstValue = true;
+
+		for (factor in factors) {
+			if (factor == "*" || factor == "/") {
+				operation = factor;
+			} else {
+				var val = resolveValue(factor, paramMap);
+				var numVal:Float = (val is Float) ? val : Std.parseFloat(Std.string(val));
+
+				if (firstValue) {
+					result = numVal;
+					firstValue = false;
+				} else {
+					result = (operation == "*") ? result * numVal : result / numVal;
+				}
+			}
+		}
+
+		return result;
 	}
 }
