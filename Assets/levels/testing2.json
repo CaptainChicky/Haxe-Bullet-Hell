@@ -1,0 +1,36 @@
+{
+  "name": "tests",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 100,
+          "pattern": "nwhip",
+          "health": 3,
+          "patternConfig": {
+            "numberOfWhips": 1,
+            "numberOfBullets": 8,
+            "baseBulletSpeed": 5,
+            "speedChange": 0.5,
+            "angleChange": 0
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 2, "vy": 0},
+              {"type": "Wait", "frames": 225},
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 60},
+              {"type": "SetVelocity", "vx": 0, "vy": 1},
+              {"type": "Wait", "frames": 120},
+              {"type": "Stop"}
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -106,6 +106,15 @@ class PatternLoader {
 				var repActions = parseActions(actionData.actions, paramMap);
 				return Rep(count, repActions);
 
+			case "Concurrent":
+				var branchesData:Array<Dynamic> = actionData.branches;
+				var branches:Array<Array<ShootingAction>> = [];
+				for (branchData in branchesData) {
+					var branchActions = parseActions(branchData, paramMap);
+					branches.push(branchActions);
+				}
+				return Concurrent(branches);
+
 			case "SetAngle":
 				var value:Float = resolveValue(actionData.value, paramMap);
 				return SetAngle(value);
