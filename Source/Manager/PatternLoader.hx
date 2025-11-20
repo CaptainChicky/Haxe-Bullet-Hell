@@ -94,7 +94,7 @@ class PatternLoader {
 				return Fire(angle, speed);
 
 			case "Wait":
-				var frames:Int = cast resolveValue(actionData.frames, paramMap);
+				var frames:Float = resolveValue(actionData.frames, paramMap);
 				return Wait(frames);
 
 			case "Loop":
@@ -146,6 +146,9 @@ class PatternLoader {
 			case "CopyAngleToOffset":
 				return CopyAngleToOffset;
 
+			case "CopyOffsetToAngle":
+				return CopyOffsetToAngle;
+
 			case "RandomSpeed":
 				var min:Float = resolveValue(actionData.min, paramMap);
 				var max:Float = resolveValue(actionData.max, paramMap);
@@ -173,8 +176,8 @@ class PatternLoader {
 		if (Std.isOfType(value, String)) {
 			var str:String = cast value;
 
-			// Check for arithmetic expressions with + or -
-			if (str.indexOf("+") != -1 || str.indexOf("-") != -1) {
+			// Check for arithmetic expressions with +, -, *, or /
+			if (str.indexOf("+") != -1 || str.indexOf("-") != -1 || str.indexOf("*") != -1 || str.indexOf("/") != -1) {
 				return evaluateExpression(str, paramMap);
 			}
 

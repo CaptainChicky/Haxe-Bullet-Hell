@@ -43,8 +43,7 @@
           "count": "$burstCount",
           "actions": [
             {"control": "Fire", "angle": 0, "speed": 0},
-            {"control": "AddSpeed", "delta": -1.0},
-            {"control": "Wait", "frames": "$burstDelay"}
+            {"control": "AddSpeed", "delta": -1.0}
           ]
         },
         {"control": "SetOffset", "distance": 0, "angle": 0},

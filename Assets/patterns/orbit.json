@@ -16,6 +16,11 @@
       "type": "float",
       "default": 30,
       "description": "How fast the orbit position rotates (degrees per frame)"
+    },
+    "fireDelay": {
+      "type": "int",
+      "default": 1,
+      "description": "Frames between bullets (minimum 1)"
     }
   },
   "script": [
@@ -26,12 +31,8 @@
       "control": "Loop",
       "actions": [
         {"control": "Fire", "angle": 0, "speed": 0},
-        {"control": "AddOffset", "distanceDelta": 0, "angleDelta": "$rotationSpeed / 4"},
-        {"control": "Fire", "angle": 0, "speed": 0},
-        {"control": "AddOffset", "distanceDelta": 0, "angleDelta": "$rotationSpeed / 4"},
-        {"control": "Fire", "angle": 0, "speed": 0},
-        {"control": "AddOffset", "distanceDelta": 0, "angleDelta": "$rotationSpeed / 4"},
-        {"control": "Wait", "frames": 1}
+        {"control": "AddOffset", "distanceDelta": 0, "angleDelta": "$rotationSpeed * $fireDelay"},
+        {"control": "Wait", "frames": "$fireDelay"}
       ]
     }
   ]
