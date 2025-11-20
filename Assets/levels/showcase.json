@@ -13,8 +13,8 @@
           "patternConfig": {
             "orbitDistance": 150,
             "bulletSpeed": 5,
-            "rotationSpeed": 8,
-            "fireDelay": 1
+            "rotationSpeed": 10,
+            "fireDelay": 2
           },
           "movementScript": {
             "loop": false,
@@ -32,7 +32,7 @@
           "patternConfig": {
             "orbitDistance": 150,
             "bulletSpeed": 5,
-            "rotationSpeed": 16,
+            "rotationSpeed": 8,
             "fireDelay": 1
           },
           "movementScript": {
@@ -53,7 +53,7 @@
             "maxSpeed": 7,
             "baseAngle": 90,
             "angleSpread": 30,
-            "fireDelay": 1
+            "fireDelay": 0.5
           },
           "movementScript": {
             "loop": false,

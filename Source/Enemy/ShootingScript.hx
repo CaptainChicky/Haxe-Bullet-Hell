@@ -71,15 +71,25 @@ class ShootingScript {
 	public function update():Void {
 		if (isPaused || !isActive) return;
 
-		// Handle wait 
+		// Start with a full frame budget (1.0 frame of time to spend)
+		var frameBudget:Float = 1.0;
+
+		// Handle waiting - consume frame budget
 		if (waitFrames > 0) {
-			waitFrames -= 1.0;
-			return;
+			var timeSpent = Math.min(waitFrames, frameBudget);
+			waitFrames -= timeSpent;
+			frameBudget -= timeSpent;
+
+			// If still waiting, we've used up the whole frame
+			if (waitFrames > 0) {
+				return;
+			}
+			// Otherwise, we have frameBudget remaining to process actions
 		}
 
-		// Process actions until we hit a Wait or run out of actions
-		// This allows multiple actions to execute in the same frame
-		while (true) {
+		// Process actions until we hit a Wait or run out of frame budget
+		// This allows multiple actions (and waits) to execute in the same frame
+		while (frameBudget > 0) {
 			// Check if we have any contexts to execute
 			if (contextStack.length == 0) {
 				isActive = false;
@@ -124,9 +134,17 @@ class ShootingScript {
 			var action = ctx.actions[ctx.currentIndex];
 			executeAction(action);
 
-			// If we just set a wait, stop processing this frame
+			// If we just set a wait, consume frame budget
 			if (waitFrames > 0) {
-				return;
+				var timeSpent = Math.min(waitFrames, frameBudget);
+				waitFrames -= timeSpent;
+				frameBudget -= timeSpent;
+
+				// If still waiting, we've used up frame budget
+				if (waitFrames > 0) {
+					return;
+				}
+				// Otherwise continue with remaining frame budget
 			}
 		}
 	}
