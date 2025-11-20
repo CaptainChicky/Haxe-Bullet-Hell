@@ -31,7 +31,7 @@
         },
         {
           "spawnTime": 1,
-          "x": 850,
+          "x": 1850,
           "y": 100,
           "pattern": "spiral",
           "health": 2,
@@ -78,13 +78,13 @@
         },
         {
           "spawnTime": 0,
-          "x": 500,
+          "x": 1720,
           "y": -50,
           "pattern": "spiral",
           "health": 2,
           "patternConfig": {
-            "bulletSpeed": 4,
-            "rotationChange": -8
+            "bulletSpeed": 10,
+            "rotationChange": -25
           },
           "movementScript": {
             "loop": false,
@@ -97,7 +97,7 @@
         },
         {
           "spawnTime": 1.5,
-          "x": 400,
+          "x": 1000,
           "y": -50,
           "pattern": "radial",
           "health": 3,
@@ -171,7 +171,7 @@
         },
         {
           "spawnTime": 2,
-          "x": 850,
+          "x": 1850,
           "y": 200,
           "pattern": "spiral",
           "health": 3,
