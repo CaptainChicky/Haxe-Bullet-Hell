@@ -19,8 +19,8 @@
     },
     "angleSpread": {
       "type": "float",
-      "default": 45,
-      "description": "Random angle spread (± this value)"
+      "default": 15,
+      "description": "Random angle spread (± this value for 30° total range)"
     },
     "fireDelay": {
       "type": "int",

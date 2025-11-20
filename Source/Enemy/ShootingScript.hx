@@ -16,6 +16,7 @@ enum ShootingAction {
 	AddSpeed(delta:Float);
 	SetOffset(distance:Float, angle:Float); // Set spawn offset from enemy
 	AddOffset(distanceDelta:Float, angleDelta:Float); // Add to spawn offset
+	CopyAngleToOffset; // Copy currentAngle to offsetAngle
 	RandomSpeed(min:Float, max:Float); // Randomize speed
 	RandomAngle(min:Float, max:Float); // Randomize angle
 	AimAtPlayer; // Set angle toward player
@@ -125,9 +126,9 @@ class ShootingScript {
 
 		switch (action) {
 			case Fire(angle, speed):
-				// Use current state if both angle and speed are 0
-				var useAngle = (angle == 0 && speed == 0) ? state.currentAngle : angle;
-				var useSpeed = (angle == 0 && speed == 0) ? state.currentSpeed : speed;
+				// Use state values when parameters are 0
+				var useAngle = (angle == 0) ? state.currentAngle : angle;
+				var useSpeed = (speed == 0) ? state.currentSpeed : speed;
 				fireBullet(useAngle, useSpeed);
 				ctx.currentIndex++;
 
@@ -173,6 +174,10 @@ class ShootingScript {
 				state.offsetAngle += angleDelta;
 				ctx.currentIndex++;
 
+			case CopyAngleToOffset:
+				state.offsetAngle = state.currentAngle;
+				ctx.currentIndex++;
+
 			case RandomSpeed(min, max):
 				state.currentSpeed = min + Math.random() * (max - min);
 				ctx.currentIndex++;
@@ -182,11 +187,21 @@ class ShootingScript {
 				ctx.currentIndex++;
 
 			case AimAtPlayer:
-				// Calculate angle from enemy to player
+				// Calculate angle from spawn position (including offset) to player
 				var player:Player = getPlayer();
 				if (player != null) {
-					var dx = player.x - enemy.x;
-					var dy = player.y - enemy.y;
+					// Calculate spawn position with offset
+					var spawnX = enemy.x;
+					var spawnY = enemy.y;
+
+					if (state.offsetDistance > 0) {
+						var offsetRad = state.offsetAngle * Math.PI / 180;
+						spawnX += Math.cos(offsetRad) * state.offsetDistance;
+						spawnY += Math.sin(offsetRad) * state.offsetDistance;
+					}
+
+					var dx = player.x - spawnX;
+					var dy = player.y - spawnY;
 					state.currentAngle = Math.atan2(dy, dx) * 180 / Math.PI;
 				}
 				ctx.currentIndex++;
@@ -251,8 +266,12 @@ class ShootingScript {
 
 	private function getPlayer():Player {
 		// Get player from collision manager
-		if (collisionManager != null && Reflect.hasField(collisionManager, "getPlayer")) {
-			return Reflect.callMethod(collisionManager, Reflect.field(collisionManager, "getPlayer"), []);
+		if (collisionManager != null) {
+			try {
+				return collisionManager.getPlayer();
+			} catch (e:Dynamic) {
+				trace("Failed to get player: " + e);
+			}
 		}
 		return null;
 	}

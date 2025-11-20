@@ -4,7 +4,7 @@
   "parameters": {
     "orbitDistance": {
       "type": "float",
-      "default": 50,
+      "default": 100,
       "description": "Distance from enemy center"
     },
     "bulletSpeed": {
@@ -14,20 +14,24 @@
     },
     "rotationSpeed": {
       "type": "float",
-      "default": 10,
-      "description": "How fast the orbit position rotates"
+      "default": 30,
+      "description": "How fast the orbit position rotates (degrees per frame)"
     }
   },
   "script": [
     {"control": "SetSpeed", "value": "$bulletSpeed"},
+    {"control": "SetAngle", "value": 90},
     {"control": "SetOffset", "distance": "$orbitDistance", "angle": 0},
     {
       "control": "Loop",
       "actions": [
-        {"control": "SetAngle", "value": 0},
         {"control": "Fire", "angle": 0, "speed": 0},
-        {"control": "AddOffset", "distanceDelta": 0, "angleDelta": "$rotationSpeed"},
-        {"control": "Wait", "frames": 3}
+        {"control": "AddOffset", "distanceDelta": 0, "angleDelta": "$rotationSpeed / 4"},
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "AddOffset", "distanceDelta": 0, "angleDelta": "$rotationSpeed / 4"},
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "AddOffset", "distanceDelta": 0, "angleDelta": "$rotationSpeed / 4"},
+        {"control": "Wait", "frames": 1}
       ]
     }
   ]
