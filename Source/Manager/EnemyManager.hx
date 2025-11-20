@@ -62,6 +62,14 @@ class EnemyManager extends Sprite {
 			// Parse inline script directly from level JSON
 			var paramMap:Map<String, Dynamic> = new Map();
 			actions = PatternLoader.parseActions(config.patternScript.actions, paramMap);
+
+			// Check for startDelay in config
+			if (Reflect.hasField(config, "startDelay")) {
+				var startDelay:Float = Reflect.field(config, "startDelay");
+				if (startDelay > 0) {
+					actions.unshift(Wait(startDelay));
+				}
+			}
 		} else {
 			// Try loading from pattern template file
 			actions = PatternLoader.parsePattern(patternName, config);

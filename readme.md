@@ -9,27 +9,23 @@ Compile into html5 using `openfl build html5 -release -clean` or `openfl test ht
 # Architecture (UPDATED!)
 The codebase has been completely refactored to be data-driven and scalable!
 
-# issues
-erm the loop system is broekn
-Each Loop or Rep reinjects itself into thread.actions.
+# issues/todo
 
-The array keeps growing infinitely because every cycle clones itself again.
+- implement variables in bullet stuff maybe?
+- bullet velocity mutation
+- bind (bullet velocity follow/mutation)
+- point system
+- level switching so when you clear a level it goes to the next one after a delay
 
-Eventually,
- - Memory will increase every frame → crash or slowdown
- - Bullets might fire extremely fast (because multiple copies are queued)
- - Speed and angle state may carry over incorrectly between Reps → runaway bullets
-So it will break eventually if left to run forever.
+man this shit is hard idk how ZUN does this lmao alone
 
-Right now:
- - Both Rep and Loop mutate the actions array during execution.
- - Mutating while iterating creates duplicated actions.
- - Every injection copies the sequence + appends another injection.
- - The array grows faster than the index advances → some actions run multiple times per cycle.
-
-also can only run one loop (see shootingscript)
-
-eventulaly i need to rewrite Loop/Rep as true state machines
+# old to-Do
+1. ~~Make a class "EnemyShootingLevel" or something which encapsulates enemy patterns into a level.~~ ✅ DONE!
+2. ~~Implement health system.~~ ✅ DONE!
+3. Implement point system. The higher the player's points, the better the payer shooting pattern.
+4. ~~Encapsulate player speed controls and movement into the player class perhaps(?)~~ ✅ DONE!
+5. Implement enemy movement and targetting.
+6. ~~Implement enemy spawning and spawning patterns.~~ ✅ DONE!
 
 ## New Manager System
 - **EnemyManager** - Handles spawning, lifecycle, and cleanup of all enemies
@@ -91,14 +87,6 @@ levelManager.loadLevel("assets/levels/level2.json");
   - Hitbox: Full sprite bounds
   - Requires multiple player bullets to destroy (based on health value)
   - Example: Enemy with health=5 needs 5 player bullet hits to destroy
-
-# To-Do
-1. ~~Make a class "EnemyShootingLevel" or something which encapsulates enemy patterns into a level.~~ ✅ DONE!
-2. ~~Implement health system.~~ ✅ DONE!
-3. Implement point system. The higher the player's points, the better the payer shooting pattern.
-4. ~~Encapsulate player speed controls and movement into the player class perhaps(?)~~ ✅ DONE!
-5. Implement enemy movement and targetting.
-6. ~~Implement enemy spawning and spawning patterns.~~ ✅ DONE!
 
 # Dependencies
 Openfl for now and lime. Check https://github.com/CaptainChicky/Haxe-Pong to install them. 
