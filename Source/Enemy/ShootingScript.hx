@@ -7,7 +7,7 @@ import openfl.Lib;
 // Shooting actions with position, random, and aiming support
 enum ShootingAction {
 	Fire(angle:Float, speed:Float);
-	Wait(frames:Int);
+	Wait(frames:Float);
 	Loop(actions:Array<ShootingAction>);
 	Rep(count:Int, actions:Array<ShootingAction>);
 	SetAngle(value:Float);
@@ -17,6 +17,7 @@ enum ShootingAction {
 	SetOffset(distance:Float, angle:Float); // Set spawn offset from enemy
 	AddOffset(distanceDelta:Float, angleDelta:Float); // Add to spawn offset
 	CopyAngleToOffset; // Copy currentAngle to offsetAngle
+	CopyOffsetToAngle; // Copy offsetAngle to currentAngle
 	RandomSpeed(min:Float, max:Float); // Randomize speed
 	RandomAngle(min:Float, max:Float); // Randomize angle
 	AimAtPlayer; // Set angle toward player
@@ -53,7 +54,7 @@ class ShootingScript {
 	private var collisionManager:Dynamic;
 	private var contextStack:Array<ExecutionContext>;
 	private var state:ScriptState;
-	private var waitFrames:Int = 0;
+	private var waitFrames:Float = 0;
 	private var isActive:Bool = true;
 
 	public var isPaused:Bool = false;
@@ -70,55 +71,64 @@ class ShootingScript {
 	public function update():Void {
 		if (isPaused || !isActive) return;
 
-		// Handle wait
+		// Handle wait 
 		if (waitFrames > 0) {
-			waitFrames--;
+			waitFrames -= 1.0;
 			return;
 		}
 
-		// Check if we have any contexts to execute
-		if (contextStack.length == 0) {
-			isActive = false;
-			return;
-		}
-
-		// Get the current (top of stack) execution context
-		var ctx = contextStack[contextStack.length - 1];
-
-		// Check if current context has finished all its actions
-		if (ctx.currentIndex >= ctx.actions.length) {
-			// Finished all actions in this context
-			if (ctx.maxIterations == -1) {
-				// Infinite loop - restart this context
-				ctx.currentIndex = 0;
-				ctx.iterationCount++;
-			} else {
-				// Finite repetition - check if we need to repeat
-				ctx.iterationCount++;
-				if (ctx.iterationCount < ctx.maxIterations) {
-					// Need to repeat - restart this context
-					ctx.currentIndex = 0;
-				} else {
-					// Done with all iterations - pop this context off the stack
-					contextStack.pop();
-
-					// If stack is now empty, we're completely done
-					if (contextStack.length == 0) {
-						isActive = false;
-						return;
-					}
-
-					// Otherwise, advance the parent context's index
-					var parentCtx = contextStack[contextStack.length - 1];
-					parentCtx.currentIndex++;
-				}
+		// Process actions until we hit a Wait or run out of actions
+		// This allows multiple actions to execute in the same frame
+		while (true) {
+			// Check if we have any contexts to execute
+			if (contextStack.length == 0) {
+				isActive = false;
+				return;
 			}
-			return; // Wait for next frame to continue
-		}
 
-		// Execute the current action
-		var action = ctx.actions[ctx.currentIndex];
-		executeAction(action);
+			// Get the current (top of stack) execution context
+			var ctx = contextStack[contextStack.length - 1];
+
+			// Check if current context has finished all its actions
+			if (ctx.currentIndex >= ctx.actions.length) {
+				// Finished all actions in this context
+				if (ctx.maxIterations == -1) {
+					// Infinite loop - restart this context
+					ctx.currentIndex = 0;
+					ctx.iterationCount++;
+				} else {
+					// Finite repetition - check if we need to repeat
+					ctx.iterationCount++;
+					if (ctx.iterationCount < ctx.maxIterations) {
+						// Need to repeat - restart this context
+						ctx.currentIndex = 0;
+					} else {
+						// Done with all iterations - pop this context off the stack
+						contextStack.pop();
+
+						// If stack is now empty, we're completely done
+						if (contextStack.length == 0) {
+							isActive = false;
+							return;
+						}
+
+						// Otherwise, advance the parent context's index
+						var parentCtx = contextStack[contextStack.length - 1];
+						parentCtx.currentIndex++;
+					}
+				}
+				continue; // Continue processing in the same frame
+			}
+
+			// Execute the current action
+			var action = ctx.actions[ctx.currentIndex];
+			executeAction(action);
+
+			// If we just set a wait, stop processing this frame
+			if (waitFrames > 0) {
+				return;
+			}
+		}
 	}
 
 	private function executeAction(action:ShootingAction):Void {
@@ -176,6 +186,10 @@ class ShootingScript {
 
 			case CopyAngleToOffset:
 				state.offsetAngle = state.currentAngle;
+				ctx.currentIndex++;
+
+			case CopyOffsetToAngle:
+				state.currentAngle = state.offsetAngle;
 				ctx.currentIndex++;
 
 			case RandomSpeed(min, max):

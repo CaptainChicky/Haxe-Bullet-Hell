@@ -11,9 +11,10 @@
           "pattern": "orbit",
           "health": 5,
           "patternConfig": {
-            "orbitDistance": 100,
+            "orbitDistance": 150,
             "bulletSpeed": 5,
-            "rotationSpeed": 30
+            "rotationSpeed": 8,
+            "fireDelay": 1
           },
           "movementScript": {
             "loop": false,
@@ -24,6 +25,25 @@
         },
         {
           "spawnTime": 0,
+          "x": 800,
+          "y": 150,
+          "pattern": "orbit",
+          "health": 5,
+          "patternConfig": {
+            "orbitDistance": 150,
+            "bulletSpeed": 5,
+            "rotationSpeed": 16,
+            "fireDelay": 1
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"}
+            ]
+          }
+        },
+        {
+          "spawnTime": 10,
           "x": 600,
           "y": 150,
           "pattern": "random",
@@ -45,7 +65,7 @@
       ]
     },
     {
-      "startTime": 8,
+      "startTime": 20,
       "enemies": [
         {
           "spawnTime": 0,
@@ -54,10 +74,10 @@
           "pattern": "sniper",
           "health": 10,
           "patternConfig": {
-            "bulletSpeed": 20,
+            "bulletSpeed": 12,
             "burstCount": 8,
             "burstDelay": 1,
-            "orbitDistance": 200,
+            "orbitDistance": 150,
             "patternDelay": 20
           },
           "movementScript": {
@@ -75,7 +95,7 @@
       ]
     },
     {
-      "startTime": 24,
+      "startTime": 30,
       "enemies": [
         {
           "spawnTime": 0,
