@@ -11,7 +11,11 @@
           "pattern": "nwhip",
           "health": 3,
           "patternConfig": {
-            "bulletSpawnInterval": 1.5
+            "bulletSpawnInterval": 1.5,
+            "numberOfWhips": 3,
+            "numberOfBullets": 5,
+            "baseBulletSpeed": 5,
+            "speedChange": 0.5
           },
           "movementScript": {
             "loop": false,
@@ -33,7 +37,9 @@
           "pattern": "spiral",
           "health": 2,
           "patternConfig": {
-            "bulletSpawnInterval": 0.02
+            "bulletSpawnInterval": 0.02,
+            "bulletSpeed": 6,
+            "rotationChange": 15
           },
           "movementScript": {
             "loop": false,
@@ -60,7 +66,9 @@
           "pattern": "spiral",
           "health": 2,
           "patternConfig": {
-            "bulletSpawnInterval": 0.01
+            "bulletSpawnInterval": 0.01,
+            "bulletSpeed": 5,
+            "rotationChange": 16
           },
           "movementScript": {
             "loop": false,
@@ -78,13 +86,35 @@
           "pattern": "spiral",
           "health": 2,
           "patternConfig": {
-            "bulletSpawnInterval": 0.01
+            "bulletSpawnInterval": 0.05,
+            "bulletSpeed": 4,
+            "rotationChange": -40
           },
           "movementScript": {
             "loop": false,
             "actions": [
               {"type": "SetVelocity", "vx": 0, "vy": 2},
               {"type": "Wait", "frames": 75},
+              {"type": "Stop"}
+            ]
+          }
+        },
+        {
+          "spawnTime": 1.5,
+          "x": 400,
+          "y": -50,
+          "pattern": "radial",
+          "health": 3,
+          "patternConfig": {
+            "bulletCount": 12,
+            "bulletSpeed": 4.5,
+            "rotationSpeed": 8
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 0, "vy": 1.5},
+              {"type": "Wait", "frames": 100},
               {"type": "Stop"}
             ]
           }
@@ -101,7 +131,11 @@
           "pattern": "nwhip",
           "health": 5,
           "patternConfig": {
-            "bulletSpawnInterval": 1.0
+            "bulletSpawnInterval": 1.0,
+            "numberOfWhips": 7,
+            "numberOfBullets": 10,
+            "baseBulletSpeed": 3,
+            "speedChange": 1.2
           },
           "movementScript": {
             "loop": true,
@@ -128,7 +162,9 @@
           "pattern": "spiral",
           "health": 3,
           "patternConfig": {
-            "bulletSpawnInterval": 0.015
+            "bulletSpawnInterval": 0.015,
+            "bulletSpeed": 5,
+            "rotationChange": 10
           },
           "movementScript": {
             "loop": false,
@@ -146,7 +182,9 @@
           "pattern": "spiral",
           "health": 3,
           "patternConfig": {
-            "bulletSpawnInterval": 0.015
+            "bulletSpawnInterval": 0.015,
+            "bulletSpeed": 5,
+            "rotationChange": -10
           },
           "movementScript": {
             "loop": false,
@@ -155,6 +193,35 @@
               {"type": "Wait", "frames": 150},
               {"type": "Stop"}
             ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 24,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 400,
+          "y": 100,
+          "pattern": "custom_inline",
+          "health": 5,
+          "patternConfig": {
+            "bulletSpawnInterval": 0.05,
+            "patternScript": {
+              "actions": [
+                {"control": "SetSpeed", "value": 5},
+                {"control": "SetAngle", "value": 0},
+                {
+                  "control": "Loop",
+                  "actions": [
+                    {"control": "Radial", "count": 8, "speed": 0},
+                    {"control": "AddAngle", "delta": 15},
+                    {"control": "Wait", "frames": 10}
+                  ]
+                }
+              ]
+            }
           }
         }
       ]

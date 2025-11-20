@@ -2,6 +2,9 @@ package manager;
 
 import enemy.*;
 import enemy.MovementScript;
+import enemy.ShootingScript;
+import enemy.ScriptedShootingPattern;
+import manager.PatternLoader;
 import openfl.display.Sprite;
 import openfl.events.Event;
 
@@ -56,25 +59,28 @@ class EnemyManager extends Sprite {
 	}
 
 	private function createPattern(enemy:Enemy, patternType:String, config:Dynamic):EnemyShootingPattern {
-		switch (patternType.toLowerCase()) {
-			case "spiral":
-				var pattern = new SpiralEnemyShootingPattern(enemy);
-				// Apply config if provided
-				if (config.bulletSpeed != null) {
-					// SpiralEnemyShootingPattern doesn't expose setters yet, but we could add them
-				}
-				return pattern;
+		var patternName = patternType.toLowerCase();
+		var actions:Array<ShootingAction> = null;
 
-			case "nwhip":
-				var pattern = new NWhipEnemyShootingPattern(enemy);
-				// NWhipEnemyShootingPattern also doesn't expose setters, but uses defaults
-				// Could extend this to pass config values
-				return pattern;
-
-			default:
-				trace("Unknown pattern type: " + patternType);
-				return null;
+		// Check if inline script is provided
+		if (config.patternScript != null && config.patternScript.actions != null) {
+			// Parse inline script directly from level JSON
+			var paramMap:Map<String, Dynamic> = new Map();
+			actions = PatternLoader.parseActions(config.patternScript.actions, paramMap);
+		} else {
+			// Try loading from pattern template file
+			actions = PatternLoader.parsePattern(patternName, config);
 		}
+
+		// Create scripted pattern if we have actions
+		if (actions != null && actions.length > 0) {
+			var collisionManager = EnemyShootingPattern.getCollisionManager();
+			var pattern = new ScriptedShootingPattern(enemy, actions, collisionManager);
+			return pattern;
+		}
+
+		trace("Pattern not found and no inline script provided: " + patternType);
+		return null;
 	}
 
 	private function createMovementScript(enemy:Enemy, scriptData:Dynamic):MovementScript {

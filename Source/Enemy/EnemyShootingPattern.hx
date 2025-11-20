@@ -27,6 +27,11 @@ abstract class EnemyShootingPattern extends Sprite {
 		collisionManager = manager;
 	}
 
+	public static function getCollisionManager():CollisionManager {
+		return collisionManager;
+	}
+ 
+
 	// Helper method for subclasses to register bullets
 	private function registerBullet(bullet:BulletEnemy):Void {
 		if (collisionManager != null) {
