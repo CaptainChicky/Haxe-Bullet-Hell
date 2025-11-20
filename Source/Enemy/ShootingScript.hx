@@ -88,6 +88,11 @@ class ShootingScript {
 
 		// Initialize with root context (executes once, not a loop)
 		this.contextStack = [new ExecutionContext(actions, 1)];
+
+		// trace("ShootingScript created with " + actions.length + " actions");
+		// if (actions.length > 0) {
+		//  	trace("First action type: " + actions[0]);
+		// }
 	}
 
 	public function update():Void {
@@ -113,8 +118,13 @@ class ShootingScript {
 			waitFrames -= timeSpent;
 			frameBudget -= timeSpent;
 
-			// If still waiting, we've used up the whole frame
+			// If still waiting, we've used up time
 			if (waitFrames > 0) {
+				return;
+			}
+
+			// If we used all the budget completing the wait, return and continue next frame
+			if (frameBudget <= 0) {
 				return;
 			}
 			// Otherwise, we have frameBudget remaining to process actions
@@ -127,12 +137,17 @@ class ShootingScript {
 			actionsThisFrame++;
 			// Check if we have any contexts to execute
 			if (contextStack.length == 0) {
+				// trace("Context stack empty, deactivating pattern");
 				isActive = false;
 				return;
 			}
 
 			// Get the current (top of stack) execution context
 			var ctx = contextStack[contextStack.length - 1];
+
+			// if (actionsThisFrame == 1) {
+			//  	trace("Frame action processing: currentIndex=" + ctx.currentIndex + " of " + ctx.actions.length + " actions, iterationCount=" + ctx.iterationCount + "/" + ctx.maxIterations);
+			// }
 
 			// Check if current context has finished all its actions
 			if (ctx.currentIndex >= ctx.actions.length) {
@@ -219,6 +234,11 @@ class ShootingScript {
 			frameBudget -= timeSpent;
 
 			if (branch.waitFrames > 0) {
+				return;
+			}
+
+			// If we used all the budget completing the wait, return and continue next frame
+			if (frameBudget <= 0) {
 				return;
 			}
 		}
@@ -387,6 +407,7 @@ class ShootingScript {
 				ctx.currentIndex++;
 
 			case NWay(count, angle, speed):
+				// trace("Executing NWay: count=" + count + ", angle=" + angle + ", speed=" + speed);
 				fireNWay(count, angle, speed);
 				ctx.currentIndex++;
 		}
@@ -498,6 +519,7 @@ class ShootingScript {
 	}
 
 	private function fireBulletWithState(angle:Float, speed:Float, bulletState:ScriptState):Void {
+		// trace("fireBulletWithState called: angle=" + angle + ", speed=" + speed + ", enemy.x=" + enemy.x + ", enemy.y=" + enemy.y);
 		var bullet = new BulletEnemy();
 
 		// Calculate spawn position with offset
@@ -544,9 +566,16 @@ class ShootingScript {
 
 	private function fireNWayWithState(count:Int, arcAngle:Float, speed:Float, bulletState:ScriptState):Void {
 		var baseAngle = bulletState.currentAngle;
+		var useSpeed = (speed == 0) ? bulletState.currentSpeed : speed;
+
+		// Special case: single bullet fires straight at baseAngle
+		if (count == 1) {
+			fireBulletWithState(baseAngle, useSpeed, bulletState);
+			return;
+		}
+
 		var startAngle = baseAngle - (arcAngle / 2);
 		var angleStep = arcAngle / (count - 1);
-		var useSpeed = (speed == 0) ? bulletState.currentSpeed : speed;
 		for (i in 0...count) {
 			var angle = startAngle + (i * angleStep);
 			fireBulletWithState(angle, useSpeed, bulletState);

@@ -66,7 +66,17 @@ class PatternLoader {
 		}
 
 		// Parse script actions
-		return parseActions(template.script, paramMap);
+		var actions = parseActions(template.script, paramMap);
+
+		// Check for startDelay parameter - if present, insert Wait at beginning
+		if (params != null && Reflect.hasField(params, "startDelay")) {
+			var startDelay:Float = Reflect.field(params, "startDelay");
+			if (startDelay > 0) {
+				actions.unshift(Wait(startDelay));
+			}
+		}
+
+		return actions;
 	}
 
 	// Parse array of action objects (public for inline scripts)
