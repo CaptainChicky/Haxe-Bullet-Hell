@@ -42,6 +42,12 @@ class BulletEnemy extends Sprite {
 	}
 
 	private function everyFrame(event:Event):Void {
+		// Check if bullet was removed (e.g., by collision)
+		if (parent == null) {
+			removeEventListener(Event.ENTER_FRAME, everyFrame);
+			return;
+		}
+
 		// Update the bullet's position based on its velocity
 		x += velocityX;
 		y += velocityY;
@@ -57,6 +63,7 @@ class BulletEnemy extends Sprite {
 			if (parent != null) {
 				parent.removeChild(this);
 			}
+			return;
 		}
 
 		// Update the bullet's rotation based on the elapsed time since its spawn
