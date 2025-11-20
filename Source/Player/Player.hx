@@ -153,6 +153,10 @@ class Player extends Sprite {
 		if (onDeathCallback != null) {
 			onDeathCallback();
 		}
+
+		// Note: We keep the ENTER_FRAME listener active even when dead
+		// so the player sprite continues to rotate. This is intentional.
+		// The listener will be removed when the player sprite is removed from stage.
 	}
 
 	public function updateMovement():Void {

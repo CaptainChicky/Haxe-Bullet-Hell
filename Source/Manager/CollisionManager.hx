@@ -33,6 +33,10 @@ class CollisionManager extends Sprite {
 		enemyBullets.push(bullet);
 	}
 
+	public function getPlayer():Player {
+		return player;
+	}
+
 	private function update(event:Event):Void {
 		// Check player bullets vs enemies
 		checkPlayerBulletsVsEnemies();

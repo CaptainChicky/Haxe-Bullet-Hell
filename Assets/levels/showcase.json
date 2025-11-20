@@ -1,0 +1,182 @@
+{
+  "name": "Pattern Showcase - New Features Demo",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 200,
+          "y": 150,
+          "pattern": "orbit",
+          "health": 5,
+          "patternConfig": {
+            "orbitDistance": 60,
+            "bulletSpeed": 4,
+            "rotationSpeed": 8
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"}
+            ]
+          }
+        },
+        {
+          "spawnTime": 0,
+          "x": 600,
+          "y": 150,
+          "pattern": "random",
+          "health": 5,
+          "patternConfig": {
+            "minSpeed": 2,
+            "maxSpeed": 6,
+            "baseAngle": 90,
+            "angleSpread": 45,
+            "fireDelay": 8
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 8,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 400,
+          "y": 100,
+          "pattern": "sniper",
+          "health": 8,
+          "patternConfig": {
+            "bulletSpeed": 7,
+            "burstCount": 5,
+            "burstDelay": 3,
+            "orbitDistance": 80,
+            "patternDelay": 45
+          },
+          "movementScript": {
+            "loop": true,
+            "actions": [
+              {"type": "SetVelocity", "vx": 1, "vy": 0},
+              {"type": "Wait", "frames": 100},
+              {"type": "SetVelocity", "vx": -1, "vy": 0},
+              {"type": "Wait", "frames": 200},
+              {"type": "SetVelocity", "vx": 1, "vy": 0},
+              {"type": "Wait", "frames": 100}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 16,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 150,
+          "y": 120,
+          "pattern": "orbit",
+          "health": 5,
+          "patternConfig": {
+            "orbitDistance": 40,
+            "bulletSpeed": 5,
+            "rotationSpeed": 15
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 0, "vy": 1},
+              {"type": "Wait", "frames": 100},
+              {"type": "Stop"}
+            ]
+          }
+        },
+        {
+          "spawnTime": 0,
+          "x": 400,
+          "y": 120,
+          "pattern": "sniper",
+          "health": 5,
+          "patternConfig": {
+            "bulletSpeed": 9,
+            "burstCount": 3,
+            "burstDelay": 2,
+            "orbitDistance": 50,
+            "patternDelay": 40
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 0, "vy": 1},
+              {"type": "Wait", "frames": 100},
+              {"type": "Stop"}
+            ]
+          }
+        },
+        {
+          "spawnTime": 0,
+          "x": 650,
+          "y": 120,
+          "pattern": "random",
+          "health": 5,
+          "patternConfig": {
+            "minSpeed": 3,
+            "maxSpeed": 8,
+            "baseAngle": 90,
+            "angleSpread": 60,
+            "fireDelay": 5
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "SetVelocity", "vx": 0, "vy": 1},
+              {"type": "Wait", "frames": 100},
+              {"type": "Stop"}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 24,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 400,
+          "y": 150,
+          "pattern": "custom_inline",
+          "health": 10,
+          "patternConfig": {
+            "patternScript": {
+              "actions": [
+                {"control": "SetSpeed", "value": 6},
+                {"control": "SetOffset", "distance": 100, "angle": 0},
+                {
+                  "control": "Loop",
+                  "actions": [
+                    {"control": "AimAtPlayer"},
+                    {"control": "Radial", "count": 8, "speed": 0},
+                    {"control": "AddOffset", "distanceDelta": 0, "angleDelta": 30},
+                    {"control": "Wait", "frames": 15}
+                  ]
+                }
+              ]
+            }
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"}
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

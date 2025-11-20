@@ -1,0 +1,51 @@
+{
+  "name": "sniper",
+  "description": "Aims at player and fires bursts from offset positions",
+  "parameters": {
+    "bulletSpeed": {
+      "type": "float",
+      "default": 8,
+      "description": "Bullet speed"
+    },
+    "burstCount": {
+      "type": "int",
+      "default": 5,
+      "description": "Bullets per burst"
+    },
+    "burstDelay": {
+      "type": "int",
+      "default": 3,
+      "description": "Frames between bullets in burst"
+    },
+    "orbitDistance": {
+      "type": "float",
+      "default": 60,
+      "description": "Distance from enemy to spawn bullets"
+    },
+    "patternDelay": {
+      "type": "int",
+      "default": 60,
+      "description": "Frames between bursts"
+    }
+  },
+  "script": [
+    {"control": "SetSpeed", "value": "$bulletSpeed"},
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "RandomAngle", "min": 0, "max": 360},
+        {"control": "SetOffset", "distance": "$orbitDistance", "angle": 0},
+        {"control": "AimAtPlayer"},
+        {
+          "control": "Rep",
+          "count": "$burstCount",
+          "actions": [
+            {"control": "Fire", "angle": 0, "speed": 0},
+            {"control": "Wait", "frames": "$burstDelay"}
+          ]
+        },
+        {"control": "Wait", "frames": "$patternDelay"}
+      ]
+    }
+  ]
+}
