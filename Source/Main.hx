@@ -50,7 +50,7 @@ class Main extends Sprite {
 			return;
 		inited = true;
 
-		Lib.current.stage.color = 0xFFFFFF;
+		Lib.current.stage.color = 0x000000;
 
 		stageWidth = Lib.current.stage.stageWidth;
 		stageHeight = Lib.current.stage.stageHeight;
