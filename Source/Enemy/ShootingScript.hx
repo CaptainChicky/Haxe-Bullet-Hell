@@ -3,7 +3,7 @@ package enemy;
 import bullet.BulletEnemy;
 import openfl.Lib;
 
-// Simple shooting actions based on _controls.json
+// Simple shooting actions
 enum ShootingAction {
 	Fire(angle:Float, speed:Float);
 	Wait(frames:Int);
@@ -23,142 +23,147 @@ class ScriptState {
 	public var currentSpeed:Float = 5;
 
 	public function new() {}
-
-	public function clone():ScriptState {
-		var state = new ScriptState();
-		state.currentAngle = this.currentAngle;
-		state.currentSpeed = this.currentSpeed;
-		return state;
-	}
 }
 
-// Execution thread for a script
-class ScriptThread {
-	public var actions:Array<ShootingAction>;
-	public var currentIndex:Int = 0;
-	public var waitFrames:Int = 0;
-	public var repStack:Array<Int> = [];
-	public var isActive:Bool = true;
-	public var state:ScriptState;
+// Execution context for nested Loop/Rep structures
+// This represents a single "frame" on the execution stack
+class ExecutionContext {
+	public var actions:Array<ShootingAction>; // The actions to execute in this context
+	public var currentIndex:Int = 0; // Which action we're currently on
+	public var iterationCount:Int = 0; // How many times have we iterated
+	public var maxIterations:Int; // -1 for infinite Loop, N for Rep
 
-	public function new(actions:Array<ShootingAction>, state:ScriptState) {
+	public function new(actions:Array<ShootingAction>, maxIterations:Int) {
 		this.actions = actions;
-		this.state = state;
+		this.maxIterations = maxIterations;
 	}
 }
 
-// Main script executor
+// Main script executor with proper stack-based execution
+// NO array mutation - uses a stack of execution contexts
 class ShootingScript {
 	private var enemy:Enemy;
-	private var mainThread:ScriptThread;
 	private var collisionManager:Dynamic;
+	private var contextStack:Array<ExecutionContext>; // Stack of execution contexts
+	private var state:ScriptState; // Shared state (angle, speed)
+	private var waitFrames:Int = 0;
+	private var isActive:Bool = true;
 
 	public var isPaused:Bool = false;
 
 	public function new(enemy:Enemy, actions:Array<ShootingAction>, collisionManager:Dynamic) {
 		this.enemy = enemy;
 		this.collisionManager = collisionManager;
+		this.state = new ScriptState();
 
-		var state = new ScriptState();
-		this.mainThread = new ScriptThread(actions, state);
+		// Initialize with root context (executes once, not a loop)
+		this.contextStack = [new ExecutionContext(actions, 1)];
 	}
 
 	public function update():Void {
-		if (isPaused || !mainThread.isActive) return;
+		if (isPaused || !isActive) return;
 
 		// Handle wait
-		if (mainThread.waitFrames > 0) {
-			mainThread.waitFrames--;
+		if (waitFrames > 0) {
+			waitFrames--;
 			return;
 		}
 
-		// Check if done
-		if (mainThread.currentIndex >= mainThread.actions.length) {
-			mainThread.isActive = false;
+		// Check if we have any contexts to execute
+		if (contextStack.length == 0) {
+			isActive = false;
 			return;
 		}
 
-		// Execute current action
-		var action = mainThread.actions[mainThread.currentIndex];
-		executeAction(mainThread, action);
-	}
+		// Get the current (top of stack) execution context
+		var ctx = contextStack[contextStack.length - 1];
 
-	private function executeAction(thread:ScriptThread, action:ShootingAction):Void {
-		switch (action) {
-			case Fire(angle, speed):
-				// Use current state if values are 0
-				var useAngle = (angle == 0 && speed == 0) ? thread.state.currentAngle : angle;
-				var useSpeed = (angle == 0 && speed == 0) ? thread.state.currentSpeed : speed;
-				fireBullet(useAngle, useSpeed);
-				thread.currentIndex++;
+		// Check if current context has finished all its actions
+		if (ctx.currentIndex >= ctx.actions.length) {
+			// Finished all actions in this context
+			if (ctx.maxIterations == -1) {
+				// Infinite loop - restart this context
+				ctx.currentIndex = 0;
+				ctx.iterationCount++;
+			} else {
+				// Finite repetition - check if we need to repeat
+				ctx.iterationCount++;
+				if (ctx.iterationCount < ctx.maxIterations) {
+					// Need to repeat - restart this context
+					ctx.currentIndex = 0;
+				} else {
+					// Done with all iterations - pop this context off the stack
+					contextStack.pop();
 
-			case Wait(frames):
-				thread.waitFrames = frames;
-				thread.currentIndex++;
-
-			case Loop(actions):
-				// Only append a new Loop AFTER the current iteration finishes
-				var loopActions = actions.copy();
-				thread.actions = thread.actions.slice(0, thread.currentIndex)
-					.concat(loopActions)
-					.concat([Loop(actions)]) // append loop as a single item
-					.concat(thread.actions.slice(thread.currentIndex + 1));
-
-			case Rep(count, actions):
-				// If this is the FIRST time entering this Rep instruction, attach a counter to it.
-				if (!Reflect.hasField(action, "___counter")) {
-					Reflect.setField(action, "___counter", 0);
-				}
-
-				var current = Reflect.field(action, "___counter");
-
-				if (current < count) {
-					// Increase counter
-					Reflect.setField(action, "___counter", current + 1);
-
-					// Build injected list
-					var injected = actions.copy();
-
-					// If more loops remain, append THIS SAME Rep action again
-					if (current + 1 < count) {
-						injected.push(action);
+					// If stack is now empty, we're completely done
+					if (contextStack.length == 0) {
+						isActive = false;
+						return;
 					}
 
-					// Replace this Rep with injected sequence
-					thread.actions = thread.actions.slice(0, thread.currentIndex)
-						.concat(injected)
-						.concat(thread.actions.slice(thread.currentIndex + 1));
-
-					// Important: do NOT advance index
-				} else {
-					// Finished the Rep — delete its counter and move on
-					Reflect.deleteField(action, "___counter");
-					thread.currentIndex++;
+					// Otherwise, advance the parent context's index
+					var parentCtx = contextStack[contextStack.length - 1];
+					parentCtx.currentIndex++;
 				}
+			}
+			return; // Wait for next frame to continue
+		}
+
+		// Execute the current action
+		var action = ctx.actions[ctx.currentIndex];
+		executeAction(action);
+	}
+
+	private function executeAction(action:ShootingAction):Void {
+		var ctx = contextStack[contextStack.length - 1];
+
+		switch (action) {
+			case Fire(angle, speed):
+				// Use current state if both angle and speed are 0
+				var useAngle = (angle == 0 && speed == 0) ? state.currentAngle : angle;
+				var useSpeed = (angle == 0 && speed == 0) ? state.currentSpeed : speed;
+				fireBullet(useAngle, useSpeed);
+				ctx.currentIndex++;
+
+			case Wait(frames):
+				waitFrames = frames;
+				ctx.currentIndex++;
+
+			case Loop(actions):
+				// Push a new context for infinite loop (maxIterations = -1)
+				var loopCtx = new ExecutionContext(actions, -1);
+				contextStack.push(loopCtx);
+				// Don't increment parent index - will happen when loop exits (never for infinite)
+
+			case Rep(count, actions):
+				// Push a new context for repeated execution (maxIterations = count)
+				var repCtx = new ExecutionContext(actions, count);
+				contextStack.push(repCtx);
+				// Don't increment parent index - will happen when all reps are done
 
 			case SetAngle(value):
-				thread.state.currentAngle = value;
-				thread.currentIndex++;
+				state.currentAngle = value;
+				ctx.currentIndex++;
 
 			case AddAngle(delta):
-				thread.state.currentAngle += delta;
-				thread.currentIndex++;
+				state.currentAngle += delta;
+				ctx.currentIndex++;
 
 			case SetSpeed(value):
-				thread.state.currentSpeed = value;
-				thread.currentIndex++;
+				state.currentSpeed = value;
+				ctx.currentIndex++;
 
 			case AddSpeed(delta):
-				thread.state.currentSpeed += delta;
-				thread.currentIndex++;
+				state.currentSpeed += delta;
+				ctx.currentIndex++;
 
 			case Radial(count, speed):
 				fireRadial(count, speed);
-				thread.currentIndex++;
+				ctx.currentIndex++;
 
 			case NWay(count, angle, speed):
 				fireNWay(count, angle, speed);
-				thread.currentIndex++;
+				ctx.currentIndex++;
 		}
 	}
 
@@ -180,8 +185,8 @@ class ShootingScript {
 
 	private function fireRadial(count:Int, speed:Float):Void {
 		var angleStep = 360.0 / count;
-		var baseAngle = mainThread.state.currentAngle;
-		var useSpeed = (speed == 0) ? mainThread.state.currentSpeed : speed;
+		var baseAngle = state.currentAngle;
+		var useSpeed = (speed == 0) ? state.currentSpeed : speed;
 		for (i in 0...count) {
 			var angle = baseAngle + (i * angleStep);
 			fireBullet(angle, useSpeed);
@@ -189,10 +194,10 @@ class ShootingScript {
 	}
 
 	private function fireNWay(count:Int, arcAngle:Float, speed:Float):Void {
-		var baseAngle = mainThread.state.currentAngle;
+		var baseAngle = state.currentAngle;
 		var startAngle = baseAngle - (arcAngle / 2);
 		var angleStep = arcAngle / (count - 1);
-		var useSpeed = (speed == 0) ? mainThread.state.currentSpeed : speed;
+		var useSpeed = (speed == 0) ? state.currentSpeed : speed;
 		for (i in 0...count) {
 			var angle = startAngle + (i * angleStep);
 			fireBullet(angle, useSpeed);
@@ -208,6 +213,6 @@ class ShootingScript {
 	}
 
 	public function stop():Void {
-		mainThread.isActive = false;
+		isActive = false;
 	}
 }
