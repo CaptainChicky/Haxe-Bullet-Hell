@@ -4,23 +4,17 @@ import bullet.BulletEnemy;
 import manager.CollisionManager;
 import openfl.events.Event;
 import openfl.display.Sprite;
-import openfl.Lib;
 
+/**
+ * Abstract base class for enemy shooting patterns.
+ * Provides core functionality for managing collision detection and event listeners.
+ * Subclasses (like ScriptedShootingPattern) override everyFrame() to implement pattern logic.
+ */
 abstract class EnemyShootingPattern extends Sprite {
-	private var enemy:Enemy; // Reference to the enemy that uses this shooting pattern
-
-	private var patternStartTime:Int = Lib.getTimer();
-
-	private var bulletSpawnTimer:Float = 0;
-	private var bulletSpawnInterval:Float = 0.01; // Adjust the interval as needed, in seconds
-
-	//private var bulletSpeed:Float = 5; // Speed of the bullet pixels per second
-	//private var rotationChange:Float = 12.0; // Change in rotation (degrees) for each shot
-	//private var currentRotation:Float = 0.0; // Initial rotation for the first shot
-
+	private var enemy:Enemy;
 	private var isShooting:Bool = false;
 
-	// Collision manager for registering bullets
+	// Static collision manager shared across all patterns
 	private static var collisionManager:CollisionManager;
 
 	public static function setCollisionManager(manager:CollisionManager):Void {
@@ -30,9 +24,8 @@ abstract class EnemyShootingPattern extends Sprite {
 	public static function getCollisionManager():CollisionManager {
 		return collisionManager;
 	}
- 
 
-	// Helper method for subclasses to register bullets
+	// Helper method for subclasses to register bullets with collision system
 	private function registerBullet(bullet:BulletEnemy):Void {
 		if (collisionManager != null) {
 			collisionManager.registerEnemyBullet(bullet);
@@ -44,23 +37,9 @@ abstract class EnemyShootingPattern extends Sprite {
 		this.enemy = enemy;
 	}
 
-	abstract private function spawnEnemyBullet():Void;
-
+	// Subclasses override this to implement their update logic
 	private function everyFrame(event:Event):Void {
-		var currentTime:Int = Lib.getTimer();
-		var deltaTime:Float = (currentTime - patternStartTime) / 1000.0; // deltaTime is in seconds
-		patternStartTime = currentTime;
-
-		bulletSpawnTimer += deltaTime; // deltaTime is in seconds
-
-		if (isShooting && (bulletSpawnTimer >= bulletSpawnInterval)) {
-			spawnEnemyBullet();
-			bulletSpawnTimer = 0;
-		}
-	}
-
-	public function setBulletSpawnInterval(bulletSpawnInterval:Float):Void {
-		this.bulletSpawnInterval = bulletSpawnInterval;
+		// Override in subclass
 	}
 
 	public function startShooting():Void {
@@ -71,5 +50,15 @@ abstract class EnemyShootingPattern extends Sprite {
 	public function stopShooting():Void {
 		isShooting = false;
 		removeEventListener(Event.ENTER_FRAME, everyFrame);
+	}
+
+	// Accessor for subclasses to get the enemy reference
+	private function getEnemy():Enemy {
+		return enemy;
+	}
+
+	// Accessor for subclasses to check shooting status
+	private function isCurrentlyShooting():Bool {
+		return isShooting;
 	}
 }

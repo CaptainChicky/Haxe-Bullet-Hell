@@ -11,7 +11,6 @@
           "pattern": "spiral",
           "health": 4,
           "patternConfig": {
-            "bulletSpawnInterval": 0.01
           }
         },
         {
@@ -21,7 +20,6 @@
           "pattern": "nwhip",
           "health": 6,
           "patternConfig": {
-            "bulletSpawnInterval": 1.2
           }
         },
         {
@@ -31,7 +29,6 @@
           "pattern": "spiral",
           "health": 4,
           "patternConfig": {
-            "bulletSpawnInterval": 0.01
           }
         }
       ]
@@ -46,7 +43,6 @@
           "pattern": "nwhip",
           "health": 7,
           "patternConfig": {
-            "bulletSpawnInterval": 0.8
           }
         },
         {
@@ -56,7 +52,6 @@
           "pattern": "nwhip",
           "health": 7,
           "patternConfig": {
-            "bulletSpawnInterval": 0.8
           }
         }
       ]
@@ -71,7 +66,6 @@
           "pattern": "spiral",
           "health": 5,
           "patternConfig": {
-            "bulletSpawnInterval": 0.012
           }
         },
         {
@@ -81,7 +75,6 @@
           "pattern": "spiral",
           "health": 5,
           "patternConfig": {
-            "bulletSpawnInterval": 0.012
           }
         },
         {
@@ -91,7 +84,6 @@
           "pattern": "spiral",
           "health": 5,
           "patternConfig": {
-            "bulletSpawnInterval": 0.012
           }
         },
         {
@@ -101,7 +93,6 @@
           "pattern": "nwhip",
           "health": 10,
           "patternConfig": {
-            "bulletSpawnInterval": 0.7
           }
         }
       ]

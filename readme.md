@@ -9,6 +9,28 @@ Compile into html5 using `openfl build html5 -release -clean` or `openfl test ht
 # Architecture (UPDATED!)
 The codebase has been completely refactored to be data-driven and scalable!
 
+# issues
+erm the loop system is broekn
+Each Loop or Rep reinjects itself into thread.actions.
+
+The array keeps growing infinitely because every cycle clones itself again.
+
+Eventually,
+ - Memory will increase every frame → crash or slowdown
+ - Bullets might fire extremely fast (because multiple copies are queued)
+ - Speed and angle state may carry over incorrectly between Reps → runaway bullets
+So it will break eventually if left to run forever.
+
+Right now:
+ - Both Rep and Loop mutate the actions array during execution.
+ - Mutating while iterating creates duplicated actions.
+ - Every injection copies the sequence + appends another injection.
+ - The array grows faster than the index advances → some actions run multiple times per cycle.
+
+also can only run one loop (see shootingscript)
+
+eventulaly i need to rewrite Loop/Rep as true state machines
+
 ## New Manager System
 - **EnemyManager** - Handles spawning, lifecycle, and cleanup of all enemies
 - **LevelManager** - Parses JSON level files and triggers enemy spawns at the correct times
@@ -121,33 +143,33 @@ On ever frame, if isSHooting (z pressed), spawnplayerbullet. startShooting sets 
 ## enemy package - Enemy and EnemyShootingPattern
 Enemy is built literally exactly like player except it also has a "salt" for rotation randomness and rotates in the opposite direction.
 
-enemyshootingpattern is an abstract class that has a patternstarttime as the current global time, an isShooting, a bulletSpawnTimer, and bulletSpawnInterval that you set manually.
+### EnemyShootingPattern (Base Class)
+Abstract base class providing core functionality for all shooting patterns:
+- Manages `isShooting` state and event listeners
+- Provides static `CollisionManager` for bullet registration
+- `startShooting()` / `stopShooting()` control the ENTER_FRAME listener
+- `everyFrame()` is overridden by subclasses to implement pattern logic
 
-start and shopshooting are the same as player, and setBulletSpawnInterval sets the bullet spawn interval.
+### ScriptedShootingPattern (Script-Based System)
+All enemy patterns now use a **data-driven script system** defined in JSON:
+- Patterns are composed from actions: Fire, Wait, Loop, Rep, SetAngle, AddAngle, SetSpeed, AddSpeed, Radial, NWay
+- Scripts execute frame-by-frame with precise timing control via Wait commands
+- Pattern templates stored in `Assets/patterns/*.json` with configurable parameters
+- Levels can reference templates or use inline scripts directly
 
-everyframe gets the time between each frame, and increments bulletSpawnTimer. If isShooting and bulletspanwtimer exceeds or equals bulletspawninterval, then we spawnenemybullet and reset the spawn timer.
+### Pattern Templates
+**spiral.json**: Fires bullets while rotating continuously
+- Parameters: `bulletSpeed`, `rotationChange`, `fireDelay`
 
-we have an abstract function spawnenemybullet.
+**nwhip.json**: Based on firedancer pattern with spreading bullet whips
+- Parameters: `numberOfWhips`, `numberOfBullets`, `baseBulletSpeed`, `speedChange`, `fireAngle`, `angleChange`, `bulletDelay`, `patternDelay`
 
-Currently, two custum patterns exist. Spiral and nwhip. 
+**radial.json**: Fires bullets in all directions
+- Parameters: `bulletCount`, `bulletSpeed`, `rotationSpeed`
 
-Spiral has a bulletSpeed, rotationChange, and currentRotation. It spawns a bullet by first setting the bullet's location to the enemy bullet. Then, the velocity is calculated by by taking the sin or cos of currentRotation (rotational startign position, usually 0), and multiplies this by bulletSpeed. set this as the bullet's velocity and spawn it. We then increment currentRotation by rotationChange for the next bullet.
-
-Works best with bulletspawninterval being 0.01 s or 1ms. *Here's something to note. If you stare at the screen with the enemy in the dead center, 0 deg is left of the enemy. 90 is down. 180 is right. 270 is up. This means in the current player enemy setup, the player is 90 degrees from the enemy's perspective.*
-
-Nwhip has a is based on the firedancer pattern. It has a whipfullangle, numberofwhips, and numberofbullets. Less important ones are baseangle, angletofire, salt, as well as basebulletspeed, and speedchange.
-
-On initialization, nwhip will add an everyframe event listenner, calculate the baseangle (the angle between two whips) to be the whipfullangle/numberofwhips. It then set's angletofire as 
-
-    (90 - (numberOfBullets/2 * salt)) - (0.5 * (numberOfWhips - 1)) * baseAngle;
-
-90 is to face downwards, subtracted by the deviation added by the salt to center the central whip angle to the exact center. Then, we start at the very left by subtracting baseAngle * (numberofwhips-1)/2. This is incremented later.
-
-now we have the function spawnwhiprow, which spawns the first wave of bullets in the whip. For 0 to the number of whips, we spawn a bullet on the enemy, set its velocity to be cos or sin of angletofire times bulletspeed, and give it to the bullet as its velo. Then, for each sequential bullet in the numberofwhips, we increment the baseangle. This makes the entire row of all whips. We reset the angletofire for the next row.
-
-We want the whip to contain numberOfBullet rows, and for the rows to fire after some delay instead of per frame. Hence, the spawnenemybullet has to implement a spanwNextBullet function as a manual for loop. With the currentindex as 0 until it numberOfBullets, it will call spawnNextBullet which increments by the salt times the currentindex (each whiprow should be offset by the salt from the previous). Then, it spawns the row and increments the bullet speed and index, while setting a 40ms timer before the next row is called. This is done until the index is equal to the number of bullets, which spawns the entire Nwhip.
-
-The bulletSpawnInterval is hence then the spawn interval of each Nwhip.
+### Angle Convention
+When enemy is at screen center: 0°=right, 90°=down, 180°=left, 270°=up
+(Player positioned below enemy = 90° from enemy's perspective)
 
 # Notes
 This is very noobishly written and I genuinly hope that I don't have to rewrite this because the structure is trash. I will probably make a very basic bullet hell level out of this for an internet game and move onto a more practical language to code a bullet hell game in lol (if i have enough time and motivation of course kek). Again, pull requests and issues welcome. I would certainly appreciate help lmao, if anyone even sees this.

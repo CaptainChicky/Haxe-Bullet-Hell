@@ -36,11 +36,6 @@ class EnemyManager extends Sprite {
 			// Link the pattern to the enemy
 			enemy.setShootingPattern(pattern);
 
-			// Set bullet spawn interval if provided
-			if (patternConfig.bulletSpawnInterval != null) {
-				pattern.setBulletSpawnInterval(patternConfig.bulletSpawnInterval);
-			}
-
 			// Auto-start shooting
 			pattern.startShooting();
 		}

@@ -11,12 +11,7 @@ class ScriptedShootingPattern extends EnemyShootingPattern {
 		this.shootingScript = new ShootingScript(enemy, actions, collisionManager);
 	}
 
-	// Override the base spawnEnemyBullet - not used in scripted patterns
-	private function spawnEnemyBullet():Void {
-		// Not used - scripts handle their own firing
-	}
-
-	// Override to use script update instead of timer-based spawning
+	// Override to use script update for pattern execution
 	override private function everyFrame(event:Event):Void {
 		if (shootingScript != null) {
 			shootingScript.update();
