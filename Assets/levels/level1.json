@@ -626,7 +626,7 @@
                   "control": "Loop",
                   "actions": [
                     {"control": "AimAtPlayer"},
-                    {"control": "Radial", "count": 12, "speed": 0},
+                    {"control": "Radial", "count": 20, "speed": 0},
                     {"control": "AddOffset", "distanceDelta": 0, "angleDelta": 25},
                     {"control": "Wait", "frames": 12}
                   ]
