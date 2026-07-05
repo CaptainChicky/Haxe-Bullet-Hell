@@ -1,26 +1,41 @@
 {
   "name": "shifter",
-  "description": "Continuous stream; each bullet kinks -120 degrees 30 frames after its own spawn (per-bullet sub-script mutating direction mid-flight)",
+  "description": "Emitter sweeps its firing direction each loop iteration while every fired bullet also kinks mid-flight via its own sub-script",
   "parameters": {
-    "streamDelay": {
+    "startDirection": {
+      "type": "float",
+      "default": 180,
+      "description": "Initial firing direction"
+    },
+    "speed": {
+      "type": "float",
+      "default": 5,
+      "description": "Bullet speed"
+    },
+    "sweepAngle": {
+      "type": "float",
+      "default": 36,
+      "description": "Degrees the emitter's firing direction advances each loop iteration"
+    },
+    "loopDelay": {
       "type": "int",
-      "default": 4,
-      "description": "Frames between stream bullets"
+      "default": 8,
+      "description": "Frames between loop iterations (i.e. between shots)"
     },
     "shiftDelay": {
       "type": "int",
       "default": 30,
-      "description": "Frames after spawn before the bullet turns"
+      "description": "Frames after a bullet's own spawn before it kinks"
     },
     "shiftAngle": {
       "type": "float",
       "default": -120,
-      "description": "Direction change applied at shiftDelay"
+      "description": "Direction change each bullet applies to itself at shiftDelay"
     }
   },
   "script": [
-    {"control": "Set", "prop": "speed", "value": 3},
-    {"control": "Set", "prop": "direction", "value": 90},
+    {"control": "Set", "prop": "speed", "value": "$speed"},
+    {"control": "Set", "prop": "direction", "value": "$startDirection"},
     {
       "control": "Sub",
       "actions": [
@@ -32,7 +47,8 @@
       "control": "Loop",
       "actions": [
         {"control": "Fire", "angle": 0, "speed": 0},
-        {"control": "Wait", "frames": "$streamDelay"}
+        {"control": "Add", "prop": "direction", "delta": "$sweepAngle"},
+        {"control": "Wait", "frames": "$loopDelay"}
       ]
     }
   ]

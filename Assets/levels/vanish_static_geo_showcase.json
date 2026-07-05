@@ -1,0 +1,38 @@
+{
+  "name": "vanish_static_geo_showcase",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 300,
+          "y": 100,
+          "pattern": "vanish",
+          "health": 999,
+          "patternConfig": {},
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"}
+            ]
+          }
+        },
+        {
+          "spawnTime": 0,
+          "x": 1200,
+          "y": 400,
+          "pattern": "static_geometry",
+          "health": 999,
+          "patternConfig": {},
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"}
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

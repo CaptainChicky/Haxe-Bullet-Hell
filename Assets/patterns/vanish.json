@@ -1,0 +1,24 @@
+{
+  "name": "vanish",
+  "description": "Emitter sweeps direction by 12° per shot; every fired bullet self-destructs 30 frames after spawning",
+  "parameters": {},
+  "script": [
+    {"control": "Set", "prop": "speed", "value": 5},
+    {"control": "Set", "prop": "direction", "value": 180},
+    {
+      "control": "Sub",
+      "actions": [
+        {"control": "Wait", "frames": 30},
+        {"control": "Vanish"}
+      ]
+    },
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "Add", "prop": "direction", "delta": 12},
+        {"control": "Wait", "frames": 1}
+      ]
+    }
+  ]
+}

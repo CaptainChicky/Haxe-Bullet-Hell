@@ -1,0 +1,24 @@
+{
+  "name": "static_geometry",
+  "description": "Every 4 frames, 8 bullets fire radially; after 20 frames each splits into a narrow 2-way and vanishes",
+  "parameters": {},
+  "script": [
+    {"control": "Set", "prop": "speed", "value": 6},
+    {"control": "Set", "prop": "direction", "value": 0},
+    {
+      "control": "Sub",
+      "actions": [
+        {"control": "Wait", "frames": 20},
+        {"control": "NWay", "count": 2, "angle": 120, "speed": 0},
+        {"control": "Vanish"}
+      ]
+    },
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "Radial", "count": 8, "speed": 0},
+        {"control": "Wait", "frames": 4}
+      ]
+    }
+  ]
+}
