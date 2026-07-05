@@ -2,9 +2,9 @@ package manager;
 
 import enemy.*;
 import enemy.MovementScript;
-import enemy.ShootingScript;
 import enemy.ScriptedShootingPattern;
 import manager.PatternLoader;
+import shot.ShotCommand.IShotCommand;
 import openfl.display.Sprite;
 import openfl.events.Event;
 
@@ -55,30 +55,21 @@ class EnemyManager extends Sprite {
 
 	private function createPattern(enemy:Enemy, patternType:String, config:Dynamic):EnemyShootingPattern {
 		var patternName = patternType.toLowerCase();
-		var actions:Array<ShootingAction> = null;
+		var commands:Array<IShotCommand> = null;
 
 		// Check if inline script is provided
 		if (config.patternScript != null && config.patternScript.actions != null) {
-			// Parse inline script directly from level JSON
-			var paramMap:Map<String, Dynamic> = new Map();
-			actions = PatternLoader.parseActions(config.patternScript.actions, paramMap);
-
-			// Check for startDelay in config
-			if (Reflect.hasField(config, "startDelay")) {
-				var startDelay:Float = Reflect.field(config, "startDelay");
-				if (startDelay > 0) {
-					actions.unshift(Wait(startDelay));
-				}
-			}
+			// Compile inline script directly from level JSON (handles startDelay in config)
+			commands = PatternLoader.parseInline(config.patternScript.actions, config);
 		} else {
 			// Try loading from pattern template file
-			actions = PatternLoader.parsePattern(patternName, config);
+			commands = PatternLoader.parsePattern(patternName, config);
 		}
 
-		// Create scripted pattern if we have actions
-		if (actions != null && actions.length > 0) {
+		// Create scripted pattern if we have commands
+		if (commands != null && commands.length > 0) {
 			var collisionManager = EnemyShootingPattern.getCollisionManager();
-			var pattern = new ScriptedShootingPattern(enemy, actions, collisionManager);
+			var pattern = new ScriptedShootingPattern(enemy, commands, collisionManager);
 			return pattern;
 		}
 

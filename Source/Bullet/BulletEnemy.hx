@@ -1,5 +1,7 @@
 package bullet;
 
+import shot.ShotPrototype;
+import shot.ScriptRunner;
 import openfl.Lib;
 import openfl.events.Event;
 import openfl.display.Bitmap;
@@ -7,38 +9,78 @@ import openfl.display.BitmapData;
 import openfl.display.Sprite;
 import openfl.Assets;
 
+/**
+ * An enemy bullet, constructed from a cloned ShotPrototype.
+ *
+ * The prototype defines the bullet's whole flight profile: direction, speed,
+ * per-frame acceleration and angular velocity (curving), speed clamps, and
+ * lifetime. Bullets may also carry their own ScriptRunner (attached by the
+ * emitter when the prototype has a sub-script), letting a bullet fire further
+ * bullets after spawning.
+ */
 class BulletEnemy extends Sprite {
-	public static inline final ROTATION_SPEED:Float = 90.0; // Rotation speed in degrees per second
+	public static inline final ROTATION_SPEED:Float = 90.0; // Sprite spin, degrees per second (visual only)
 
-	public var velocityX:Float;
-	public var velocityY:Float;
+	/** Cached texture - loading BitmapData per bullet was a per-spawn cost. */
+	private static var cachedBitmapData:BitmapData = null;
 
-	private var spawnTime:Int = Lib.getTimer(); // To store the time of bullet spawn
+	// Kept public for compatibility with any external velocity reads.
+	public var velocityX:Float = 0;
+	public var velocityY:Float = 0;
 
-	// Add a random salt to the rotation speed to make the bullet's rotation less uniform from other bullets
-	private var salt:Float = Math.random() * 20; // gives a decimal between 0 inclusive and 10 exclusive
+	// Flight state (from prototype).
+	private var direction:Float; // degrees
+	private var speed:Float; // px/frame
+	private var accel:Float;
+	private var angularVelocity:Float;
+	private var minSpeed:Float;
+	private var maxSpeed:Float;
+	private var lifetime:Float; // frames; <= 0 means unlimited
+	private var age:Float = 0;
 
-	public function new() {
+	/** Optional script this bullet runs itself (nested patterns). */
+	private var script:ScriptRunner = null;
+
+	private var spawnTime:Int = Lib.getTimer();
+
+	// Random salt so bullet sprite spin isn't uniform across bullets.
+	private var salt:Float = Math.random() * 20;
+
+	public function new(?prototype:ShotPrototype) {
 		super();
 
-		// Load the image from the assets folder
-		var bitmapData:BitmapData = Assets.getBitmapData("assets/BulletEnemy.png");
+		if (prototype == null) prototype = new ShotPrototype();
+		direction = prototype.direction;
+		speed = prototype.speed;
+		accel = prototype.accel;
+		angularVelocity = prototype.angularVelocity;
+		minSpeed = prototype.minSpeed;
+		maxSpeed = prototype.maxSpeed;
+		lifetime = prototype.lifetime;
+		updateVelocity();
 
-		// Create a Bitmap using the loaded image
-		var bitmap:Bitmap = new Bitmap(bitmapData);
-
-		// Set the position of the sprite to its center
+		if (cachedBitmapData == null) {
+			cachedBitmapData = Assets.getBitmapData("assets/BulletEnemy.png");
+		}
+		var bitmap:Bitmap = new Bitmap(cachedBitmapData);
 		bitmap.x = -bitmap.width / 2;
 		bitmap.y = -bitmap.height / 2;
-
-		// Add the Bitmap to the sprite
 		addChild(bitmap);
 
-		// Set the spawn time to the current time
 		spawnTime = Lib.getTimer();
 
-		// Register the "everyFrame" function to be called on every frame update
 		addEventListener(Event.ENTER_FRAME, everyFrame);
+	}
+
+	/** Attach a script this bullet runs on its own (called by the emitter). */
+	public function attachScript(runner:ScriptRunner):Void {
+		this.script = runner;
+	}
+
+	private inline function updateVelocity():Void {
+		var rad = direction * Math.PI / 180;
+		velocityX = Math.cos(rad) * speed;
+		velocityY = Math.sin(rad) * speed;
 	}
 
 	private function everyFrame(event:Event):Void {
@@ -48,31 +90,51 @@ class BulletEnemy extends Sprite {
 			return;
 		}
 
-		// Update the bullet's position based on its velocity
+		// Run the bullet's own script (if any) before moving.
+		if (script != null) {
+			script.update();
+		}
+
+		// Apply in-flight prototype behavior.
+		if (angularVelocity != 0 || accel != 0) {
+			direction += angularVelocity;
+			speed += accel;
+			if (speed < minSpeed) speed = minSpeed;
+			if (speed > maxSpeed) speed = maxSpeed;
+			updateVelocity();
+		}
+
 		x += velocityX;
 		y += velocityY;
 
-		// Get the width and height of the stage (window screen)
-		var stageWidth:Int = Lib.current.stage.stageWidth;
-		var stageHeight:Int = Lib.current.stage.stageHeight;
-
-		// Check if the bullet is out of the stage boundaries
-		if (x < -100 || x > stageWidth + 100 || y < -100 || y > stageHeight + 100) {
-			// Remove the bullet from the stage
-			removeEventListener(Event.ENTER_FRAME, everyFrame);
-			if (parent != null) {
-				parent.removeChild(this);
-			}
+		// Lifetime expiry.
+		age += 1;
+		if (lifetime > 0 && age >= lifetime) {
+			despawn();
 			return;
 		}
 
-		// Update the bullet's rotation based on the elapsed time since its spawn
-		var currentTime:Int = Lib.getTimer();
-		var deltaTime:Float = (currentTime - spawnTime) / 1000.0; // Convert milliseconds to seconds
+		// Despawn outside stage boundaries.
+		var stageWidth:Int = Lib.current.stage.stageWidth;
+		var stageHeight:Int = Lib.current.stage.stageHeight;
+		if (x < -100 || x > stageWidth + 100 || y < -100 || y > stageHeight + 100) {
+			despawn();
+			return;
+		}
 
-		// Rotate the bullet
-		// the salt adds between 0 and 10 degrees to the initial rotational position
-		// delta position updates betwene every frame
+		// Cosmetic sprite spin based on time since spawn.
+		var deltaTime:Float = (Lib.getTimer() - spawnTime) / 1000.0;
 		rotation = salt + (ROTATION_SPEED * deltaTime);
+	}
+
+	private function despawn():Void {
+		removeEventListener(Event.ENTER_FRAME, everyFrame);
+		if (script != null) {
+			script.stop();
+			script = null;
+		}
+		if (parent != null) {
+			parent.removeChild(this);
+		}
 	}
 }

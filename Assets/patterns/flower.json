@@ -1,0 +1,71 @@
+{
+  "name": "flower",
+  "description": "Showcase of the prototype engine: slow curving seed bullets that burst into accelerating petals mid-flight (requires no engine changes - built from Sub + generic prototype properties)",
+  "parameters": {
+    "seedCount": {
+      "type": "int",
+      "default": 6,
+      "description": "Seed bullets per ring"
+    },
+    "seedSpeed": {
+      "type": "float",
+      "default": 2.5,
+      "description": "Initial seed bullet speed"
+    },
+    "seedTurn": {
+      "type": "float",
+      "default": 1.5,
+      "description": "Seed curve rate (degrees per frame)"
+    },
+    "burstDelay": {
+      "type": "int",
+      "default": 45,
+      "description": "Frames before a seed bursts"
+    },
+    "petalCount": {
+      "type": "int",
+      "default": 8,
+      "description": "Petals per burst"
+    },
+    "petalSpeed": {
+      "type": "float",
+      "default": 1,
+      "description": "Initial petal speed (accelerates outward)"
+    },
+    "ringDelay": {
+      "type": "int",
+      "default": 50,
+      "description": "Frames between seed rings"
+    },
+    "ringRotation": {
+      "type": "float",
+      "default": 22.5,
+      "description": "Ring rotation between volleys"
+    }
+  },
+  "script": [
+    {"control": "Set", "prop": "speed", "value": "$seedSpeed"},
+    {"control": "Set", "prop": "turn", "value": "$seedTurn"},
+    {"control": "Set", "prop": "lifetime", "value": "$burstDelay + 300"},
+    {
+      "control": "Sub",
+      "actions": [
+        {"control": "Wait", "frames": "$burstDelay"},
+        {"control": "Set", "prop": "turn", "value": 0},
+        {"control": "Set", "prop": "speed", "value": "$petalSpeed"},
+        {"control": "Set", "prop": "accel", "value": 0.08},
+        {"control": "Set", "prop": "maxSpeed", "value": 6},
+        {"control": "Random", "prop": "direction", "min": 0, "max": 360},
+        {"control": "Radial", "count": "$petalCount", "speed": 0}
+      ]
+    },
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "Radial", "count": "$seedCount", "speed": 0},
+        {"control": "Add", "prop": "direction", "delta": "$ringRotation"},
+        {"control": "Wait", "frames": "$ringDelay"}
+      ]
+    }
+  ]
+}
