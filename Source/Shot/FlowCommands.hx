@@ -68,6 +68,55 @@ class ConcurrentCommand implements IShotCommand {
 }
 
 /**
+ * Runs its body against a CLONE of the prototype, discarded when the block
+ * ends - mutations inside affect only bullets fired inside the block.
+ *
+ * This is what separates "configure a one-shot burst of children" from
+ * "steer the bullet that owns this script": a bullet syncs its flight state
+ * from the script's ROOT prototype (ScriptRunner.getPrototype()), which a
+ * Scope never touches. flower.json's seeds keep curving through their petal
+ * burst because the burst's Set turn/speed/accel happen inside a Scope.
+ *
+ * Executes inline within the same frame budget (unlike a Concurrent branch,
+ * which starts the next frame). Nests freely. Like Tween, per-execution
+ * state (the saved prototype) is allocated fresh in run(), so the compiled
+ * command can be shared across Loop iterations and contexts.
+ *
+ * Note: the clone is a snapshot at Scope entry. In a multi-frame Scope
+ * (body contains Waits), writes the owning bullet makes to the root
+ * prototype during the block are not visible inside it.
+ */
+class ScopeCommand implements IShotCommand {
+	private var body:Array<IShotCommand>;
+
+	public function new(body:Array<IShotCommand>) {
+		this.body = body;
+	}
+
+	public function run(ctx:ShotContext, runner:ScriptRunner):Void {
+		if (body.length == 0) return;
+		var saved = ctx.prototype;
+		ctx.prototype = saved.clone();
+		var cmds = body.copy();
+		cmds.push(new RestorePrototypeCommand(saved));
+		ctx.frames.push(new ShotFrame(cmds, 1));
+	}
+}
+
+/** Sentinel appended to a Scope body: restores the pre-Scope prototype. */
+private class RestorePrototypeCommand implements IShotCommand {
+	private var saved:ShotPrototype;
+
+	public function new(saved:ShotPrototype) {
+		this.saved = saved;
+	}
+
+	public function run(ctx:ShotContext, runner:ScriptRunner):Void {
+		ctx.prototype = saved;
+	}
+}
+
+/**
  * Removes the script's owner from play. For a bullet-owned script this
  * despawns the bullet mid-flight (the `vanish()` primitive - static geometry,
  * seeds, timed disappearing walls). Also terminates this script context.

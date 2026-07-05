@@ -35,6 +35,90 @@ class FakeEmitter implements IShotEmitter {
 	}
 }
 
+/**
+ * Mirrors the shipped BulletEnemy.everyFrame control flow (script update ->
+ * sync flight state from the script's root prototype -> integrate turn/accel
+ * -> write direction/speed back), minus display/stage concerns, so the full
+ * bullet<->sub-script feedback loop is testable under --interp.
+ * If BulletEnemy.everyFrame changes, keep this in sync.
+ */
+class HeadlessTestBullet {
+	public var x:Float = 0;
+	public var y:Float = 0;
+	public var alive:Bool = true;
+	public var direction:Float;
+	public var speed:Float;
+	public var accel:Float;
+	public var angularVelocity:Float;
+	public var minSpeed:Float;
+	public var maxSpeed:Float;
+	public var script:ScriptRunner = null;
+
+	public function new(p:ShotPrototype) {
+		direction = p.direction;
+		speed = p.speed;
+		accel = p.accel;
+		angularVelocity = p.angularVelocity;
+		minSpeed = p.minSpeed;
+		maxSpeed = p.maxSpeed;
+	}
+
+	public function everyFrame():Void {
+		if (!alive) return;
+		if (script != null) {
+			script.update();
+			if (!alive) return;
+			var proto = script.getPrototype();
+			if (proto != null) {
+				direction = proto.direction;
+				speed = proto.speed;
+				accel = proto.accel;
+				angularVelocity = proto.angularVelocity;
+				minSpeed = proto.minSpeed;
+				maxSpeed = proto.maxSpeed;
+			}
+		}
+		direction += angularVelocity;
+		speed += accel;
+		if (speed < minSpeed) speed = minSpeed;
+		if (speed > maxSpeed) speed = maxSpeed;
+		if (script != null) {
+			var proto = script.getPrototype();
+			if (proto != null) {
+				proto.direction = direction;
+				proto.speed = speed;
+			}
+		}
+		var rad = direction * Math.PI / 180;
+		x += Math.cos(rad) * speed;
+		y += Math.sin(rad) * speed;
+	}
+}
+
+/** FakeEmitter anchored to a HeadlessTestBullet (mirrors BulletSubEmitter). */
+class FakeBulletEmitter implements IShotEmitter {
+	public var bullet:HeadlessTestBullet;
+	public var spawns:Array<{proto:ShotPrototype, x:Float, y:Float}> = [];
+
+	public function new(bullet:HeadlessTestBullet) {
+		this.bullet = bullet;
+	}
+
+	public function getOriginX():Float return bullet.x;
+
+	public function getOriginY():Float return bullet.y;
+
+	public function getTarget():ShotTarget return null;
+
+	public function spawn(prototype:ShotPrototype, x:Float, y:Float):Void {
+		spawns.push({proto: prototype, x: x, y: y});
+	}
+
+	public function isAlive():Bool return bullet.alive;
+
+	public function vanish():Void bullet.alive = false;
+}
+
 class TestShot {
 	static var failures = 0;
 
@@ -193,7 +277,7 @@ class TestShot {
 		check(bulletEm.spawns.length == 8 && bulletEm.spawns[0].frame == 10, "sub: burst timing correct");
 
 		// --- Legacy pattern files compile & run ---------------------------------------
-		for (name in ["spiral", "nwhip", "orbit", "sniper", "random", "radial", "flower"]) {
+		for (name in ["spiral", "nwhip", "orbit", "sniper", "random", "radial", "flower", "shifter"]) {
 			var text = sys.io.File.getContent("Assets/patterns/" + name + ".json");
 			var template:Dynamic = Json.parse(text);
 			var paramMap:Map<String, Dynamic> = new Map();
@@ -287,6 +371,93 @@ class TestShot {
 		for (i in 0...6) runner8.update();
 		check(runner8.getPrototype() != null && runner8.getPrototype().direction == startDir - 120,
 			"getPrototype: retained after completion, final-frame Add not lost");
+
+		// --- Scope: body mutates a discarded clone -------------------------------
+		var scopeScript = compile('[
+			{"control": "Set", "prop": "turn", "value": 1.5},
+			{"control": "Set", "prop": "speed", "value": 3},
+			{"control": "Scope", "actions": [
+				{"control": "Set", "prop": "turn", "value": 0},
+				{"control": "Set", "prop": "speed", "value": 9},
+				{"control": "Set", "prop": "burstVar", "value": 7},
+				{"control": "Fire", "angle": 0, "speed": 0}
+			]},
+			{"control": "Fire", "angle": 0, "speed": 0}
+		]');
+		var em9 = run(scopeScript, 3);
+		check(em9.spawns.length == 2, "scope: both Fires executed");
+		check(em9.spawns[0].proto.speed == 9 && em9.spawns[0].proto.angularVelocity == 0,
+			"scope: bullet fired inside gets scoped values (speed 9, turn 0)");
+		check(em9.spawns[1].proto.speed == 3 && em9.spawns[1].proto.angularVelocity == 1.5,
+			"scope: prototype restored after block - outside Fire sees pre-scope values");
+		check(!em9.spawns[1].proto.vars.exists("burstVar"),
+			"scope: custom vars set inside the block are discarded too");
+		check(em9.spawns[0].frame == 0 && em9.spawns[1].frame == 0,
+			"scope: executes inline within the same frame budget (no branch delay)");
+
+		// --- Scope inside Rep: fresh clone per execution (stateful pattern) -----
+		var scopeLoop = compile('[
+			{"control": "Set", "prop": "speed", "value": 1},
+			{"control": "Rep", "count": 2, "actions": [
+				{"control": "Scope", "actions": [
+					{"control": "Add", "prop": "speed", "delta": 10},
+					{"control": "Fire", "angle": 0, "speed": 0}
+				]},
+				{"control": "Wait", "frames": 1}
+			]}
+		]');
+		var em10 = run(scopeLoop, 5);
+		check(em10.spawns.length == 2 && em10.spawns[0].proto.speed == 11 && em10.spawns[1].proto.speed == 11,
+			"scope in Rep: each execution clones fresh (no accumulation across iterations)");
+
+		// --- REGRESSION: curving seed keeps curving through and after a Scoped burst
+		// (flower.json seeds: prior fix made the bullet adopt the burst's
+		// turn=0 / random direction / petal accel permanently).
+		var seedProto = new ShotPrototype();
+		seedProto.direction = 0;
+		seedProto.speed = 2.5;
+		seedProto.angularVelocity = 1.5;
+		var burstSub = compile('[
+			{"control": "Wait", "frames": 20},
+			{"control": "Scope", "actions": [
+				{"control": "Set", "prop": "turn", "value": 0},
+				{"control": "Set", "prop": "speed", "value": 1},
+				{"control": "Set", "prop": "accel", "value": 0.08},
+				{"control": "Set", "prop": "maxSpeed", "value": 6},
+				{"control": "Random", "prop": "direction", "min": 0, "max": 360},
+				{"control": "Radial", "count": 8, "speed": 0}
+			]}
+		]');
+		var seed = new HeadlessTestBullet(seedProto);
+		var seedEm = new FakeBulletEmitter(seed);
+		seed.script = new ScriptRunner(seedEm, burstSub, seedProto.clone());
+		var dirAt20:Float = 0;
+		for (f in 0...60) {
+			seed.everyFrame();
+			if (f == 19) dirAt20 = seed.direction;
+		}
+		check(Math.abs(dirAt20 - 30) < 1e-6, "seed burst: curving accumulates before the burst (30 deg at frame 20)");
+		check(seedEm.spawns.length == 8, "seed burst: 8 petals fired at the burst");
+		check(Math.abs(seed.direction - 90) < 1e-6,
+			'seed burst: seed keeps curving through and after the burst (dir=${seed.direction}, expected 90)');
+		check(Math.abs(seed.speed - 2.5) < 1e-6 && Math.abs(seed.angularVelocity - 1.5) < 1e-6,
+			"seed burst: seed keeps its own speed/turn (petal accel/turn=0 did not leak)");
+		check(seedEm.spawns[0].proto.accel == 0.08 && seedEm.spawns[0].proto.angularVelocity == 0 && seedEm.spawns[0].proto.maxSpeed == 6,
+			"seed burst: petals got the scoped burst properties");
+
+		// --- Shifter semantics still intact: sub-script Add steers the bullet ---
+		var kinkProto = new ShotPrototype();
+		kinkProto.direction = 90;
+		kinkProto.speed = 3;
+		var kinkSub = compile('[
+			{"control": "Wait", "frames": 30},
+			{"control": "Add", "prop": "direction", "delta": -120}
+		]');
+		var kink = new HeadlessTestBullet(kinkProto);
+		kink.script = new ScriptRunner(new FakeBulletEmitter(kink), kinkSub, kinkProto.clone());
+		for (f in 0...40) kink.everyFrame();
+		check(Math.abs(kink.direction - (-30)) < 1e-6,
+			"shifter semantics: unscoped sub-script Add still steers the bullet (90 -> -30)");
 
 		Sys.println(failures == 0 ? "\nALL TESTS PASSED" : '\n$failures TEST(S) FAILED');
 		Sys.exit(failures == 0 ? 0 : 1);

@@ -1,6 +1,6 @@
 {
   "name": "flower",
-  "description": "Showcase of the prototype engine: slow curving seed bullets that burst into accelerating petals mid-flight (requires no engine changes - built from Sub + generic prototype properties)",
+  "description": "Showcase of the prototype engine: slow curving seed bullets that burst into accelerating petals mid-flight and keep curving afterwards (Sub + generic prototype properties; the burst is wrapped in Scope so it configures only the petals, not the seed's own flight)",
   "parameters": {
     "seedCount": {
       "type": "int",
@@ -51,12 +51,14 @@
       "control": "Sub",
       "actions": [
         {"control": "Wait", "frames": "$burstDelay"},
-        {"control": "Set", "prop": "turn", "value": 0},
-        {"control": "Set", "prop": "speed", "value": "$petalSpeed"},
-        {"control": "Set", "prop": "accel", "value": 0.08},
-        {"control": "Set", "prop": "maxSpeed", "value": 6},
-        {"control": "Random", "prop": "direction", "min": 0, "max": 360},
-        {"control": "Radial", "count": "$petalCount", "speed": 0}
+        {"control": "Scope", "actions": [
+          {"control": "Set", "prop": "turn", "value": 0},
+          {"control": "Set", "prop": "speed", "value": "$petalSpeed"},
+          {"control": "Set", "prop": "accel", "value": 0.08},
+          {"control": "Set", "prop": "maxSpeed", "value": 6},
+          {"control": "Random", "prop": "direction", "min": 0, "max": 360},
+          {"control": "Radial", "count": "$petalCount", "speed": 0}
+        ]}
       ]
     },
     {

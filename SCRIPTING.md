@@ -20,7 +20,7 @@ ScriptRunner ── mutates ──▶ ShotPrototype ── clone ──▶ IShot
 | `Shot/ShotCommand.hx` | `IShotCommand` interface — one class per behavior, no central enum |
 | `Shot/ShotContext.hx` | An execution thread: prototype + frame stack + wait/blocking state |
 | `Shot/ScriptRunner.hx` | The interpreter: frame budget, loops, concurrency, firing |
-| `Shot/FlowCommands.hx` | `Wait`, `Loop`, `Rep`, `Concurrent`, `Sub`, `Vanish` |
+| `Shot/FlowCommands.hx` | `Wait`, `Loop`, `Rep`, `Concurrent`, `Sub`, `Scope`, `Vanish` |
 | `Shot/PropertyCommands.hx` | Generic `Set`/`Add`/`Random`/`Copy`/`Offset`/`AimAtTarget` |
 | `Shot/FireCommands.hx` | `Fire`, `Radial`, `NWay` |
 | `Shot/CommandRegistry.hx` | JSON `"control"` name → command parser (the extension point) |
@@ -74,6 +74,21 @@ New generic controls:
 
 `Vanish` despawns the script's owner: inside a `Sub` script it removes the bullet itself (and halts the script); on an enemy-owned script it is a no-op.
 
+### Scope — one-shot child configuration vs steering yourself
+
+```jsonc
+{"control": "Scope", "actions": [
+    {"control": "Set", "prop": "turn", "value": 0},
+    {"control": "Radial", "count": 8, "speed": 2}
+]}
+```
+
+`Scope` runs its body against a **clone** of the prototype, discarded when the block ends. Mutations inside (including custom vars) affect only bullets fired inside the block; afterwards the prototype is exactly what it was before. Unlike a `Concurrent` branch, the body executes inline within the same frame budget (no one-frame scheduling delay), and `Scope` nests freely.
+
+Why it exists: inside a bullet's own `Sub` script, the prototype does double duty. Mutating `direction`/`speed`/`turn` **steers the bullet itself** (that's how `shifter.json` kinks mid-flight, and it's usually what you want) — but a burst script like `flower.json`'s seed-to-petal explosion mutates those same properties only to *configure the children it's about to fire*. Without `Scope`, the seed permanently adopts the petals' direction/turn/accel at the moment of the burst and stops curving. **Rule of thumb: in a bullet's own script, wrap burst-configuration in `Scope`; leave steering mutations unscoped.** The bullet syncs its flight state from the script's *root* prototype, which a `Scope` never touches.
+
+Caveat: the clone is a snapshot at `Scope` entry — in a multi-frame `Scope` (body containing `Wait`s), the owning bullet's live direction/speed updates during the block aren't visible inside it.
+
 Available properties: `direction` (alias `angle`), `speed`, `offsetDistance`, `offsetAngle`, `accel` (alias `acceleration`), `angularVelocity` (alias `turn`), `minSpeed`, `maxSpeed`, `lifetime` — plus any custom variable name.
 
 ### Sub-scripts (bullets that fire bullets)
@@ -85,7 +100,7 @@ Available properties: `direction` (alias `angle`), `speed`, `offsetDistance`, `o
 ]}
 ```
 
-Every bullet fired *after* a `Sub` carries that script and executes it itself after spawning (the bullet becomes its own emitter). The bullet syncs its flight state (`direction`, `speed`, `accel`, `turn`, speed clamps) from the sub-script's live prototype every frame via `ScriptRunner.getPrototype()`, so a sub-script that mutates `direction` mid-flight steers the bullet itself (see `Assets/patterns/shifter.json`); the bullet writes its integrated direction/speed back so curving keeps accumulating. The sub-script starts from a clone of the bullet's prototype (inheriting direction/speed/vars) with the sub-script stripped so it doesn't recurse by accident. `{"control": "Sub", "actions": []}` clears it. See `Assets/patterns/flower.json` for a full example: curving seed bullets that burst into accelerating petals.
+Every bullet fired *after* a `Sub` carries that script and executes it itself after spawning (the bullet becomes its own emitter). The bullet syncs its flight state (`direction`, `speed`, `accel`, `turn`, speed clamps) from the sub-script's live prototype every frame via `ScriptRunner.getPrototype()`, so a sub-script that mutates `direction` mid-flight steers the bullet itself (see `Assets/patterns/shifter.json`); the bullet writes its integrated direction/speed back so curving keeps accumulating. The sub-script starts from a clone of the bullet's prototype (inheriting direction/speed/vars) with the sub-script stripped so it doesn't recurse by accident. `{"control": "Sub", "actions": []}` clears it. Because the bullet adopts the sub-script prototype's flight properties, wrap any *fire-configuration* mutations (setting direction/speed/turn just to shape a burst of children) in `Scope` — otherwise the bullet itself adopts them. See `Assets/patterns/flower.json` for a full example: curving seed bullets whose `Scope`d burst fires accelerating petals while the seed keeps curving.
 
 ### Values and expressions
 

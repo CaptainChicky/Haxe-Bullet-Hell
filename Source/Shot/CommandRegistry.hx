@@ -91,6 +91,10 @@ class CommandRegistry {
 			return new ConcurrentCommand(branches, d.share == true);
 		});
 		parsers.set("Sub", (d, c) -> new SubCommand(c.compileList(d.actions)));
+		// {"control": "Scope", "actions": [...]} -> body mutates a discarded
+		// clone; use for burst-configuration inside a bullet's own script so
+		// the bullet's flight state (curving etc.) is not hijacked.
+		parsers.set("Scope", (d, c) -> new ScopeCommand(c.compileList(d.actions)));
 		parsers.set("Vanish", (d, c) -> new VanishCommand());
 
 		// --- Firing -----------------------------------------------------------
