@@ -27,4 +27,11 @@ interface IShotEmitter {
 
 	/** False once the owner is gone (enemy dead / bullet removed); the runner stops. */
 	function isAlive():Bool;
+
+	/**
+	 * Remove the script's owner from play (the Vanish command). Meaningful for
+	 * bullet-owned emitters (the bullet despawns itself mid-flight); a no-op
+	 * for enemy emitters.
+	 */
+	function vanish():Void;
 }

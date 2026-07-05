@@ -20,6 +20,9 @@ private class EmitterBase {
 		this.collisionManager = collisionManager;
 	}
 
+	/** Vanish is a no-op for enemy emitters; BulletSubEmitter overrides. */
+	public function vanish():Void {}
+
 	public function getTarget():ShotTarget {
 		if (collisionManager == null) return null;
 		var player = collisionManager.getPlayer();
@@ -84,5 +87,10 @@ class BulletSubEmitter extends EmitterBase implements IShotEmitter {
 
 	public function isAlive():Bool {
 		return bullet != null && bullet.parent != null;
+	}
+
+	/** The Vanish command: the bullet removes itself mid-flight. */
+	override public function vanish():Void {
+		if (bullet != null) bullet.destroy();
 	}
 }

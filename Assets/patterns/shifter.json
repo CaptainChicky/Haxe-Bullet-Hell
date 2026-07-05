@@ -1,0 +1,39 @@
+{
+  "name": "shifter",
+  "description": "Continuous stream; each bullet kinks -120 degrees 30 frames after its own spawn (per-bullet sub-script mutating direction mid-flight)",
+  "parameters": {
+    "streamDelay": {
+      "type": "int",
+      "default": 4,
+      "description": "Frames between stream bullets"
+    },
+    "shiftDelay": {
+      "type": "int",
+      "default": 30,
+      "description": "Frames after spawn before the bullet turns"
+    },
+    "shiftAngle": {
+      "type": "float",
+      "default": -120,
+      "description": "Direction change applied at shiftDelay"
+    }
+  },
+  "script": [
+    {"control": "Set", "prop": "speed", "value": 3},
+    {"control": "Set", "prop": "direction", "value": 90},
+    {
+      "control": "Sub",
+      "actions": [
+        {"control": "Wait", "frames": "$shiftDelay"},
+        {"control": "Add", "prop": "direction", "delta": "$shiftAngle"}
+      ]
+    },
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "Wait", "frames": "$streamDelay"}
+      ]
+    }
+  ]
+}

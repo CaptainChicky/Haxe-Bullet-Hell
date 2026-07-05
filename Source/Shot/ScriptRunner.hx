@@ -21,11 +21,19 @@ class ScriptRunner {
 	private var contexts:Array<ShotContext>;
 	private var isActive:Bool = true;
 
+	/** The root context's prototype, retained across the whole runner lifetime.
+	 *  Kept as a direct reference (not contexts[0]) because the root context is
+	 *  spliced out of `contexts` the same update() it completes - a script whose
+	 *  LAST command mutates the prototype (e.g. shifter's final Add) would
+	 *  otherwise have that mutation vanish before the owning bullet reads it. */
+	private var rootPrototype:ShotPrototype;
+
 	public var isPaused:Bool = false;
 
 	public function new(emitter:IShotEmitter, commands:Array<IShotCommand>, ?prototype:ShotPrototype) {
 		this.emitter = emitter;
 		var proto = (prototype != null) ? prototype : new ShotPrototype();
+		this.rootPrototype = proto;
 		this.contexts = [new ShotContext(commands, proto)];
 	}
 
@@ -118,10 +126,13 @@ class ScriptRunner {
 
 	// ------------------------------------------------------------------ API used by commands
 
-	/** Spawn concurrent branches. Each branch clones the parent's prototype. */
-	public function branch(parent:ShotContext, branches:Array<Array<IShotCommand>>):Void {
+	/** Spawn concurrent branches. Each branch clones the parent's prototype,
+	 *  unless share = true, in which case all branches (and the parent) operate
+	 *  on the same prototype - e.g. two parallel Tweens on one bullet. */
+	public function branch(parent:ShotContext, branches:Array<Array<IShotCommand>>, share:Bool = false):Void {
 		for (commands in branches) {
-			var child = new ShotContext(commands, parent.prototype.clone(), parent);
+			var proto = share ? parent.prototype : parent.prototype.clone();
+			var child = new ShotContext(commands, proto, parent);
 			contexts.push(child);
 			parent.blockedBy++;
 		}
@@ -152,6 +163,15 @@ class ScriptRunner {
 
 	public function getEmitter():IShotEmitter {
 		return emitter;
+	}
+
+	/**
+	 * The root context's live prototype. This is what lets an owning bullet
+	 * read back script-driven flight changes (direction/speed/...) each frame.
+	 * Remains valid after the script finishes (see rootPrototype note above).
+	 */
+	public function getPrototype():ShotPrototype {
+		return rootPrototype;
 	}
 
 	public function pause():Void isPaused = true;

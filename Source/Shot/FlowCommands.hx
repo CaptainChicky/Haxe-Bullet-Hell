@@ -48,16 +48,38 @@ class RepCommand implements IShotCommand {
  * Runs several command sequences in parallel, each with an independent clone
  * of the prototype. The parent context resumes after all branches complete.
  * Branches may themselves contain Concurrent blocks (nesting now supported).
+ *
+ * With share = true, branches operate on the PARENT's prototype instead of
+ * clones - required for e.g. two simultaneous Tweens animating different
+ * properties of the same upcoming bullet (flowering).
  */
 class ConcurrentCommand implements IShotCommand {
 	private var branches:Array<Array<IShotCommand>>;
+	private var share:Bool;
 
-	public function new(branches:Array<Array<IShotCommand>>) {
+	public function new(branches:Array<Array<IShotCommand>>, share:Bool = false) {
 		this.branches = branches;
+		this.share = share;
 	}
 
 	public function run(ctx:ShotContext, runner:ScriptRunner):Void {
-		if (branches.length > 0) runner.branch(ctx, branches);
+		if (branches.length > 0) runner.branch(ctx, branches, share);
+	}
+}
+
+/**
+ * Removes the script's owner from play. For a bullet-owned script this
+ * despawns the bullet mid-flight (the `vanish()` primitive - static geometry,
+ * seeds, timed disappearing walls). Also terminates this script context.
+ */
+class VanishCommand implements IShotCommand {
+	public function new() {}
+
+	public function run(ctx:ShotContext, runner:ScriptRunner):Void {
+		runner.getEmitter().vanish();
+		// Halt: clear the frame stack so no further commands run this frame,
+		// letting the runner retire the context normally next iteration.
+		ctx.frames.resize(0);
 	}
 }
 

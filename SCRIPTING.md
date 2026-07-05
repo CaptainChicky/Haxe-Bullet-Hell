@@ -20,7 +20,7 @@ ScriptRunner ── mutates ──▶ ShotPrototype ── clone ──▶ IShot
 | `Shot/ShotCommand.hx` | `IShotCommand` interface — one class per behavior, no central enum |
 | `Shot/ShotContext.hx` | An execution thread: prototype + frame stack + wait/blocking state |
 | `Shot/ScriptRunner.hx` | The interpreter: frame budget, loops, concurrency, firing |
-| `Shot/FlowCommands.hx` | `Wait`, `Loop`, `Rep`, `Concurrent`, `Sub` |
+| `Shot/FlowCommands.hx` | `Wait`, `Loop`, `Rep`, `Concurrent`, `Sub`, `Vanish` |
 | `Shot/PropertyCommands.hx` | Generic `Set`/`Add`/`Random`/`Copy`/`Offset`/`AimAtTarget` |
 | `Shot/FireCommands.hx` | `Fire`, `Radial`, `NWay` |
 | `Shot/CommandRegistry.hx` | JSON `"control"` name → command parser (the extension point) |
@@ -59,7 +59,20 @@ New generic controls:
 {"control": "Add",    "prop": "turn",  "delta": -0.5}       // curving bullets
 {"control": "Random", "prop": "speed", "min": 2, "max": 6}
 {"control": "Copy",   "from": "direction", "to": "offsetAngle"}
+{"control": "Tween",  "prop": "speed", "to": 6, "frames": 30}   // linear interp over N frames
+{"control": "Vanish"}                                            // bullet removes itself mid-flight
 ```
+
+`Tween` is stateful: it interpolates the property one step per frame and lands exactly on `to` after `frames` frames, then the script continues. To run two tweens simultaneously on the *same* upcoming bullet, use `Concurrent` with `"share": true` (branches normally clone the prototype; `share` makes them mutate the parent's):
+
+```jsonc
+{"control": "Concurrent", "share": true, "branches": [
+    [{"control": "Tween", "prop": "speed", "to": 10, "frames": 30}],
+    [{"control": "Tween", "prop": "turn",  "to": 5,  "frames": 30}]
+]}
+```
+
+`Vanish` despawns the script's owner: inside a `Sub` script it removes the bullet itself (and halts the script); on an enemy-owned script it is a no-op.
 
 Available properties: `direction` (alias `angle`), `speed`, `offsetDistance`, `offsetAngle`, `accel` (alias `acceleration`), `angularVelocity` (alias `turn`), `minSpeed`, `maxSpeed`, `lifetime` — plus any custom variable name.
 
@@ -72,7 +85,7 @@ Available properties: `direction` (alias `angle`), `speed`, `offsetDistance`, `o
 ]}
 ```
 
-Every bullet fired *after* a `Sub` carries that script and executes it itself after spawning (the bullet becomes its own emitter). The sub-script starts from a clone of the bullet's prototype (inheriting direction/speed/vars) with the sub-script stripped so it doesn't recurse by accident. `{"control": "Sub", "actions": []}` clears it. See `Assets/patterns/flower.json` for a full example: curving seed bullets that burst into accelerating petals.
+Every bullet fired *after* a `Sub` carries that script and executes it itself after spawning (the bullet becomes its own emitter). The bullet syncs its flight state (`direction`, `speed`, `accel`, `turn`, speed clamps) from the sub-script's live prototype every frame via `ScriptRunner.getPrototype()`, so a sub-script that mutates `direction` mid-flight steers the bullet itself (see `Assets/patterns/shifter.json`); the bullet writes its integrated direction/speed back so curving keeps accumulating. The sub-script starts from a clone of the bullet's prototype (inheriting direction/speed/vars) with the sub-script stripped so it doesn't recurse by accident. `{"control": "Sub", "actions": []}` clears it. See `Assets/patterns/flower.json` for a full example: curving seed bullets that burst into accelerating petals.
 
 ### Values and expressions
 
@@ -86,4 +99,4 @@ The engine tests run without OpenFL:
 haxe -cp Source -cp Tests -main TestShot --interp
 ```
 
-(On case-sensitive filesystems, use a lowercase symlink for `Source/Shot` → `shot`, since packages are lowercase.)
+(Source folders are lowercase to match package names, so this works on case-sensitive filesystems.)

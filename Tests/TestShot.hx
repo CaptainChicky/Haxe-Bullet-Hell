@@ -26,6 +26,13 @@ class FakeEmitter implements IShotEmitter {
 	}
 
 	public function isAlive():Bool return alive;
+
+	public var vanished:Bool = false;
+
+	public function vanish():Void {
+		vanished = true;
+		alive = false;
+	}
 }
 
 class TestShot {
@@ -208,6 +215,78 @@ class TestShot {
 		runner2.update();
 		runner2.update();
 		check(em2.spawns.length == 1, "lifecycle: runner stops firing once emitter dies");
+
+		// --- Vanish: emitter's owner despawns, script halts --------------------
+		var vanishScript = compile('[
+			{"control": "Wait", "frames": 5},
+			{"control": "Vanish"},
+			{"control": "Fire", "angle": 0, "speed": 1}
+		]');
+		var em3 = new FakeEmitter();
+		var runner3 = new ScriptRunner(em3, vanishScript);
+		for (i in 0...10) runner3.update();
+		check(em3.vanished, "vanish: emitter.vanish() called after the wait");
+		check(em3.spawns.length == 0, "vanish: no commands execute after Vanish (Fire skipped)");
+
+		// --- Tween: linear interpolation landing exactly on target -------------
+		var tweenScript = compile('[
+			{"control": "Set", "prop": "speed", "value": 2},
+			{"control": "Tween", "prop": "speed", "to": 10, "frames": 4},
+			{"control": "Fire", "angle": 90, "speed": 0}
+		]');
+		var em4 = run(tweenScript, 20);
+		check(em4.spawns.length == 1 && em4.spawns[0].proto.speed == 10, "tween: property lands exactly on target (speed 10)");
+		check(em4.spawns[0].frame == 4, 'tween: took 4 frames (fired on frame ${em4.spawns[0].frame})');
+
+		// --- Tween inside Loop: fresh state per execution -----------------------
+		var tweenLoop = compile('[
+			{"control": "Rep", "count": 2, "actions": [
+				{"control": "Set", "prop": "speed", "value": 0},
+				{"control": "Tween", "prop": "speed", "to": 6, "frames": 3},
+				{"control": "Fire", "angle": 90, "speed": 0}
+			]}
+		]');
+		var em5 = run(tweenLoop, 20);
+		check(em5.spawns.length == 2 && em5.spawns[0].proto.speed == 6 && em5.spawns[1].proto.speed == 6,
+			"tween: shared compiled command re-runs cleanly (state is per-execution)");
+
+		// --- Concurrent share: two parallel tweens on ONE prototype -------------
+		var parallelTween = compile('[
+			{"control": "Set", "prop": "speed", "value": 0},
+			{"control": "Set", "prop": "turn", "value": 0},
+			{"control": "Concurrent", "share": true, "branches": [
+				[{"control": "Tween", "prop": "speed", "to": 10, "frames": 5}],
+				[{"control": "Tween", "prop": "turn", "to": 5, "frames": 5}]
+			]},
+			{"control": "Fire", "angle": 90, "speed": 0}
+		]');
+		var em6 = run(parallelTween, 20);
+		check(em6.spawns.length == 1 && em6.spawns[0].proto.speed == 10 && em6.spawns[0].proto.angularVelocity == 5,
+			"concurrent share: parallel tweens both landed on the same prototype");
+
+		// --- Default Concurrent still clones (regression) ------------------------
+		var cloneCheck = compile('[
+			{"control": "Set", "prop": "speed", "value": 0},
+			{"control": "Concurrent", "branches": [
+				[{"control": "Set", "prop": "speed", "value": 99}]
+			]},
+			{"control": "Fire", "angle": 90, "speed": 0}
+		]');
+		var em7 = run(cloneCheck, 5);
+		check(em7.spawns.length == 1 && em7.spawns[0].proto.speed == 0,
+			"concurrent default: branches still clone (parent prototype untouched)");
+
+		// --- getPrototype survives script completion (last-frame mutation) ------
+		var lastMutation = compile('[
+			{"control": "Wait", "frames": 3},
+			{"control": "Add", "prop": "direction", "delta": -120}
+		]');
+		var em8 = new FakeEmitter();
+		var runner8 = new ScriptRunner(em8, lastMutation);
+		var startDir = runner8.getPrototype().direction;
+		for (i in 0...6) runner8.update();
+		check(runner8.getPrototype() != null && runner8.getPrototype().direction == startDir - 120,
+			"getPrototype: retained after completion, final-frame Add not lost");
 
 		Sys.println(failures == 0 ? "\nALL TESTS PASSED" : '\n$failures TEST(S) FAILED');
 		Sys.exit(failures == 0 ? 0 : 1);

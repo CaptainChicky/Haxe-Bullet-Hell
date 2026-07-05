@@ -97,6 +97,61 @@ class OffsetCommand implements IShotCommand {
 	}
 }
 
+/**
+ * Linearly interpolates prototype[prop] from its current value to `target`
+ * over `frames` frames (one step per frame, landing exactly on `target`).
+ *
+ * This is the engine's first *stateful* command type. Compiled commands are
+ * shared across contexts (Concurrent clones, sub-script bullets, Loop
+ * re-entry), so per-execution state must NOT live on the command itself:
+ * run() captures the start value and allocates a fresh TweenStepCommand,
+ * pushed as its own repeat-frame - each execution owns its own state.
+ */
+class TweenCommand implements IShotCommand {
+	private var prop:String;
+	private var target:Float;
+	private var frames:Int;
+
+	public function new(prop:String, target:Float, frames:Int) {
+		this.prop = prop;
+		this.target = target;
+		this.frames = frames;
+	}
+
+	public function run(ctx:ShotContext, runner:ScriptRunner):Void {
+		if (frames <= 0) {
+			ctx.prototype.setProp(prop, target);
+			return;
+		}
+		var start = ctx.prototype.getProp(prop);
+		ctx.frames.push(new shot.ShotContext.ShotFrame([new TweenStepCommand(prop, start, target, frames)], frames));
+	}
+}
+
+/** One in-flight tween execution; instantiated fresh by TweenCommand.run(). */
+private class TweenStepCommand implements IShotCommand {
+	private var prop:String;
+	private var start:Float;
+	private var target:Float;
+	private var total:Int;
+	private var i:Int = 0;
+
+	public function new(prop:String, start:Float, target:Float, total:Int) {
+		this.prop = prop;
+		this.start = start;
+		this.target = target;
+		this.total = total;
+	}
+
+	public function run(ctx:ShotContext, runner:ScriptRunner):Void {
+		i++;
+		var t = i / total;
+		// Final step assigns target exactly (t == 1), no float drift.
+		ctx.prototype.setProp(prop, start + (target - start) * t);
+		ctx.waitFrames = 1;
+	}
+}
+
 /** Points the prototype's direction from the (offset) spawn position at the emitter's target. */
 class AimAtTargetCommand implements IShotCommand {
 	public function new() {}

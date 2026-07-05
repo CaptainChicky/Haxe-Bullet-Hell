@@ -90,19 +90,50 @@ class BulletEnemy extends Sprite {
 			return;
 		}
 
-		// Run the bullet's own script (if any) before moving.
+		// Run the bullet's own script (if any) before moving, then sync flight
+		// state FROM the script's live prototype: a sub-script that mutates
+		// direction/speed/... mid-flight (e.g. shifter's delayed Add) must
+		// steer this bullet, not just the prototype of bullets it fires next.
 		if (script != null) {
 			script.update();
+
+			// The script may have despawned this bullet (Vanish command).
+			if (parent == null) {
+				removeEventListener(Event.ENTER_FRAME, everyFrame);
+				return;
+			}
+
+			var proto = (script != null) ? script.getPrototype() : null;
+			if (proto != null) {
+				direction = proto.direction;
+				speed = proto.speed;
+				accel = proto.accel;
+				angularVelocity = proto.angularVelocity;
+				minSpeed = proto.minSpeed;
+				maxSpeed = proto.maxSpeed;
+			}
 		}
 
-		// Apply in-flight prototype behavior.
-		if (angularVelocity != 0 || accel != 0) {
-			direction += angularVelocity;
-			speed += accel;
-			if (speed < minSpeed) speed = minSpeed;
-			if (speed > maxSpeed) speed = maxSpeed;
-			updateVelocity();
+		// Apply in-flight prototype behavior unconditionally: the recompute
+		// must happen every frame, not only when angularVelocity/accel are
+		// nonzero, or purely script-driven direction changes never take effect.
+		direction += angularVelocity;
+		speed += accel;
+		if (speed < minSpeed) speed = minSpeed;
+		if (speed > maxSpeed) speed = maxSpeed;
+
+		// Write the integrated state back so the prototype stays the single
+		// source of truth: without this, the sync above would reset a curving
+		// bullet's direction to the prototype's stale value every frame and
+		// angularVelocity would stop accumulating (breaks flower's seeds).
+		if (script != null) {
+			var proto = script.getPrototype();
+			if (proto != null) {
+				proto.direction = direction;
+				proto.speed = speed;
+			}
 		}
+		updateVelocity();
 
 		x += velocityX;
 		y += velocityY;
@@ -125,6 +156,11 @@ class BulletEnemy extends Sprite {
 		// Cosmetic sprite spin based on time since spawn.
 		var deltaTime:Float = (Lib.getTimer() - spawnTime) / 1000.0;
 		rotation = salt + (ROTATION_SPEED * deltaTime);
+	}
+
+	/** Public destroy hook (used by the Vanish command via BulletSubEmitter). */
+	public function destroy():Void {
+		despawn();
 	}
 
 	private function despawn():Void {

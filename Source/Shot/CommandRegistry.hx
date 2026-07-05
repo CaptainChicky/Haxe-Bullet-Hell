@@ -86,9 +86,12 @@ class CommandRegistry {
 			var branches:Array<Array<IShotCommand>> = [];
 			var raw:Array<Dynamic> = d.branches;
 			if (raw != null) for (b in raw) branches.push(c.compileList(b));
-			return new ConcurrentCommand(branches);
+			// {"share": true} -> branches mutate the parent's prototype directly
+			// (parallel Tweens on one bullet) instead of independent clones.
+			return new ConcurrentCommand(branches, d.share == true);
 		});
 		parsers.set("Sub", (d, c) -> new SubCommand(c.compileList(d.actions)));
+		parsers.set("Vanish", (d, c) -> new VanishCommand());
 
 		// --- Firing -----------------------------------------------------------
 		parsers.set("Fire", (d, c) -> new FireCommand(c.num(d.angle), c.num(d.speed)));
@@ -104,6 +107,8 @@ class CommandRegistry {
 		parsers.set("Add", (d, c) -> new AddPropCommand(c.str(d.prop, "direction"), c.num(d.delta)));
 		parsers.set("Random", (d, c) -> new RandomPropCommand(c.str(d.prop, "direction"), c.num(d.min), c.num(d.max)));
 		parsers.set("Copy", (d, c) -> new CopyPropCommand(c.str(d.from, "direction"), c.str(d.to, "direction")));
+		// {"control": "Tween", "prop": "speed", "to": 6, "frames": 30}
+		parsers.set("Tween", (d, c) -> new TweenCommand(c.str(d.prop, "direction"), c.num(d.to), c.int(d.frames)));
 
 		// --- Aiming -----------------------------------------------------------
 		parsers.set("AimAtPlayer", (d, c) -> new AimAtTargetCommand());
