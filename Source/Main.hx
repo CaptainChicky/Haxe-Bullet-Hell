@@ -122,7 +122,7 @@ class Main extends Sprite {
 			enemyManager.clearAllEnemies();
 
 			// Start the level!
-			levelManager.loadLevel("assets/levels/vanishingflowersidk.json");
+			levelManager.loadLevel("assets/levels/testershowcase.json");
 		}
 	}
 

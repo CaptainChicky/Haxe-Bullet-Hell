@@ -1,0 +1,38 @@
+{
+  "name": "seeds",
+  "description": "Alternating top/bottom volleys of 5-way seeds, each spawning a 12-step line of accelerating sub-seeds toward the player",
+  "parameters": {},
+  "script": [
+    {
+      "control": "Sub",
+      "actions": [
+        {"control": "AimAtPlayer"},
+        {"control": "Set", "prop": "speed", "value": 8},
+        {
+          "control": "Sub",
+          "actions": [
+            {"control": "AimAtPlayer"},
+            {"control": "Set", "prop": "speed", "value": 1},
+            {"control": "Line", "count": 12, "prop": "speed", "from": 1, "to": 7},
+            {"control": "Vanish"}
+          ]
+        },
+        {"control": "NWay", "count": 5, "angle": 150, "speed": 0},
+        {"control": "Vanish"}
+      ]
+    },
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "Random", "prop": "speed", "min": 6, "max": 9},
+        {"control": "Set", "prop": "direction", "value": 90},
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "Wait", "frames": 30},
+        {"control": "Random", "prop": "speed", "min": 6, "max": 9},
+        {"control": "Set", "prop": "direction", "value": 270},
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "Wait", "frames": 30}
+      ]
+    }
+  ]
+}

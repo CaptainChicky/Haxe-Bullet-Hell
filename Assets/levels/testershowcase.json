@@ -1,0 +1,80 @@
+{
+  "name": "pattern_showcase",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 500,
+          "y": 300,
+          "pattern": "pods",
+          "health": 999,
+          "patternConfig": {
+            "podSpeed": 10,
+            "decelFrames": 30,
+            "orbitStep": -3,
+            "spinStep": 12,
+            "streamDelay": 1
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Wait", "frames": 600},
+              {"type": "SetVelocity", "vx": 0, "vy": -15}
+            ]
+          }
+        },
+        {
+          "spawnTime": 15,
+          "x": 500,
+          "y": 300,
+          "pattern": "seeds",
+          "health": 999,
+          "patternConfig": {},
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Wait", "frames": 600},
+              {"type": "SetVelocity", "vx": 0, "vy": -15}
+            ]
+          }
+        },
+        {
+          "spawnTime": 30,
+          "x": 500,
+          "y": 300,
+          "pattern": "variables_demo",
+          "health": 999,
+          "patternConfig": {
+            "speed": 5,
+            "angleStep": 20,
+            "fireDelay": 4
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Wait", "frames": 600},
+              {"type": "SetVelocity", "vx": 0, "vy": -15}
+            ]
+          }
+        },
+        {
+          "spawnTime": 45,
+          "x": 500,
+          "y": 300,
+          "pattern": "flowerdup",
+          "health": 999,
+          "patternConfig": {},
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Wait", "frames": 600},
+              {"type": "SetVelocity", "vx": 0, "vy": -15}
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

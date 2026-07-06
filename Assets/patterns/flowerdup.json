@@ -1,0 +1,31 @@
+{
+  "name": "flowerdup",
+  "description": "32 randomly-bearinged 9-way volleys; each shot's speed tweens up while direction settles (absolute approximation - see note)",
+  "parameters": {},
+  "script": [
+    {"control": "Set", "prop": "speed", "value": 4},
+    {"control": "Set", "prop": "offsetDistance", "value": 80},
+    {
+      "control": "Loop",
+      "actions": [
+        {
+          "control": "Rep",
+          "count": 32,
+          "actions": [
+            {"control": "Random", "prop": "offsetAngle", "min": 0, "max": 360},
+            {"control": "Random", "prop": "direction", "min": 0, "max": 360},
+            {"control": "Add", "prop": "direction", "delta": 90},
+            {
+              "control": "Sub",
+              "actions": [
+                {"control": "Tween", "prop": "speed", "to": 2, "frames": 30}
+              ]
+            },
+            {"control": "NWay", "count": 9, "angle": 90, "speed": 1}
+          ]
+        },
+        {"control": "Wait", "frames": 240}
+      ]
+    }
+  ]
+}

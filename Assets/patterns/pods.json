@@ -1,0 +1,43 @@
+{
+  "name": "pods",
+  "description": "Two pods launch outward via offset (not velocity, since bind overrides position), settle into orbit, and fire a spinning stream",
+  "parameters": {
+    "orbitRadius": {"type": "float", "default": 120},
+    "launchFrames": {"type": "int", "default": 30},
+    "orbitStep": {"type": "float", "default": -3},
+    "spinStep": {"type": "float", "default": 12},
+    "streamSpeed": {"type": "float", "default": 4},
+    "streamDelay": {"type": "int", "default": 1}
+  },
+  "script": [
+    {"control": "Set", "prop": "offsetAngle", "value": 0},
+    {
+      "control": "Rep",
+      "count": 2,
+      "actions": [
+        {"control": "Bind", "mode": "position"},
+        {
+          "control": "Sub",
+          "actions": [
+            {"control": "Tween", "prop": "offsetDistance", "to": "$orbitRadius", "frames": "$launchFrames"},
+            {
+              "control": "Loop",
+              "actions": [
+                {"control": "Scope", "actions": [
+                  {"control": "Set", "prop": "speed", "value": "$streamSpeed"},
+                  {"control": "Fire", "angle": 0, "speed": 0}
+                ]},
+                {"control": "Add", "prop": "offsetAngle", "delta": "$orbitStep"},
+                {"control": "Add", "prop": "direction", "delta": "$spinStep"},
+                {"control": "Wait", "frames": "$streamDelay"}
+              ]
+            }
+          ]
+        },
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "Bind", "mode": "none"},
+        {"control": "Add", "prop": "offsetAngle", "delta": 180}
+      ]
+    }
+  ]
+}
