@@ -1,0 +1,185 @@
+{
+  "name": "full_showcase",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 500,
+          "y": 200,
+          "pattern": "flower",
+          "health": 999,
+          "patternConfig": {
+            "seedCount": 6,
+            "seedSpeed": 2.5,
+            "seedTurn": 1.5,
+            "burstDelay": 45,
+            "petalCount": 8,
+            "petalSpeed": 1,
+            "ringDelay": 50,
+            "ringRotation": 22.5
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 1200},
+              {"type": "SetVelocity", "vx": 0, "vy": -6}
+            ]
+          }
+        },
+        {
+          "spawnTime": 25,
+          "x": 200,
+          "y": 300,
+          "pattern": "flower",
+          "health": 999,
+          "patternConfig": {
+            "startDelay": 20,
+            "seedCount": 4,
+            "seedSpeed": 3.5,
+            "seedTurn": 4,
+            "burstDelay": 20,
+            "petalCount": 12,
+            "petalSpeed": 0.5,
+            "ringDelay": 30,
+            "ringRotation": 45
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 1200},
+              {"type": "SetVelocity", "vx": 0, "vy": -6}
+            ]
+          }
+        },
+        {
+          "spawnTime": 50,
+          "x": 800,
+          "y": 300,
+          "pattern": "flower",
+          "health": 999,
+          "patternConfig": {
+            "startDelay": 40,
+            "seedCount": 10,
+            "seedSpeed": 1.5,
+            "seedTurn": 0.5,
+            "burstDelay": 90,
+            "petalCount": 6,
+            "petalSpeed": 1.5,
+            "ringDelay": 70,
+            "ringRotation": 12
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 1200},
+              {"type": "SetVelocity", "vx": 0, "vy": -6}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 75,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 200,
+          "y": 50,
+          "pattern": "shifter",
+          "health": 999,
+          "patternConfig": {
+            "streamDelay": 4,
+            "shiftDelay": 30,
+            "shiftAngle": -120
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 1200},
+              {"type": "SetVelocity", "vx": 0, "vy": -6}
+            ]
+          }
+        },
+        {
+          "spawnTime": 10,
+          "x": 500,
+          "y": 50,
+          "pattern": "shifter",
+          "health": 999,
+          "patternConfig": {
+            "streamDelay": 2,
+            "shiftDelay": 15,
+            "shiftAngle": 45
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 1200},
+              {"type": "SetVelocity", "vx": 0, "vy": -6}
+            ]
+          }
+        },
+        {
+          "spawnTime": 20,
+          "x": 800,
+          "y": 50,
+          "pattern": "shifter",
+          "health": 999,
+          "patternConfig": {
+            "streamDelay": 8,
+            "shiftDelay": 60,
+            "shiftAngle": -180
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"},
+              {"type": "Wait", "frames": 1200},
+              {"type": "SetVelocity", "vx": 0, "vy": -6}
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 115,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 300,
+          "y": 100,
+          "pattern": "vanish",
+          "health": 999,
+          "patternConfig": {},
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"}
+            ]
+          }
+        },
+        {
+          "spawnTime": 0,
+          "x": 1200,
+          "y": 400,
+          "pattern": "static_geometry",
+          "health": 999,
+          "patternConfig": {},
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {"type": "Stop"}
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
