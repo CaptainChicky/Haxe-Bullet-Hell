@@ -144,12 +144,20 @@ class ScriptRunner {
 		var proto = ctx.prototype.clone();
 		if (directionOverride != null) proto.direction = directionOverride;
 		if (speedOverride != null) proto.speed = speedOverride;
+		fireClone(proto);
+	}
 
-		var pos = spawnPosition(ctx.prototype);
+	/** Spawn an already-cloned prototype (Fire/Radial/NWay/Line all route
+	 *  through here; Dup calls it directly with per-copy clones). Wires up
+	 *  binding: a bound bullet follows THIS runner's root prototype. */
+	public function fireClone(proto:ShotPrototype):Void {
+		if (proto.bindMode != ShotPrototype.BIND_NONE) proto.bindSource = rootPrototype;
+		var pos = spawnPosition(proto);
 		emitter.spawn(proto, pos.x, pos.y);
 	}
 
-	/** World-space spawn position for the current prototype (origin + offset). */
+	/** World-space spawn position for the current prototype
+	 *  (origin + polar offset + Cartesian offset). */
 	public function spawnPosition(proto:ShotPrototype):{x:Float, y:Float} {
 		var x = emitter.getOriginX();
 		var y = emitter.getOriginY();
@@ -158,6 +166,8 @@ class ScriptRunner {
 			x += Math.cos(rad) * proto.offsetDistance;
 			y += Math.sin(rad) * proto.offsetDistance;
 		}
+		x += proto.x;
+		y += proto.y;
 		return {x: x, y: y};
 	}
 

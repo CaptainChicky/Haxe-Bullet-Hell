@@ -12,12 +12,14 @@ class FakeEmitter implements IShotEmitter {
 	public var alive:Bool = true;
 	public var targetX:Float = 100;
 	public var targetY:Float = 0;
+	public var originX:Float = 0;
+	public var originY:Float = 0;
 
 	public function new() {}
 
-	public function getOriginX():Float return 0;
+	public function getOriginX():Float return originX;
 
-	public function getOriginY():Float return 0;
+	public function getOriginY():Float return originY;
 
 	public function getTarget():ShotTarget return {x: targetX, y: targetY};
 
@@ -54,6 +56,13 @@ class HeadlessTestBullet {
 	public var maxSpeed:Float;
 	public var script:ScriptRunner = null;
 
+	// Binding (mirrors BulletEnemy).
+	public var bindMode:Int = ShotPrototype.BIND_NONE;
+	public var bindAnchor:IShotEmitter = null;
+	public var bindSource:ShotPrototype = null;
+	var anchorLastX:Float = 0;
+	var anchorLastY:Float = 0;
+
 	public function new(p:ShotPrototype) {
 		direction = p.direction;
 		speed = p.speed;
@@ -63,19 +72,56 @@ class HeadlessTestBullet {
 		maxSpeed = p.maxSpeed;
 	}
 
+	public function bindTo(anchor:IShotEmitter, mode:Int, source:ShotPrototype):Void {
+		bindAnchor = anchor;
+		bindMode = mode;
+		bindSource = source;
+		anchorLastX = anchor.getOriginX();
+		anchorLastY = anchor.getOriginY();
+	}
+
 	public function everyFrame():Void {
 		if (!alive) return;
 		if (script != null) {
 			script.update();
 			if (!alive) return;
-			var proto = script.getPrototype();
-			if (proto != null) {
-				direction = proto.direction;
-				speed = proto.speed;
-				accel = proto.accel;
-				angularVelocity = proto.angularVelocity;
-				minSpeed = proto.minSpeed;
-				maxSpeed = proto.maxSpeed;
+			// In BIND_FULL mode the parent's live prototype owns flight state.
+			if (bindMode != ShotPrototype.BIND_FULL) {
+				var proto = script.getPrototype();
+				if (proto != null) {
+					direction = proto.direction;
+					speed = proto.speed;
+					accel = proto.accel;
+					angularVelocity = proto.angularVelocity;
+					minSpeed = proto.minSpeed;
+					maxSpeed = proto.maxSpeed;
+				}
+			}
+		}
+		// Bound bullets follow their parent.
+		var bindDX:Float = 0;
+		var bindDY:Float = 0;
+		if (bindAnchor != null) {
+			if (!bindAnchor.isAlive()) {
+				// Orphan-release.
+				bindAnchor = null;
+				bindSource = null;
+				bindMode = ShotPrototype.BIND_NONE;
+			} else {
+				if (bindMode == ShotPrototype.BIND_FULL && bindSource != null) {
+					direction = bindSource.direction;
+					speed = bindSource.speed;
+					accel = bindSource.accel;
+					angularVelocity = bindSource.angularVelocity;
+					minSpeed = bindSource.minSpeed;
+					maxSpeed = bindSource.maxSpeed;
+				}
+				var px = bindAnchor.getOriginX();
+				var py = bindAnchor.getOriginY();
+				bindDX = px - anchorLastX;
+				bindDY = py - anchorLastY;
+				anchorLastX = px;
+				anchorLastY = py;
 			}
 		}
 		direction += angularVelocity;
@@ -90,8 +136,8 @@ class HeadlessTestBullet {
 			}
 		}
 		var rad = direction * Math.PI / 180;
-		x += Math.cos(rad) * speed;
-		y += Math.sin(rad) * speed;
+		x += Math.cos(rad) * speed + bindDX;
+		y += Math.sin(rad) * speed + bindDY;
 	}
 }
 
@@ -277,7 +323,7 @@ class TestShot {
 		check(bulletEm.spawns.length == 8 && bulletEm.spawns[0].frame == 10, "sub: burst timing correct");
 
 		// --- Legacy pattern files compile & run ---------------------------------------
-		for (name in ["spiral", "nwhip", "orbit", "sniper", "random", "radial", "flower", "shifter"]) {
+		for (name in ["spiral", "nwhip", "orbit", "sniper", "random", "radial", "flower", "shifter", "satellite"]) {
 			var text = sys.io.File.getContent("Assets/patterns/" + name + ".json");
 			var template:Dynamic = Json.parse(text);
 			var paramMap:Map<String, Dynamic> = new Map();
@@ -458,6 +504,310 @@ class TestShot {
 		for (f in 0...40) kink.everyFrame();
 		check(Math.abs(kink.direction - (-30)) < 1e-6,
 			"shifter semantics: unscoped sub-script Add still steers the bullet (90 -> -30)");
+
+		// ======================================================================
+		// Item 2: expression extensions
+		// ======================================================================
+		var xp:Map<String, Dynamic> = ["base" => 90.0, "n" => 4.0];
+		check(Math.abs(Expression.evaluate("sin(90)", xp) - 1) < 1e-12, "expr fn: sin(90) = 1 (degrees)");
+		check(Math.abs(Expression.evaluate("cos(0) * 4", xp) - 4) < 1e-12, "expr fn: cos(0) * 4 = 4");
+		check(Math.abs(Expression.evaluate("sin($base - 60)", xp) - 0.5) < 1e-12, "expr fn: params inside call args, sin(30) = 0.5");
+		check(Expression.evaluate("2 * (3 + 4)", xp) == 14, "expr: parentheses now supported");
+		check(Expression.evaluate("-(2 + 3)", xp) == -5, "expr: unary minus on a group");
+		check(Expression.evaluate("$base - $n * 2", xp) == 82, "expr: legacy precedence semantics intact");
+
+		var allIn = true, sawDistinct = false, firstV:Float = -1;
+		for (i in 0...300) {
+			var v = Expression.evaluate("random.between(2, 6)", xp);
+			if (v < 2 || v >= 6) allIn = false;
+			if (i == 0) firstV = v else if (v != firstV) sawDistinct = true;
+		}
+		check(allIn && sawDistinct, "expr fn: random.between(2,6) stays in [2,6) and varies");
+
+		var anglesOk = true;
+		var angleSeen = [false, false, false, false];
+		for (i in 0...300) {
+			var v = Expression.evaluate("random.angle(4)", xp);
+			if (v != 0 && v != 90 && v != 180 && v != 270) anglesOk = false
+			else angleSeen[Std.int(v / 90)] = true;
+		}
+		check(anglesOk && angleSeen[0] && angleSeen[1] && angleSeen[2] && angleSeen[3],
+			"expr fn: random.angle(4) hits exactly {0, 90, 180, 270}");
+
+		// Volatile expressions re-roll PER COMMAND EXECUTION (the whole point).
+		var inlineRand = compile('[{"control": "Loop", "actions": [
+			{"control": "Set", "prop": "speed", "value": "random.between(2, 6)"},
+			{"control": "Fire", "angle": 90, "speed": 0},
+			{"control": "Wait", "frames": 1}
+		]}]');
+		var emA = run(inlineRand, 30);
+		var inRange = true, varies = false;
+		for (s in emA.spawns) {
+			if (s.proto.speed < 2 || s.proto.speed >= 6) inRange = false;
+			if (s.proto.speed != emA.spawns[0].proto.speed) varies = true;
+		}
+		check(emA.spawns.length == 30 && inRange && varies,
+			"inline random: Set re-rolls per loop iteration (30 bullets, varied speeds in range)");
+
+		// Deterministic expressions still fold to constants (params captured).
+		var folded = compile('[{"control": "Set", "prop": "speed", "value": "sin($$a) * 10"},
+			{"control": "Fire", "angle": 90, "speed": 0}]', {a: 90});
+		var emB = run(folded, 1);
+		check(Math.abs(emB.spawns[0].proto.speed - 10) < 1e-12, "expr fn: functions usable in command values via $params");
+
+		// Copy scaling (needed its own small addition - see notes).
+		var copyScale = compile('[
+			{"control": "Set", "prop": "speed", "value": 4},
+			{"control": "Copy", "from": "speed", "to": "myVar", "scale": 3},
+			{"control": "Copy", "from": "myVar", "to": "speed", "scale": 0.5},
+			{"control": "Fire", "angle": 90, "speed": 0}
+		]');
+		var emC = run(copyScale, 1);
+		check(emC.spawns[0].proto.speed == 6, "copy scale: dst = src * k (4*3=12 into var, *0.5 back = 6)");
+		check(emC.spawns[0].proto.vars.get("myVar") == 12, "copy scale: works into custom vars too");
+
+		// ======================================================================
+		// Item 3: Cartesian position + transforms
+		// ======================================================================
+		var cart = compile('[
+			{"control": "Set", "prop": "x", "value": 30},
+			{"control": "Set", "prop": "y", "value": -10},
+			{"control": "Fire", "angle": 90, "speed": 1}
+		]');
+		var emD = run(cart, 1);
+		check(emD.spawns[0].x == 30 && emD.spawns[0].y == -10, "cartesian: bullet spawns at origin + (x, y)");
+
+		var both = compile('[
+			{"control": "SetOffset", "distance": 50, "angle": 0},
+			{"control": "Set", "prop": "x", "value": 30},
+			{"control": "Set", "prop": "y", "value": -10},
+			{"control": "Fire", "angle": 90, "speed": 1}
+		]');
+		var emE = run(both, 1);
+		check(Math.abs(emE.spawns[0].x - 80) < 1e-9 && Math.abs(emE.spawns[0].y - (-10)) < 1e-9,
+			"cartesian: polar and Cartesian offsets compose (50,0) + (30,-10)");
+
+		var rot = compile('[
+			{"control": "Set", "prop": "x", "value": 10},
+			{"control": "Set", "prop": "direction", "value": 0},
+			{"control": "Rotate", "degrees": 90},
+			{"control": "Fire", "angle": 0, "speed": 1}
+		]');
+		var emF = run(rot, 1);
+		check(Math.abs(emF.spawns[0].x - 0) < 1e-9 && Math.abs(emF.spawns[0].y - 10) < 1e-9,
+			"rotate: (10,0) rotated 90 deg -> (0,10) (matches offsetAngle convention)");
+		check(emF.spawns[0].proto.offsetAngle == 90, "rotate: polar offsetAngle rotates in step");
+		check(emF.spawns[0].proto.direction == 0, "rotate: direction untouched by default");
+
+		var rotDir = compile('[
+			{"control": "Set", "prop": "direction", "value": 45},
+			{"control": "Rotate", "degrees": 90, "withDirection": true},
+			{"control": "Fire", "angle": 0, "speed": 1}
+		]');
+		var emG = run(rotDir, 1);
+		check(emG.spawns[0].proto.direction == 135, "rotate withDirection: travel direction rotates too");
+
+		var scl = compile('[
+			{"control": "Set", "prop": "x", "value": 10},
+			{"control": "Set", "prop": "y", "value": 5},
+			{"control": "SetOffset", "distance": 50, "angle": 90},
+			{"control": "Scale", "factor": 2},
+			{"control": "Fire", "angle": 0, "speed": 1}
+		]');
+		var emH = run(scl, 1);
+		check(emH.spawns[0].proto.x == 20 && emH.spawns[0].proto.y == 10 && emH.spawns[0].proto.offsetDistance == 100,
+			"scale: factor scales x, y, and offsetDistance uniformly");
+
+		var sclAxis = compile('[
+			{"control": "Set", "prop": "x", "value": 10},
+			{"control": "Set", "prop": "y", "value": 10},
+			{"control": "SetOffset", "distance": 50, "angle": 0},
+			{"control": "Scale", "x": 3, "y": 0.5},
+			{"control": "Fire", "angle": 0, "speed": 1}
+		]');
+		var emI = run(sclAxis, 1);
+		check(emI.spawns[0].proto.x == 30 && emI.spawns[0].proto.y == 5 && emI.spawns[0].proto.offsetDistance == 50,
+			"scale: per-axis x/y factors leave offsetDistance alone");
+
+		// ======================================================================
+		// Item 1: Bind
+		// ======================================================================
+		// clone(): bindMode travels, bindSource (runtime wiring) does not.
+		var bproto = new ShotPrototype();
+		bproto.bindMode = ShotPrototype.BIND_FULL;
+		bproto.bindSource = new ShotPrototype();
+		var bclone = bproto.clone();
+		check(bclone.bindMode == ShotPrototype.BIND_FULL && bclone.bindSource == null,
+			"bind: clone copies bindMode but never bindSource");
+
+		// Position bind: bullet moves in the parent's frame of reference.
+		var posBind = compile('[
+			{"control": "Bind", "mode": "position"},
+			{"control": "Set", "prop": "direction", "value": 0},
+			{"control": "Set", "prop": "speed", "value": 1},
+			{"control": "Fire", "angle": 0, "speed": 0}
+		]');
+		var parentEm = new FakeEmitter();
+		var parentRunner = new ScriptRunner(parentEm, posBind);
+		parentRunner.update();
+		check(parentEm.spawns.length == 1 && parentEm.spawns[0].proto.bindMode == ShotPrototype.BIND_POSITION,
+			"bind: Bind control marks the fired clone");
+		check(parentEm.spawns[0].proto.bindSource == parentRunner.getPrototype(),
+			"bind: fireClone wires bindSource to the parent's live root prototype");
+
+		var childP = parentEm.spawns[0].proto;
+		var child = new HeadlessTestBullet(childP);
+		child.x = parentEm.spawns[0].x;
+		child.y = parentEm.spawns[0].y;
+		child.bindTo(parentEm, childP.bindMode, childP.bindSource); // as EmitterBase.spawn does
+		for (f in 0...10) {
+			parentEm.originX += 5; // parent moves right 5 px/frame
+			parentEm.originY += 2;
+			child.everyFrame();
+		}
+		check(Math.abs(child.x - (50 + 10)) < 1e-9 && Math.abs(child.y - 20) < 1e-9,
+			"bind position: parent translation (50,20) carries child while own velocity (10,0) integrates on top");
+
+		// Unbound bullets are NOT dragged by a moving parent (default unchanged).
+		var freeP = new ShotPrototype();
+		freeP.direction = 0;
+		freeP.speed = 1;
+		var freeB = new HeadlessTestBullet(freeP);
+		var movEm = new FakeEmitter();
+		for (f in 0...10) {
+			movEm.originX += 5;
+			freeB.everyFrame();
+		}
+		check(freeB.x == 10 && freeB.y == 0, "bind: default (unbound) bullets ignore parent movement entirely");
+
+		// Full bind: flight state re-derived from the parent's live prototype;
+		// the bullet's own sub-script cannot steer (bind wins).
+		var fullBind = compile('[
+			{"control": "Bind", "mode": "full"},
+			{"control": "Set", "prop": "direction", "value": 0},
+			{"control": "Set", "prop": "speed", "value": 2},
+			{"control": "Sub", "actions": [
+				{"control": "Wait", "frames": 3},
+				{"control": "Add", "prop": "direction", "delta": 45}
+			]},
+			{"control": "Fire", "angle": 0, "speed": 0}
+		]');
+		var parentEm2 = new FakeEmitter();
+		var parentRunner2 = new ScriptRunner(parentEm2, fullBind);
+		parentRunner2.update();
+		var childP2 = parentEm2.spawns[0].proto;
+		var child2 = new HeadlessTestBullet(childP2);
+		child2.bindTo(parentEm2, childP2.bindMode, childP2.bindSource);
+		// Attach its sub-script exactly like EmitterBase.spawn does.
+		var subProto2 = childP2.clone();
+		subProto2.subCommands = null;
+		subProto2.bindMode = ShotPrototype.BIND_NONE;
+		child2.script = new ScriptRunner(new FakeBulletEmitter(child2), childP2.subCommands, subProto2);
+		for (f in 0...6) child2.everyFrame();
+		check(child2.direction == 0, "bind full: own sub-script Add cannot steer a fully-bound bullet (bind wins)");
+		// Parent script steers ALL fully-bound children by mutating its live prototype.
+		parentRunner2.getPrototype().direction = 90;
+		var yBefore = child2.y;
+		child2.everyFrame();
+		check(child2.direction == 90 && child2.y > yBefore,
+			"bind full: mutating the parent's live prototype re-steers the bound bullet next frame");
+
+		// Orphan-release: parent dies -> bullet keeps state, continues independently.
+		parentEm2.alive = false;
+		var xBefore = child2.x;
+		parentEm2.originX += 100; // must have no effect anymore
+		child2.everyFrame();
+		child2.everyFrame();
+		check(child2.bindMode == ShotPrototype.BIND_NONE && Math.abs(child2.x - xBefore) < 1e-9 && child2.direction == 90,
+			"bind orphan: parent death releases the bullet with its current state (no cascade-vanish, no drag)");
+
+		// Sub-script prototypes strip bindMode: children of a bound bullet
+		// don't implicitly bind to it (checked at the clone level above and
+		// via the wiring convention replicated here).
+		check(subProto2.bindMode == ShotPrototype.BIND_NONE, "bind: sub-script prototype starts unbound (explicit chain opt-in)");
+
+		// ======================================================================
+		// Item 4: Line and Dup
+		// ======================================================================
+		var line = compile('[
+			{"control": "Set", "prop": "direction", "value": 90},
+			{"control": "Set", "prop": "speed", "value": 9},
+			{"control": "Line", "count": 5, "prop": "speed", "from": 1, "to": 5},
+			{"control": "Fire", "angle": 0, "speed": 0}
+		]');
+		var emJ = run(line, 1);
+		check(emJ.spawns.length == 6, "line: 5 line bullets + 1 plain Fire");
+		var lineOk = true;
+		for (i in 0...5) if (emJ.spawns[i].proto.speed != i + 1 || emJ.spawns[i].proto.direction != 90) lineOk = false;
+		check(lineOk, "line: speeds step 1..5 inclusive along direction 90");
+		check(emJ.spawns[5].proto.speed == 9, "line: prototype property restored afterwards");
+
+		var lineOne = compile('[{"control": "Line", "count": 1, "prop": "speed", "from": 4, "to": 8}]');
+		var emK = run(lineOne, 1);
+		check(emK.spawns.length == 1 && emK.spawns[0].proto.speed == 4, "line: count 1 fires at 'from'");
+
+		var dup = compile('[
+			{"control": "Set", "prop": "speed", "value": 2},
+			{"control": "Set", "prop": "direction", "value": 0},
+			{"control": "Dup", "count": 3, "props": {
+				"direction": {"from": -30, "to": 30},
+				"speed": {"step": 1}
+			}},
+			{"control": "Fire", "angle": 0, "speed": 0}
+		]');
+		var emL = run(dup, 1);
+		check(emL.spawns.length == 4, "dup: 3 copies + 1 plain Fire");
+		check(emL.spawns[0].proto.direction == -30 && emL.spawns[1].proto.direction == 0 && emL.spawns[2].proto.direction == 30,
+			"dup: from/to interpolates across copies (inclusive)");
+		check(emL.spawns[0].proto.speed == 2 && emL.spawns[1].proto.speed == 3 && emL.spawns[2].proto.speed == 4,
+			"dup: step adds i*step per copy");
+		check(emL.spawns[3].proto.direction == 0 && emL.spawns[3].proto.speed == 2,
+			"dup: script prototype untouched (copies are independent clones)");
+
+		var dupRand = compile('[{"control": "Dup", "count": 50, "props": {"speed": {"min": 2, "max": 6}}}]');
+		var emM = run(dupRand, 1);
+		var dupIn = true, dupVaries = false;
+		for (s in emM.spawns) {
+			if (s.proto.speed < 2 || s.proto.speed >= 6) dupIn = false;
+			if (s.proto.speed != emM.spawns[0].proto.speed) dupVaries = true;
+		}
+		check(emM.spawns.length == 50 && dupIn && dupVaries, "dup: min/max rolls independently per copy, in range");
+
+		// Dup spreading a PLACEMENT property moves spawn positions per copy.
+		var dupPos = compile('[
+			{"control": "SetOffset", "distance": 100, "angle": 0},
+			{"control": "Dup", "count": 2, "props": {"offsetAngle": {"from": 0, "to": 90}}}
+		]');
+		var emN = run(dupPos, 1);
+		check(Math.abs(emN.spawns[0].x - 100) < 1e-9 && Math.abs(emN.spawns[0].y) < 1e-9
+			&& Math.abs(emN.spawns[1].x) < 1e-9 && Math.abs(emN.spawns[1].y - 100) < 1e-9,
+			"dup: spreading offsetAngle produces per-copy spawn positions (fireClone uses the copy's placement)");
+
+		// --- satellite end-to-end: the Sub's Scope+Bind+Dup spawns a bound ring --
+		{
+			var text = sys.io.File.getContent("Assets/patterns/satellite.json");
+			var template:Dynamic = Json.parse(text);
+			var paramMap:Map<String, Dynamic> = new Map();
+			for (f in Reflect.fields(template.parameters))
+				paramMap.set(f, Reflect.field(Reflect.field(template.parameters, f), "default"));
+			var cmds = CommandRegistry.compileList(template.script, new CompileContext(paramMap));
+			var enemyEm = run(cmds, 1);
+			var anchorProto = enemyEm.spawns[0].proto;
+			var anchor = new HeadlessTestBullet(anchorProto);
+			var anchorEm = new FakeBulletEmitter(anchor);
+			var subProto = anchorProto.clone();
+			subProto.subCommands = null;
+			subProto.bindMode = ShotPrototype.BIND_NONE;
+			anchor.script = new ScriptRunner(anchorEm, anchorProto.subCommands, subProto);
+			for (f in 0...20) anchor.everyFrame();
+			var ringOk = anchorEm.spawns.length == 6;
+			for (sp in anchorEm.spawns)
+				if (sp.proto.bindMode != ShotPrototype.BIND_POSITION || sp.proto.bindSource != anchor.script.getPrototype())
+					ringOk = false;
+			check(ringOk, "satellite e2e: Sub's Scoped Bind+Dup spawned 6 position-bound satellites wired to the anchor");
+			check(anchor.bindMode == ShotPrototype.BIND_NONE && Math.abs(anchor.direction - 90) < 1e-9,
+				"satellite e2e: the anchor itself stays unbound and unsteered (Scope contained the burst)");
+		}
 
 		Sys.println(failures == 0 ? "\nALL TESTS PASSED" : '\n$failures TEST(S) FAILED');
 		Sys.exit(failures == 0 ? 0 : 1);

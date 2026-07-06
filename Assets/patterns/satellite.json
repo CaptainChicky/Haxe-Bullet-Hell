@@ -1,0 +1,53 @@
+{
+  "name": "satellite",
+  "description": "Showcase of the new batch: anchors drift while a position-bound ring of satellites (Bind + Dup inside a Scope) travels with each one; the enemy fires speed-stepped Lines and rotates the whole pattern by a grouped random angle each volley",
+  "parameters": {
+    "anchorSpeed": {
+      "type": "float",
+      "default": 1.5,
+      "description": "Anchor bullet speed"
+    },
+    "satelliteCount": {
+      "type": "int",
+      "default": 6,
+      "description": "Satellites per anchor"
+    },
+    "ringRadius": {
+      "type": "float",
+      "default": 24,
+      "description": "Satellite ring spawn radius around the anchor"
+    },
+    "volleyDelay": {
+      "type": "int",
+      "default": 50,
+      "description": "Frames between volleys"
+    }
+  },
+  "script": [
+    {"control": "Set", "prop": "direction", "value": 90},
+    {"control": "Set", "prop": "lifetime", "value": 300},
+    {
+      "control": "Sub",
+      "actions": [
+        {"control": "Wait", "frames": 12},
+        {"control": "Scope", "actions": [
+          {"control": "Bind", "mode": "position"},
+          {"control": "Set", "prop": "speed", "value": 0.5},
+          {"control": "Set", "prop": "offsetDistance", "value": "$ringRadius"},
+          {"control": "Dup", "count": "$satelliteCount", "props": {
+            "offsetAngle": {"from": 0, "to": "360 - 360 / $satelliteCount"},
+            "direction":   {"from": 0, "to": "360 - 360 / $satelliteCount"}
+          }}
+        ]}
+      ]
+    },
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "Line", "count": 3, "prop": "speed", "from": "$anchorSpeed", "to": "$anchorSpeed + 1"},
+        {"control": "Rotate", "degrees": "random.angle(8) / 4", "withDirection": true},
+        {"control": "Wait", "frames": "$volleyDelay"}
+      ]
+    }
+  ]
+}

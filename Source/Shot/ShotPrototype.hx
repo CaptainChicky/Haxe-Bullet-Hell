@@ -26,6 +26,11 @@ class ShotPrototype {
 	/** Bearing (degrees) of the spawn offset relative to the emitter origin. */
 	public var offsetAngle:Float = 0;
 
+	/** Cartesian spawn offset from the emitter origin, applied IN ADDITION
+	 *  to the polar offset above. Shaped by the Rotate/Scale transforms. */
+	public var x:Float = 0;
+	public var y:Float = 0;
+
 	// --- In-flight behavior --------------------------------------------------
 	/** Change in speed per frame after spawning (pixels/frame^2). */
 	public var accel:Float = 0;
@@ -39,6 +44,31 @@ class ShotPrototype {
 
 	/** Frames the bullet lives before auto-despawn. <= 0 means unlimited. */
 	public var lifetime:Float = 0;
+
+	// --- Binding --------------------------------------------------------------
+	public static inline final BIND_NONE:Int = 0;
+	public static inline final BIND_POSITION:Int = 1;
+	public static inline final BIND_FULL:Int = 2;
+
+	/**
+	 * How bullets fired from this prototype relate to their firer:
+	 *   BIND_NONE (default)  - fully independent clone, historical behavior.
+	 *   BIND_POSITION        - the bullet moves in its parent's frame of
+	 *                          reference: parent translation carries it along
+	 *                          while its own velocity still integrates on top.
+	 *   BIND_FULL            - position binding PLUS flight state (direction,
+	 *                          speed, accel, turn, clamps) re-derived every
+	 *                          frame from the parent script's live prototype.
+	 * Set via {"control": "Bind", "mode": "position"|"full"|"none"}.
+	 */
+	public var bindMode:Int = BIND_NONE;
+
+	/**
+	 * Runtime wiring: the parent script's live (root) prototype, attached by
+	 * ScriptRunner.fireClone to the fired clone when bindMode != BIND_NONE.
+	 * Never copied by clone() - it identifies a specific live parent.
+	 */
+	public var bindSource:ShotPrototype = null;
 
 	// --- Extensibility hooks -------------------------------------------------
 	/** Free-form script variables. Unknown property names in Set/Add/etc. land here. */
@@ -63,11 +93,14 @@ class ShotPrototype {
 		p.speed = speed;
 		p.offsetDistance = offsetDistance;
 		p.offsetAngle = offsetAngle;
+		p.x = x;
+		p.y = y;
 		p.accel = accel;
 		p.angularVelocity = angularVelocity;
 		p.minSpeed = minSpeed;
 		p.maxSpeed = maxSpeed;
 		p.lifetime = lifetime;
+		p.bindMode = bindMode; // config travels; bindSource (runtime wiring) does not
 		p.subCommands = subCommands;
 		for (k in vars.keys()) p.vars.set(k, vars.get(k));
 		return p;
@@ -80,11 +113,14 @@ class ShotPrototype {
 			case "speed": speed;
 			case "offsetDistance": offsetDistance;
 			case "offsetAngle": offsetAngle;
+			case "x": x;
+			case "y": y;
 			case "accel", "acceleration": accel;
 			case "angularVelocity", "turn": angularVelocity;
 			case "minSpeed": minSpeed;
 			case "maxSpeed": maxSpeed;
 			case "lifetime": lifetime;
+			case "bindMode": bindMode;
 			default: vars.exists(name) ? vars.get(name) : 0;
 		}
 	}
@@ -96,11 +132,14 @@ class ShotPrototype {
 			case "speed": speed = value;
 			case "offsetDistance": offsetDistance = value;
 			case "offsetAngle": offsetAngle = value;
+			case "x": x = value;
+			case "y": y = value;
 			case "accel", "acceleration": accel = value;
 			case "angularVelocity", "turn": angularVelocity = value;
 			case "minSpeed": minSpeed = value;
 			case "maxSpeed": maxSpeed = value;
 			case "lifetime": lifetime = value;
+			case "bindMode": bindMode = Std.int(value);
 			default: vars.set(name, value);
 		}
 	}

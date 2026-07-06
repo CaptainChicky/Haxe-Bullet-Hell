@@ -21,10 +21,10 @@ ScriptRunner ── mutates ──▶ ShotPrototype ── clone ──▶ IShot
 | `Shot/ShotContext.hx` | An execution thread: prototype + frame stack + wait/blocking state |
 | `Shot/ScriptRunner.hx` | The interpreter: frame budget, loops, concurrency, firing |
 | `Shot/FlowCommands.hx` | `Wait`, `Loop`, `Rep`, `Concurrent`, `Sub`, `Scope`, `Vanish` |
-| `Shot/PropertyCommands.hx` | Generic `Set`/`Add`/`Random`/`Copy`/`Offset`/`AimAtTarget` |
-| `Shot/FireCommands.hx` | `Fire`, `Radial`, `NWay` |
+| `Shot/PropertyCommands.hx` | Generic `Set`/`Add`/`Random`/`Copy`/`Offset`/`Tween`/`Rotate`/`Scale`/`AimAtTarget` |
+| `Shot/FireCommands.hx` | `Fire`, `Radial`, `NWay`, `Line`, `Dup` |
 | `Shot/CommandRegistry.hx` | JSON `"control"` name → command parser (the extension point) |
-| `Shot/Expression.hx` | `"$param"` references and arithmetic in JSON values |
+| `Shot/Expression.hx` | Expression AST: `$param`s, arithmetic, `sin`/`cos`, inline randoms, `NumValue` |
 | `Shot/ShotEmitter.hx` | `IShotEmitter` — anything that can fire (enemy **or bullet**) |
 | `Bullet/BulletEmitters.hx` | `EnemyBulletEmitter`, `BulletSubEmitter` (nested patterns) |
 
@@ -89,7 +89,57 @@ Why it exists: inside a bullet's own `Sub` script, the prototype does double dut
 
 Caveat: the clone is a snapshot at `Scope` entry — in a multi-frame `Scope` (body containing `Wait`s), the owning bullet's live direction/speed updates during the block aren't visible inside it.
 
-Available properties: `direction` (alias `angle`), `speed`, `offsetDistance`, `offsetAngle`, `accel` (alias `acceleration`), `angularVelocity` (alias `turn`), `minSpeed`, `maxSpeed`, `lifetime` — plus any custom variable name.
+Available properties: `direction` (alias `angle`), `speed`, `offsetDistance`, `offsetAngle`, `x`, `y`, `accel` (alias `acceleration`), `angularVelocity` (alias `turn`), `minSpeed`, `maxSpeed`, `lifetime`, `bindMode` — plus any custom variable name.
+
+### Cartesian placement + transforms
+
+`x`/`y` are a **Cartesian spawn offset** from the emitter origin, applied *in addition* to the polar offset (`offsetDistance`/`offsetAngle`). Two transform commands reshape placement:
+
+```jsonc
+{"control": "Rotate", "degrees": 15}                        // rotates (x,y) about the origin AND advances offsetAngle
+{"control": "Rotate", "degrees": 15, "withDirection": true} // ...and rotates travel direction (spin a whole pattern)
+{"control": "Scale", "factor": 2}                           // scales x, y, and offsetDistance uniformly
+{"control": "Scale", "x": 2, "y": 0.5}                      // per-axis Cartesian factors (offsetDistance is a radius, stays uniform)
+```
+
+Rotation follows the engine's angle convention (0° = +x, 90° = +y/down), so rotating a Cartesian point and adding the same degrees to a polar bearing agree.
+
+### Line and Dup (multi-fire)
+
+```jsonc
+{"control": "Line", "count": 5, "prop": "speed", "from": 1, "to": 5}
+```
+
+`Line` fires `count` bullets stepping **one property** linearly from `from` to `to` inclusive (e.g. increasing speed strings the bullets out along the travel direction). The prototype's value is restored afterwards. `from`/`to` re-evaluate per execution, so volatile endpoints give a fresh line per volley.
+
+```jsonc
+{"control": "Dup", "count": 5, "props": {
+    "direction": {"from": -30, "to": 30},   // interpolated across copies (inclusive)
+    "speed":     {"min": 2, "max": 6},      // uniform random, rolled per copy
+    "lifetime":  {"step": 10}               // prototype value + i*10
+}}
+```
+
+`Dup` spawns `count` independent clones with declarative per-copy spreads on any number of properties. Because each copy is a full clone fed through the normal spawn path, spreading a *placement* property (`offsetAngle`, `x`, `y`) moves the spawn position per copy — `{"offsetAngle": {"from": 0, "to": 360}}` is a positional ring. The script's own prototype is never touched.
+
+### Bind (bullets that follow their parent)
+
+```jsonc
+{"control": "Bind", "mode": "position"}   // or "full", or "none" to clear
+{"control": "Fire", "angle": 0, "speed": 0}
+```
+
+Every bullet fired while `bindMode` is set stays attached to the emitter that fired it (enemy or bullet):
+
+- **`position`** — the bullet moves in its parent's frame of reference: the parent's translation carries it along each frame while the bullet's own direction/speed/accel/turn still integrate on top. A pattern fired by a moving boss travels with the boss.
+- **`full`** — position binding *plus* flight state (direction, speed, accel, turn, speed clamps) re-derived every frame from the parent script's **live root prototype**. Mutate the parent's prototype and every fully-bound bullet re-steers in unison. Because the source is the *root* prototype, parent-side `Scope` blocks (burst configuration) are invisible to bound children — the same ownership rule as bullet steering. A fully-bound bullet's own sub-script can still fire children or `Vanish`, but cannot steer (**bind wins**).
+
+Rules and behaviors:
+
+- **Parent death → orphan-release**: the bullet keeps its current position and flight state and continues as a normal independent bullet. Tradeoff: cascade-vanish (children die with the parent) is the tidier mental model and prevents stranded formations, but it lets the player erase whole patterns by sniping one parent bullet; orphan-release was chosen as the default. Cascade could be added later as a third mode without breaking anything.
+- `bindMode` is part of the prototype and travels through `clone()` (so `Concurrent` branches inherit it), **except** into a bullet's sub-script starting prototype, which is reset to `none` — a bound bullet's children don't implicitly bind to it; a chain opts in with another `Bind` inside the sub-script.
+- The runtime link to the parent (`bindSource`) is attached at fire time and is never copied by `clone()`.
+- One-frame lag caveat: children re-derive from the parent's position/prototype as of when *they* update; depending on display-list update order a bound bullet can trail its parent's movement by one frame. Cosmetically invisible at 60fps, but don't build frame-exact logic on it.
 
 ### Sub-scripts (bullets that fire bullets)
 
@@ -104,7 +154,31 @@ Every bullet fired *after* a `Sub` carries that script and executes it itself af
 
 ### Values and expressions
 
-Any numeric field accepts a literal, a `"$param"` reference, or arithmetic: `"$base - $spread"`, `"$rotationSpeed * $fireDelay"` (correct `*`/`/` precedence, left-to-right associativity).
+Any numeric field accepts a literal, a `"$param"` reference, or an expression:
+
+- Arithmetic `+ - * /` with correct precedence and left-to-right associativity, **and parentheses**: `"2 * ($base + 4)"`.
+- Trig **in degrees** (the engine-wide convention): `"sin($phase) * 40"`, `"cos(90)"`.
+- Inline randoms: `"random.between(2, 6)"` (uniform in `[min, max)`) and `"random.angle(8)"` (one of `n` evenly spaced angles — `floor(random*n) * 360/n` — for grouping shots into discrete spokes).
+
+**Evaluation model**: deterministic expressions are folded to constants at compile time (zero per-frame cost, identical semantics to before). Expressions containing any `random.*` call stay live and **re-roll on every command execution** — `{"control": "Set", "prop": "speed", "value": "random.between(2, 6)"}` inside a `Loop` gives each volley a fresh speed, and a `Wait` with a volatile frame count re-rolls each iteration. Structural values (`Rep`/`Radial`/`NWay`/`Line`/`Dup` **counts**, `Tween` **frames**) are fixed at compile time.
+
+`Copy` supports scaling — `dst = src * k`:
+
+```jsonc
+{"control": "Copy", "from": "speed", "to": "turn", "scale": 0.5}
+```
+
+(This needed its own small addition: expressions can reference `$params` but not live prototype properties, so `src * k` isn't expressible in the expression language itself.)
+
+### Script variables and scoping (status)
+
+`vars` remains one flat `Map<String, Float>` per prototype. **`Scope` already provides block scoping with shadowing**: a variable set inside a `Scope` (like any prototype mutation there) is discarded when the block ends, so nested blocks can reuse names freely. What `Scope` does *not* give you — and what a real scoped-variable implementation would need — is:
+
+1. **Write-through to outer scopes** (mutating an outer counter from inside a block): requires a variable-environment stack parallel to the `ShotFrame` stack, with reads walking up the parent chain and an explicit `Declare`/`Let` command to distinguish "new local" from "assign outer".
+2. **Types beyond Float**: `vars` and `getProp`/`setProp` are all-Float; strings/bools would need a tagged value union threaded through every generic command.
+3. **Expression access to variables**: expressions can only read `$params` today, not prototype vars/properties — scoped variables are of limited use until expressions can read them.
+
+None of these are individually hard, but together they touch `ShotContext`, `ShotPrototype`, every property command, and the expression evaluator — deliberately left out of this batch.
 
 ## Running the tests
 

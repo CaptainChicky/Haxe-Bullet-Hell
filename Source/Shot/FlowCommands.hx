@@ -2,17 +2,21 @@ package shot;
 
 import shot.ShotCommand.IShotCommand;
 import shot.ShotContext.ShotFrame;
+import shot.Expression.NumValue;
 
-/** Suspends the context for a (possibly fractional) number of frames. */
+/** Suspends the context for a (possibly fractional) number of frames.
+ *  The frame count re-evaluates per execution, so a volatile expression
+ *  ("random.between(5, 10)") gives a fresh wait each loop iteration. */
 class WaitCommand implements IShotCommand {
-	private var frames:Float;
+	private var frames:NumValue;
 
-	public function new(frames:Float) {
+	public function new(frames:NumValue) {
 		this.frames = frames;
 	}
 
 	public function run(ctx:ShotContext, runner:ScriptRunner):Void {
-		if (frames > 0) ctx.waitFrames = frames;
+		var f = frames.get();
+		if (f > 0) ctx.waitFrames = f;
 	}
 }
 

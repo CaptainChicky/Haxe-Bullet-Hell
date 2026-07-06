@@ -2,6 +2,7 @@ package bullet;
 
 import shot.ShotPrototype;
 import shot.ScriptRunner;
+import shot.ShotEmitter.IShotEmitter;
 import openfl.Lib;
 import openfl.events.Event;
 import openfl.display.Bitmap;
@@ -41,6 +42,13 @@ class BulletEnemy extends Sprite {
 	/** Optional script this bullet runs itself (nested patterns). */
 	private var script:ScriptRunner = null;
 
+	// --- Binding (see ShotPrototype.bindMode) --------------------------------
+	private var bindMode:Int = ShotPrototype.BIND_NONE;
+	private var bindAnchor:IShotEmitter = null; // parent position/liveness source
+	private var bindSource:ShotPrototype = null; // parent's live prototype (full mode)
+	private var anchorLastX:Float = 0;
+	private var anchorLastY:Float = 0;
+
 	private var spawnTime:Int = Lib.getTimer();
 
 	// Random salt so bullet sprite spin isn't uniform across bullets.
@@ -77,6 +85,17 @@ class BulletEnemy extends Sprite {
 		this.script = runner;
 	}
 
+	/** Bind this bullet to its parent (called by the emitter at spawn).
+	 *  anchor provides live parent position + liveness; source is the parent
+	 *  script's live prototype (used by BIND_FULL). */
+	public function bindTo(anchor:IShotEmitter, mode:Int, source:ShotPrototype):Void {
+		bindAnchor = anchor;
+		bindMode = mode;
+		bindSource = source;
+		anchorLastX = anchor.getOriginX();
+		anchorLastY = anchor.getOriginY();
+	}
+
 	private inline function updateVelocity():Void {
 		var rad = direction * Math.PI / 180;
 		velocityX = Math.cos(rad) * speed;
@@ -103,14 +122,47 @@ class BulletEnemy extends Sprite {
 				return;
 			}
 
-			var proto = (script != null) ? script.getPrototype() : null;
-			if (proto != null) {
-				direction = proto.direction;
-				speed = proto.speed;
-				accel = proto.accel;
-				angularVelocity = proto.angularVelocity;
-				minSpeed = proto.minSpeed;
-				maxSpeed = proto.maxSpeed;
+			// In BIND_FULL mode the parent's live prototype owns flight
+			// state (bind wins); the bullet's own script can still fire
+			// children or Vanish, but cannot steer.
+			if (bindMode != ShotPrototype.BIND_FULL) {
+				var proto = (script != null) ? script.getPrototype() : null;
+				if (proto != null) {
+					direction = proto.direction;
+					speed = proto.speed;
+					accel = proto.accel;
+					angularVelocity = proto.angularVelocity;
+					minSpeed = proto.minSpeed;
+					maxSpeed = proto.maxSpeed;
+				}
+			}
+		}
+
+		// Bound bullets follow their parent.
+		var bindDX:Float = 0;
+		var bindDY:Float = 0;
+		if (bindAnchor != null) {
+			if (!bindAnchor.isAlive()) {
+				// Orphan-release: parent gone -> keep current state and
+				// continue as a normal independent bullet.
+				bindAnchor = null;
+				bindSource = null;
+				bindMode = ShotPrototype.BIND_NONE;
+			} else {
+				if (bindMode == ShotPrototype.BIND_FULL && bindSource != null) {
+					direction = bindSource.direction;
+					speed = bindSource.speed;
+					accel = bindSource.accel;
+					angularVelocity = bindSource.angularVelocity;
+					minSpeed = bindSource.minSpeed;
+					maxSpeed = bindSource.maxSpeed;
+				}
+				var px = bindAnchor.getOriginX();
+				var py = bindAnchor.getOriginY();
+				bindDX = px - anchorLastX;
+				bindDY = py - anchorLastY;
+				anchorLastX = px;
+				anchorLastY = py;
 			}
 		}
 
@@ -135,8 +187,8 @@ class BulletEnemy extends Sprite {
 		}
 		updateVelocity();
 
-		x += velocityX;
-		y += velocityY;
+		x += velocityX + bindDX;
+		y += velocityY + bindDY;
 
 		// Lifetime expiry.
 		age += 1;

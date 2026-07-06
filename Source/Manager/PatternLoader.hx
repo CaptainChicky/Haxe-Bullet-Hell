@@ -92,7 +92,7 @@ class PatternLoader {
 		if (params == null || !Reflect.hasField(params, "startDelay")) return;
 		var startDelay:Float = Reflect.field(params, "startDelay");
 		if (startDelay > 0) {
-			commands.unshift(new WaitCommand(startDelay));
+			commands.unshift(new WaitCommand(shot.Expression.NumValue.of(startDelay)));
 		}
 	}
 }

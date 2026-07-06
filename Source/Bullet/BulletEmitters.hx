@@ -41,6 +41,14 @@ private class EmitterBase {
 			collisionManager.registerEnemyBullet(bullet);
 		}
 
+		// Bound bullets follow the emitter that fired them (this object):
+		// it provides live parent position + liveness. bindSource (the parent
+		// script's live prototype) was attached by ScriptRunner.fireClone.
+		if (prototype.bindMode != ShotPrototype.BIND_NONE) {
+			var self:IShotEmitter = cast this;
+			bullet.bindTo(self, prototype.bindMode, prototype.bindSource);
+		}
+
 		// Bullets with a sub-script become emitters themselves. The sub-script
 		// starts from a clone of this bullet's prototype (inheriting direction,
 		// speed, vars, ...) with subCommands stripped to prevent infinite
@@ -48,6 +56,9 @@ private class EmitterBase {
 		if (prototype.subCommands != null) {
 			var subProto = prototype.clone();
 			subProto.subCommands = null;
+			// A bound bullet's own children do not implicitly bind to it;
+			// a chain must opt in with an explicit Bind in the sub-script.
+			subProto.bindMode = ShotPrototype.BIND_NONE;
 			var runner = new ScriptRunner(new BulletSubEmitter(bullet, collisionManager), prototype.subCommands, subProto);
 			bullet.attachScript(runner);
 		}
