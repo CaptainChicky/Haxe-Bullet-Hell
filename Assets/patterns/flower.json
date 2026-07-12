@@ -1,70 +1,66 @@
 {
   "name": "flower",
-  "description": "Showcase of the prototype engine: slow curving seed bullets that burst into accelerating petals mid-flight and keep curving afterwards (Sub + generic prototype properties; the burst is wrapped in Scope so it configures only the petals, not the seed's own flight)",
+  "description": "Structured petal clusters: each petal is drawn by a MIRRORED PAIR of curving seeds (launched at +-petalSpread around the petal axis with opposite turn; at constant speed each arc's chord lands exactly on the axis, so the pair meets at the petal tip after 2*petalSpread/seedTurn frames). Along the way each seed drops a slow trail of bullets that hangs as the visible petal outline; at the tip the seeds fire a focused fan and straighten into crossing spikes. Rings of petals rotate between volleys",
   "parameters": {
-    "seedCount": {
-      "type": "int",
-      "default": 6,
-      "description": "Seed bullets per ring"
-    },
-    "seedSpeed": {
-      "type": "float",
-      "default": 2.5,
-      "description": "Initial seed bullet speed"
-    },
-    "seedTurn": {
-      "type": "float",
-      "default": 1.5,
-      "description": "Seed curve rate (degrees per frame)"
-    },
-    "burstDelay": {
-      "type": "int",
-      "default": 45,
-      "description": "Frames before a seed bursts"
-    },
-    "petalCount": {
-      "type": "int",
-      "default": 8,
-      "description": "Petals per burst"
-    },
-    "petalSpeed": {
-      "type": "float",
-      "default": 1,
-      "description": "Initial petal speed (accelerates outward)"
-    },
-    "ringDelay": {
-      "type": "int",
-      "default": 50,
-      "description": "Frames between seed rings"
-    },
-    "ringRotation": {
-      "type": "float",
-      "default": 22.5,
-      "description": "Ring rotation between volleys"
-    }
+    "petalCount": {"type": "int", "default": 6, "description": "Petals per ring"},
+    "petalSpread": {"type": "float", "default": 30, "description": "Half-angle between the two edge seeds of a petal (degrees)"},
+    "seedSpeed": {"type": "float", "default": 3, "description": "Edge seed speed (constant while drawing the petal)"},
+    "seedTurn": {"type": "float", "default": 1.5, "description": "Edge seed curve rate (degrees per frame); petal tip is reached after 2*petalSpread/seedTurn frames"},
+    "trailGap": {"type": "int", "default": 4, "description": "Frames between trail bullets dropped along the petal edge"},
+    "trailSpeed": {"type": "float", "default": 0.4, "description": "Initial trail bullet speed (slow, so the outline hangs)"},
+    "trailAccel": {"type": "float", "default": 0.02, "description": "Trail bullet acceleration (outline slowly inflates outward)"},
+    "trailMax": {"type": "float", "default": 1.4, "description": "Trail bullet max speed"},
+    "trailLife": {"type": "int", "default": 240, "description": "Trail bullet lifetime in frames"},
+    "tipCount": {"type": "int", "default": 3, "description": "Bullets in the petal-tip fan"},
+    "tipArc": {"type": "float", "default": 24, "description": "Petal-tip fan arc (degrees)"},
+    "tipSpeed": {"type": "float", "default": 4.5, "description": "Tip fan speed; the seeds also accelerate to this and fly off as crossing spikes"},
+    "ringDelay": {"type": "int", "default": 150, "description": "Frames between petal rings"},
+    "ringRotation": {"type": "float", "default": 25, "description": "Ring rotation between volleys (degrees)"}
   },
   "script": [
-    {"control": "Set", "prop": "speed", "value": "$seedSpeed"},
-    {"control": "Set", "prop": "turn", "value": "$seedTurn"},
-    {"control": "Set", "prop": "lifetime", "value": "$burstDelay + 300"},
-    {
-      "control": "Sub",
-      "actions": [
-        {"control": "Wait", "frames": "$burstDelay"},
-        {"control": "Scope", "actions": [
-          {"control": "Set", "prop": "turn", "value": 0},
-          {"control": "Set", "prop": "speed", "value": "$petalSpeed"},
-          {"control": "Set", "prop": "accel", "value": 0.08},
-          {"control": "Set", "prop": "maxSpeed", "value": 6},
-          {"control": "Random", "prop": "direction", "min": 0, "max": 360},
-          {"control": "Radial", "count": "$petalCount", "speed": 0}
-        ]}
-      ]
-    },
     {
       "control": "Loop",
       "actions": [
-        {"control": "Radial", "count": "$seedCount", "speed": 0},
+        {
+          "control": "Rep",
+          "count": "$petalCount",
+          "actions": [
+            {"control": "Scope", "actions": [
+              {"control": "Set", "prop": "speed", "value": "$seedSpeed"},
+              {"control": "Sub", "actions": [
+                {
+                  "control": "Rep",
+                  "count": "2 * $petalSpread / ($seedTurn * $trailGap)",
+                  "actions": [
+                    {"control": "Scope", "actions": [
+                      {"control": "Set", "prop": "turn", "value": 0},
+                      {"control": "Set", "prop": "speed", "value": "$trailSpeed"},
+                      {"control": "Set", "prop": "accel", "value": "$trailAccel"},
+                      {"control": "Set", "prop": "maxSpeed", "value": "$trailMax"},
+                      {"control": "Set", "prop": "lifetime", "value": "$trailLife"},
+                      {"control": "Fire", "angle": 0, "speed": 0}
+                    ]},
+                    {"control": "Wait", "frames": "$trailGap"}
+                  ]
+                },
+                {"control": "Scope", "actions": [
+                  {"control": "Set", "prop": "turn", "value": 0},
+                  {"control": "Set", "prop": "speed", "value": "$tipSpeed"},
+                  {"control": "NWay", "count": "$tipCount", "angle": "$tipArc", "speed": 0}
+                ]},
+                {"control": "Set", "prop": "turn", "value": 0},
+                {"control": "Tween", "prop": "speed", "to": "$tipSpeed", "frames": 12}
+              ]},
+              {"control": "Add", "prop": "direction", "delta": "-$petalSpread"},
+              {"control": "Set", "prop": "turn", "value": "$seedTurn"},
+              {"control": "Fire", "angle": 0, "speed": 0},
+              {"control": "Add", "prop": "direction", "delta": "2 * $petalSpread"},
+              {"control": "Set", "prop": "turn", "value": "-$seedTurn"},
+              {"control": "Fire", "angle": 0, "speed": 0}
+            ]},
+            {"control": "Add", "prop": "direction", "delta": "360 / $petalCount"}
+          ]
+        },
         {"control": "Add", "prop": "direction", "delta": "$ringRotation"},
         {"control": "Wait", "frames": "$ringDelay"}
       ]

@@ -1,12 +1,13 @@
 {
   "name": "flowerdup",
-  "description": "Firedancer flower: 32 evenly-spaced positions each fire a 9-way fan; bullets decelerate then curve 210° into petal spirals while re-accelerating (288 bullets per volley)",
+  "description": "Firedancer flower: 32 evenly-spaced positions on a spawn ring each fire a 9-way fan outward; bullets decelerate 4->1 over 30 frames, visibly bunching into a scalloped ring of overlapping arcs that hangs in space, then curve 210deg while re-accelerating - curling the arcs into petals that collapse through the center and re-bloom (288 bullets per volley). tangentOffset rotates the launch off radial (90 = firedancer's literal tangential launch, denser/spiral look)",
   "parameters": {
     "copies": {"type": "int", "default": 32, "description": "Radial positions per volley"},
     "ways": {"type": "int", "default": 9, "description": "NWay fan per position"},
     "fanArc": {"type": "float", "default": 90, "description": "NWay arc degrees"},
     "bulletSpeed": {"type": "float", "default": 4, "description": "Initial bullet speed"},
     "offsetDist": {"type": "float", "default": 80, "description": "Spawn distance from emitter"},
+    "tangentOffset": {"type": "float", "default": 0, "description": "Launch angle relative to outward radial (0 = outward, 90 = tangential like the firedancer original)"},
     "decelTo": {"type": "float", "default": 1, "description": "Speed after deceleration"},
     "decelFrames": {"type": "int", "default": 30, "description": "Deceleration duration"},
     "curveDeg": {"type": "float", "default": 210, "description": "Direction curve (relative) during petal phase"},
@@ -31,7 +32,7 @@
           {"control": "Rep", "count": "$copies", "actions": [
             {"control": "Copy", "from": "cnt", "to": "offsetAngle", "scale": "360 / $copies"},
             {"control": "Copy", "from": "cnt", "to": "direction", "scale": "360 / $copies"},
-            {"control": "Add", "prop": "direction", "delta": 90},
+            {"control": "Add", "prop": "direction", "delta": "$tangentOffset"},
             {"control": "NWay", "count": "$ways", "angle": "$fanArc", "speed": 0},
             {"control": "Add", "prop": "cnt", "delta": 1}
           ]}

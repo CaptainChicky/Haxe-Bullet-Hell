@@ -840,7 +840,7 @@ class TestShot {
 			&& Math.abs(emN.spawns[1].x) < 1e-9 && Math.abs(emN.spawns[1].y - 100) < 1e-9,
 			"dup: spreading offsetAngle produces per-copy spawn positions (fireClone uses the copy's placement)");
 
-		// --- satellite end-to-end: the Sub's Scope+Bind+Dup spawns a bound ring --
+		// --- satellite end-to-end: offset-bound pods orbit the dish and fire spooling beams --
 		{
 			var text = sys.io.File.getContent("Assets/patterns/satellite.json");
 			var template:Dynamic = Json.parse(text);
@@ -849,21 +849,47 @@ class TestShot {
 				paramMap.set(f, Reflect.field(Reflect.field(template.parameters, f), "default"));
 			var cmds = CommandRegistry.compileList(template.script, new CompileContext(paramMap));
 			var enemyEm = run(cmds, 1);
-			var anchorProto = enemyEm.spawns[0].proto;
-			var anchor = new HeadlessTestBullet(anchorProto);
-			var anchorEm = new FakeBulletEmitter(anchor);
-			var subProto = anchorProto.clone();
+			var pods = [for (s in enemyEm.spawns) if (s.proto.bindMode == ShotPrototype.BIND_OFFSET) s];
+			var rings = [for (s in enemyEm.spawns) if (s.proto.bindMode == ShotPrototype.BIND_NONE) s];
+			check(pods.length == 3 && rings.length == 12,
+				'satellite e2e: 3 offset-bound pods + 12-bullet radar ring on frame 0 (${pods.length}/${rings.length})');
+			var ringClean = true;
+			for (r in rings)
+				if (r.proto.subCommands != null) ringClean = false;
+			check(ringClean, "satellite e2e: radar-ring bullets carry no sub-script (pod Sub cleared before the pulse loop)");
+
+			// Drive pod 0 through launch + charge + one beam volley.
+			var podProto = pods[0].proto;
+			var pod = new HeadlessTestBullet(podProto);
+			var podEm = new FakeBulletEmitter(pod);
+			var subProto = podProto.clone();
 			subProto.subCommands = null;
 			subProto.bindMode = ShotPrototype.BIND_NONE;
-			anchor.script = new ScriptRunner(anchorEm, anchorProto.subCommands, subProto);
-			for (f in 0...20) anchor.everyFrame();
-			var ringOk = anchorEm.spawns.length == 6;
-			for (sp in anchorEm.spawns)
-				if (sp.proto.bindMode != ShotPrototype.BIND_POSITION || sp.proto.bindSource != anchor.script.getPrototype())
-					ringOk = false;
-			check(ringOk, "satellite e2e: Sub's Scoped Bind+Dup spawned 6 position-bound satellites wired to the anchor");
-			check(anchor.bindMode == ShotPrototype.BIND_NONE && Math.abs(anchor.direction - 90) < 1e-9,
-				"satellite e2e: the anchor itself stays unbound and unsteered (Scope contained the burst)");
+			pod.bindTo(enemyEm, podProto.bindMode, podProto.bindSource);
+			pod.script = new ScriptRunner(podEm, podProto.subCommands, subProto);
+			for (f in 0...130) pod.everyFrame();
+			check(Math.abs(pod.script.getPrototype().offsetDistance - 100) < 1e-9,
+				"satellite e2e: pod tweened out to its 100px orbit radius (root prototype untouched by the firing Scope)");
+			check(podEm.spawns.length == 7, 'satellite e2e: pod fired one 7-bullet beam volley (${podEm.spawns.length})');
+			var beamSpawnOk = podEm.spawns.length == 7;
+			for (sp in podEm.spawns)
+				if (sp.proto.bindMode != ShotPrototype.BIND_NONE || sp.proto.speed != 0 || sp.proto.subCommands == null)
+					beamSpawnOk = false;
+			check(beamSpawnOk, "satellite e2e: beam bullets spawn unbound at speed 0 with the spool/stall/vanish sub-script");
+
+			// Drive one beam bullet through its full lifecycle: spool -> cruise -> stall -> vanish.
+			var beamProto = podEm.spawns[0].proto;
+			var beam = new HeadlessTestBullet(beamProto);
+			var beamSub = beamProto.clone();
+			beamSub.subCommands = null;
+			beam.script = new ScriptRunner(new FakeBulletEmitter(beam), beamProto.subCommands, beamSub);
+			var peak:Float = 0;
+			for (f in 0...120) {
+				beam.everyFrame();
+				if (beam.speed > peak) peak = beam.speed;
+			}
+			check(Math.abs(peak - 8) < 1e-6, 'satellite e2e: beam bullet spooled up to full speed (peak $peak)');
+			check(!beam.alive, "satellite e2e: beam bullet stalled and dissipated (Vanish)");
 		}
 
 		Sys.println(failures == 0 ? "\nALL TESTS PASSED" : '\n$failures TEST(S) FAILED');

@@ -1,6 +1,6 @@
 {
   "name": "seeds",
-  "description": "Firedancer seeds: alternating top/bottom volleys of decelerating seed bullets; each seed aims at the player and fires a 5-way fan of lineSeed children, each lineSeed also decelerates, re-aims, and fires a 12-step line of accelerating bullets",
+  "description": "Firedancer seeds: alternating top/bottom volleys of decelerating seed bullets; each seed aims at the player and fires a 5-way fan of lineSeed children. The aim direction is captured ONCE at the seed (Copy into the aimDir var, inherited by the children), so all 5 line bursts fire PARALLEL to it - only the center beam passes through the player, the flanking beams run alongside it",
   "parameters": {
     "seedSpeedMin": {"type": "float", "default": 6, "description": "Minimum seed launch speed"},
     "seedSpeedMax": {"type": "float", "default": 9, "description": "Maximum seed launch speed"},
@@ -22,10 +22,11 @@
       {"control": "Scope", "actions": [
         {"control": "Set", "prop": "speed", "value": "$nwaySpeed"},
         {"control": "AimAtPlayer"},
+        {"control": "Copy", "from": "direction", "to": "aimDir"},
         {"control": "Sub", "actions": [
           {"control": "Tween", "prop": "speed", "to": 1, "frames": "$seedDecelFrames"},
           {"control": "Scope", "actions": [
-            {"control": "AimAtPlayer"},
+            {"control": "Copy", "from": "aimDir", "to": "direction"},
             {"control": "Sub", "actions": [
               {"control": "Wait", "frames": "$accelWait"},
               {"control": "Tween", "prop": "speed", "to": "$accelAmount", "frames": "$accelFrames", "relative": true}

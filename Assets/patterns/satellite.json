@@ -1,52 +1,79 @@
 {
   "name": "satellite",
-  "description": "Showcase of the new batch: anchors drift while a position-bound ring of satellites (Bind + Dup inside a Scope) travels with each one; the enemy fires speed-stepped Lines and rotates the whole pattern by a grouped random angle each volley",
+  "description": "Orbital weapon platform: offset-bound pods launch from the dish to an orbit radius (Bind offset + Tween offsetDistance, like pods.json), orbit while charging, then lock on (AimAtPlayer from the pod position, inside a Scope so the pod itself keeps its orbit state) and fire a focused beam - a short stream whose bullets spool up from speed 0, cruise, stall to a hang, then dissipate (Vanish). The central dish emits slow expanding radar-ring pulses underneath",
   "parameters": {
-    "anchorSpeed": {
-      "type": "float",
-      "default": 1.5,
-      "description": "Anchor bullet speed"
-    },
-    "satelliteCount": {
-      "type": "int",
-      "default": 6,
-      "description": "Satellites per anchor"
-    },
-    "ringRadius": {
-      "type": "float",
-      "default": 24,
-      "description": "Satellite ring spawn radius around the anchor"
-    },
-    "volleyDelay": {
-      "type": "int",
-      "default": 50,
-      "description": "Frames between volleys"
-    }
+    "podCount": {"type": "int", "default": 3, "description": "Orbiting weapon pods"},
+    "orbitRadius": {"type": "float", "default": 100, "description": "Pod orbit distance from the dish"},
+    "launchFrames": {"type": "int", "default": 40, "description": "Frames for a pod to extend to orbit"},
+    "orbitStep": {"type": "float", "default": 1.5, "description": "Pod orbit speed (degrees per frame while charging)"},
+    "chargeFrames": {"type": "int", "default": 70, "description": "Orbit/charge frames between beams (pod halts while firing)"},
+    "beamCount": {"type": "int", "default": 7, "description": "Bullets per beam"},
+    "beamGap": {"type": "int", "default": 2, "description": "Frames between beam bullets"},
+    "beamSpeed": {"type": "float", "default": 8, "description": "Beam bullet speed after spool-up"},
+    "spoolFrames": {"type": "int", "default": 20, "description": "Frames for a beam bullet to spool up from speed 0"},
+    "cruiseFrames": {"type": "int", "default": 25, "description": "Frames a beam bullet flies at full speed"},
+    "stallFrames": {"type": "int", "default": 30, "description": "Frames a beam bullet hangs near-still before dissipating"},
+    "pulseCount": {"type": "int", "default": 12, "description": "Bullets per dish radar ring"},
+    "pulseSpeed": {"type": "float", "default": 0.8, "description": "Radar ring expansion speed"},
+    "pulseLife": {"type": "int", "default": 150, "description": "Radar ring bullet lifetime"},
+    "pulseDelay": {"type": "int", "default": 90, "description": "Frames between radar rings"}
   },
   "script": [
-    {"control": "Set", "prop": "direction", "value": 90},
-    {"control": "Set", "prop": "lifetime", "value": 300},
+    {"control": "Set", "prop": "offsetAngle", "value": 0},
     {
-      "control": "Sub",
+      "control": "Rep",
+      "count": "$podCount",
       "actions": [
-        {"control": "Wait", "frames": 12},
-        {"control": "Scope", "actions": [
-          {"control": "Bind", "mode": "position"},
-          {"control": "Set", "prop": "speed", "value": 0.5},
-          {"control": "Set", "prop": "offsetDistance", "value": "$ringRadius"},
-          {"control": "Dup", "count": "$satelliteCount", "props": {
-            "offsetAngle": {"from": 0, "to": "360 - 360 / $satelliteCount"},
-            "direction":   {"from": 0, "to": "360 - 360 / $satelliteCount"}
-          }}
-        ]}
+        {"control": "Bind", "mode": "offset"},
+        {"control": "Set", "prop": "speed", "value": 0},
+        {
+          "control": "Sub",
+          "actions": [
+            {"control": "Tween", "prop": "offsetDistance", "to": "$orbitRadius", "frames": "$launchFrames"},
+            {
+              "control": "Loop",
+              "actions": [
+                {"control": "Rep", "count": "$chargeFrames", "actions": [
+                  {"control": "Add", "prop": "offsetAngle", "delta": "$orbitStep"},
+                  {"control": "Wait", "frames": 1}
+                ]},
+                {"control": "Scope", "actions": [
+                  {"control": "Set", "prop": "offsetDistance", "value": 0},
+                  {"control": "Set", "prop": "offsetAngle", "value": 0},
+                  {"control": "Bind", "mode": "none"},
+                  {"control": "AimAtPlayer"},
+                  {"control": "Set", "prop": "speed", "value": 0},
+                  {"control": "Sub", "actions": [
+                    {"control": "Tween", "prop": "speed", "to": "$beamSpeed", "frames": "$spoolFrames"},
+                    {"control": "Wait", "frames": "$cruiseFrames"},
+                    {"control": "Tween", "prop": "speed", "to": 0.3, "frames": 12},
+                    {"control": "Wait", "frames": "$stallFrames"},
+                    {"control": "Vanish"}
+                  ]},
+                  {"control": "Rep", "count": "$beamCount", "actions": [
+                    {"control": "Fire", "angle": 0, "speed": 0},
+                    {"control": "Wait", "frames": "$beamGap"}
+                  ]}
+                ]}
+              ]
+            }
+          ]
+        },
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "Bind", "mode": "none"},
+        {"control": "Add", "prop": "offsetAngle", "delta": "360 / $podCount"}
       ]
     },
+    {"control": "Sub", "actions": []},
     {
       "control": "Loop",
       "actions": [
-        {"control": "Line", "count": 3, "prop": "speed", "from": "$anchorSpeed", "to": "$anchorSpeed + 1"},
-        {"control": "Rotate", "degrees": "random.angle(8) / 4", "withDirection": true},
-        {"control": "Wait", "frames": "$volleyDelay"}
+        {"control": "Scope", "actions": [
+          {"control": "Set", "prop": "speed", "value": "$pulseSpeed"},
+          {"control": "Set", "prop": "lifetime", "value": "$pulseLife"},
+          {"control": "Radial", "count": "$pulseCount", "speed": 0}
+        ]},
+        {"control": "Wait", "frames": "$pulseDelay"}
       ]
     }
   ]
