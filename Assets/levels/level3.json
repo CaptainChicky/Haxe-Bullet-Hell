@@ -6676,6 +6676,189 @@
       ]
     },
     {
+      "startTime": 68,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 160,
+          "pattern": "spiral",
+          "health": 3,
+          "patternConfig": {
+            "bulletSpeed": 3.4,
+            "rotationChange": 15,
+            "fireDelay": 4
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 1.7600000000000002,
+                "vy": 1.15
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.24,
+                "vy": 1.3
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.72,
+                "vy": 1.4500000000000002
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 3.2,
+                "vy": 1.6
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.88,
+                "vy": 2.075
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.56,
+                "vy": 2.55
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.24,
+                "vy": 3.025
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.92,
+                "vy": 3.5
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              }
+            ]
+          }
+        },
+        {
+          "spawnTime": 1.2,
+          "x": 1850,
+          "y": 200,
+          "pattern": "spiral",
+          "health": 3,
+          "patternConfig": {
+            "bulletSpeed": 3.4,
+            "rotationChange": -15,
+            "fireDelay": 4
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": -1.7600000000000002,
+                "vy": 1.15
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.24,
+                "vy": 1.3
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.72,
+                "vy": 1.4500000000000002
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -3.2,
+                "vy": 1.6
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.88,
+                "vy": 2.075
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.56,
+                "vy": 2.55
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.24,
+                "vy": 3.025
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.92,
+                "vy": 3.5
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
       "startTime": 70,
       "enemies": [
         {
@@ -9147,7 +9330,279 @@
       ]
     },
     {
-      "startTime": 126,
+      "startTime": 110,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 150,
+          "pattern": "spiral",
+          "health": 3,
+          "patternConfig": {
+            "bulletSpeed": 3.4,
+            "rotationChange": 15,
+            "fireDelay": 4
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 1.7600000000000002,
+                "vy": 1.15
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.24,
+                "vy": 1.3
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.72,
+                "vy": 1.4500000000000002
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 3.2,
+                "vy": 1.6
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.88,
+                "vy": 2.075
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.56,
+                "vy": 2.55
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.24,
+                "vy": 3.025
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.92,
+                "vy": 3.5
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              }
+            ]
+          }
+        },
+        {
+          "spawnTime": 1.5,
+          "x": 1850,
+          "y": 180,
+          "pattern": "spiral",
+          "health": 3,
+          "patternConfig": {
+            "bulletSpeed": 3.4,
+            "rotationChange": -15,
+            "fireDelay": 4
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": -1.7600000000000002,
+                "vy": 1.15
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.24,
+                "vy": 1.3
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.72,
+                "vy": 1.4500000000000002
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -3.2,
+                "vy": 1.6
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.88,
+                "vy": 2.075
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.56,
+                "vy": 2.55
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.24,
+                "vy": 3.025
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.92,
+                "vy": 3.5
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              }
+            ]
+          }
+        },
+        {
+          "spawnTime": 3.0,
+          "x": -50,
+          "y": 240,
+          "pattern": "spiral",
+          "health": 3,
+          "patternConfig": {
+            "bulletSpeed": 3.4,
+            "rotationChange": 15,
+            "fireDelay": 4
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 1.7600000000000002,
+                "vy": 1.15
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.24,
+                "vy": 1.3
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.72,
+                "vy": 1.4500000000000002
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 3.2,
+                "vy": 1.6
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.88,
+                "vy": 2.075
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.56,
+                "vy": 2.55
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.24,
+                "vy": 3.025
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.92,
+                "vy": 3.5
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 116,
       "enemies": [
         {
           "spawnTime": 0,
@@ -9786,7 +10241,190 @@
       ]
     },
     {
-      "startTime": 144,
+      "startTime": 124,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": -50,
+          "y": 150,
+          "pattern": "spiral",
+          "health": 3,
+          "patternConfig": {
+            "bulletSpeed": 3.4,
+            "rotationChange": 15,
+            "fireDelay": 4
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 1.7600000000000002,
+                "vy": 1.15
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.24,
+                "vy": 1.3
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.72,
+                "vy": 1.4500000000000002
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 3.2,
+                "vy": 1.6
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.88,
+                "vy": 2.075
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.56,
+                "vy": 2.55
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.24,
+                "vy": 3.025
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.92,
+                "vy": 3.5
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              }
+            ]
+          }
+        },
+        {
+          "spawnTime": 1.5,
+          "x": 1850,
+          "y": 190,
+          "pattern": "spiral",
+          "health": 3,
+          "patternConfig": {
+            "bulletSpeed": 3.4,
+            "rotationChange": -15,
+            "fireDelay": 4
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": -1.7600000000000002,
+                "vy": 1.15
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.24,
+                "vy": 1.3
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.72,
+                "vy": 1.4500000000000002
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -3.2,
+                "vy": 1.6
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.88,
+                "vy": 2.075
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.56,
+                "vy": 2.55
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.24,
+                "vy": 3.025
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.92,
+                "vy": 3.5
+              },
+              {
+                "type": "Wait",
+                "frames": 22
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 130,
       "enemies": [
         {
           "spawnTime": 0,
@@ -10366,6 +11004,104 @@
                   "value": 0
                 },
                 {
+                  "control": "Set",
+                  "prop": "direction",
+                  "value": 90
+                },
+                {
+                  "control": "Tween",
+                  "prop": "speed",
+                  "to": 3,
+                  "frames": 30
+                },
+                {
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 0
+                },
+                {
+                  "control": "Wait",
+                  "frames": 20
+                },
+                {
+                  "control": "SetAngle",
+                  "value": 90
+                },
+                {
+                  "control": "SetSpeed",
+                  "value": 4
+                },
+                {
+                  "control": "Rep",
+                  "count": 10,
+                  "actions": [
+                    {
+                      "control": "NWay",
+                      "count": 6,
+                      "angle": 90,
+                      "speed": 0
+                    },
+                    {
+                      "control": "AddAngle",
+                      "delta": 3
+                    },
+                    {
+                      "control": "AddSpeed",
+                      "delta": 0.4
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 4
+                    }
+                  ]
+                },
+                {
+                  "control": "SetAngle",
+                  "value": 90
+                },
+                {
+                  "control": "SetSpeed",
+                  "value": 4
+                },
+                {
+                  "control": "Rep",
+                  "count": 10,
+                  "actions": [
+                    {
+                      "control": "NWay",
+                      "count": 8,
+                      "angle": 45,
+                      "speed": 0
+                    },
+                    {
+                      "control": "AddAngle",
+                      "delta": -4
+                    },
+                    {
+                      "control": "AddSpeed",
+                      "delta": 0.8
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 4
+                    }
+                  ]
+                },
+                {
+                  "control": "Wait",
+                  "frames": 40
+                },
+                {
+                  "control": "Set",
+                  "prop": "direction",
+                  "value": 180
+                },
+                {
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 3
+                },
+                {
                   "control": "Concurrent",
                   "share": true,
                   "branches": [
@@ -10389,7 +11125,7 @@
                       },
                       {
                         "control": "Wait",
-                        "frames": 10
+                        "frames": 20
                       },
                       {
                         "control": "Set",
@@ -10410,7 +11146,7 @@
                       },
                       {
                         "control": "Wait",
-                        "frames": 10
+                        "frames": 20
                       },
                       {
                         "control": "Set",
@@ -10437,135 +11173,6 @@
                           {
                             "control": "Set",
                             "prop": "speed",
-                            "value": 4
-                          },
-                          {
-                            "control": "Set",
-                            "prop": "shotAng",
-                            "value": 90
-                          },
-                          {
-                            "control": "Rep",
-                            "count": 14,
-                            "actions": [
-                              {
-                                "control": "SetAngle",
-                                "value": 90
-                              },
-                              {
-                                "control": "NWay",
-                                "count": 6,
-                                "angle": 90,
-                                "speed": 0
-                              },
-                              {
-                                "control": "AddSpeed",
-                                "delta": 0.35
-                              },
-                              {
-                                "control": "Wait",
-                                "frames": 5
-                              }
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  ]
-                },
-                {
-                  "control": "Wait",
-                  "frames": 24
-                },
-                {
-                  "control": "Concurrent",
-                  "share": true,
-                  "branches": [
-                    [
-                      {
-                        "control": "Set",
-                        "prop": "direction",
-                        "value": 90
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 4,
-                        "frames": 22
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 0,
-                        "frames": 22
-                      },
-                      {
-                        "control": "Wait",
-                        "frames": 30
-                      },
-                      {
-                        "control": "Set",
-                        "prop": "direction",
-                        "value": 270
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 4,
-                        "frames": 22
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 0,
-                        "frames": 22
-                      },
-                      {
-                        "control": "Set",
-                        "prop": "direction",
-                        "value": 90
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 4,
-                        "frames": 22
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 0,
-                        "frames": 22
-                      },
-                      {
-                        "control": "Wait",
-                        "frames": 30
-                      },
-                      {
-                        "control": "Set",
-                        "prop": "direction",
-                        "value": 270
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 4,
-                        "frames": 22
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 0,
-                        "frames": 22
-                      }
-                    ],
-                    [
-                      {
-                        "control": "Scope",
-                        "actions": [
-                          {
-                            "control": "Set",
-                            "prop": "speed",
                             "value": 3.5
                           },
                           {
@@ -10574,7 +11181,7 @@
                           },
                           {
                             "control": "Rep",
-                            "count": 60,
+                            "count": 50,
                             "actions": [
                               {
                                 "control": "NWay",
@@ -10598,142 +11205,59 @@
                   ]
                 },
                 {
-                  "control": "Wait",
-                  "frames": 20
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 0
                 },
                 {
-                  "control": "Concurrent",
-                  "share": true,
-                  "branches": [
-                    [
-                      {
-                        "control": "Set",
-                        "prop": "direction",
-                        "value": 270
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 2.5,
-                        "frames": 26
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 0,
-                        "frames": 26
-                      },
-                      {
-                        "control": "Wait",
-                        "frames": 20
-                      },
-                      {
-                        "control": "Set",
-                        "prop": "direction",
-                        "value": 90
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 2.0,
-                        "frames": 26
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 0,
-                        "frames": 26
-                      }
-                    ],
-                    [
-                      {
-                        "control": "Rep",
-                        "count": 4,
-                        "actions": [
-                          {
-                            "control": "Scope",
-                            "actions": [
-                              {
-                                "control": "Set",
-                                "prop": "speed",
-                                "value": 4
-                              },
-                              {
-                                "control": "Radial",
-                                "count": 90,
-                                "speed": 0
-                              }
-                            ]
-                          },
-                          {
-                            "control": "Wait",
-                            "frames": 8
-                          },
-                          {
-                            "control": "Scope",
-                            "actions": [
-                              {
-                                "control": "Set",
-                                "prop": "speed",
-                                "value": 8
-                              },
-                              {
-                                "control": "Radial",
-                                "count": 72,
-                                "speed": 0
-                              }
-                            ]
-                          },
-                          {
-                            "control": "Wait",
-                            "frames": 8
-                          },
-                          {
-                            "control": "Scope",
-                            "actions": [
-                              {
-                                "control": "Set",
-                                "prop": "speed",
-                                "value": 12
-                              },
-                              {
-                                "control": "Radial",
-                                "count": 45,
-                                "speed": 0
-                              }
-                            ]
-                          },
-                          {
-                            "control": "Wait",
-                            "frames": 8
-                          },
-                          {
-                            "control": "Scope",
-                            "actions": [
-                              {
-                                "control": "Set",
-                                "prop": "speed",
-                                "value": 16
-                              },
-                              {
-                                "control": "Radial",
-                                "count": 30,
-                                "speed": 0
-                              }
-                            ]
-                          },
-                          {
-                            "control": "Wait",
-                            "frames": 38
-                          }
-                        ]
-                      }
-                    ]
+                  "control": "Wait",
+                  "frames": 30
+                },
+                {
+                  "control": "Rep",
+                  "count": 4,
+                  "actions": [
+                    {
+                      "control": "Radial",
+                      "count": 90,
+                      "speed": 4
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 8
+                    },
+                    {
+                      "control": "Radial",
+                      "count": 72,
+                      "speed": 8
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 8
+                    },
+                    {
+                      "control": "Radial",
+                      "count": 45,
+                      "speed": 12
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 8
+                    },
+                    {
+                      "control": "Radial",
+                      "count": 30,
+                      "speed": 16
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 38
+                    }
                   ]
                 },
                 {
                   "control": "Wait",
-                  "frames": 20
+                  "frames": 26
                 },
                 {
                   "control": "Set",
@@ -10848,84 +11372,36 @@
                   "frames": 200
                 },
                 {
-                  "control": "Concurrent",
-                  "share": true,
-                  "branches": [
-                    [
-                      {
-                        "control": "Set",
-                        "prop": "direction",
-                        "value": 90
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 5,
-                        "frames": 20
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 0,
-                        "frames": 20
-                      },
-                      {
-                        "control": "Wait",
-                        "frames": 40
-                      },
-                      {
-                        "control": "Set",
-                        "prop": "direction",
-                        "value": 270
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 5,
-                        "frames": 20
-                      },
-                      {
-                        "control": "Tween",
-                        "prop": "speed",
-                        "to": 0,
-                        "frames": 20
-                      }
-                    ],
-                    [
-                      {
-                        "control": "AimAtPlayer"
-                      },
-                      {
-                        "control": "Rep",
-                        "count": 26,
-                        "actions": [
-                          {
-                            "control": "Scope",
-                            "actions": [
-                              {
-                                "control": "Set",
-                                "prop": "speed",
-                                "value": 13
-                              },
-                              {
-                                "control": "NWay",
-                                "count": 9,
-                                "angle": 6,
-                                "speed": 0
-                              }
-                            ]
-                          },
-                          {
-                            "control": "AddAngle",
-                            "delta": 1.3
-                          },
-                          {
-                            "control": "Wait",
-                            "frames": 2
-                          }
-                        ]
-                      }
-                    ]
+                  "control": "AimAtPlayer"
+                },
+                {
+                  "control": "Rep",
+                  "count": 26,
+                  "actions": [
+                    {
+                      "control": "Scope",
+                      "actions": [
+                        {
+                          "control": "Set",
+                          "prop": "speed",
+                          "value": 13
+                        },
+                        {
+                          "control": "NWay",
+                          "count": 9,
+                          "angle": 6,
+                          "speed": 0
+                        }
+                      ]
+                    },
+                    {
+                      "control": "AddAngle",
+                      "delta": 1.3
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 2
+                    }
                   ]
                 },
                 {
@@ -10935,6 +11411,16 @@
                 {
                   "control": "SetAngle",
                   "value": 90
+                },
+                {
+                  "control": "Set",
+                  "prop": "direction",
+                  "value": 180
+                },
+                {
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 3
                 },
                 {
                   "control": "Loop",
@@ -11041,13 +11527,13 @@
                                 ]
                               }
                             ]
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 40
                           }
                         ]
                       ]
-                    },
-                    {
-                      "control": "Wait",
-                      "frames": 30
                     }
                   ]
                 }

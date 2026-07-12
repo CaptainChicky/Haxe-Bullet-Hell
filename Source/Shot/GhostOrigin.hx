@@ -37,7 +37,7 @@ interface IGhostAnchor {
  * `expired` flips and bound bullets force-vanish - no bullet is ever immortal.
  */
 class GhostOrigin implements IMovable {
-	public static inline final DEFAULT_MAX_ORPHAN_FRAMES:Int = 600; // 10s @ 60fps
+	public static inline final DEFAULT_MAX_ORPHAN_FRAMES:Int = 60; // 1s @ 60fps
 
 	public var x:Float;
 	public var y:Float;
