@@ -5,20 +5,102 @@
       "startTime": 0,
       "enemies": [
         {
-          "spawnTime": 0, "x": 350, "y": 200, "pattern": "nwhip", "health": 999,
-          "patternConfig": { "numberOfWhips": 3, "numberOfBullets": 5, "baseBulletSpeed": 3, "speedChange": 0.3, "angleChange": 1, "patternDelay": 40 },
-          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
-        },
+          "spawnTime": 0,
+          "x": 700,
+          "y": 200,
+          "pattern": "nwhip",
+          "health": 999,
+          "patternConfig": {
+            "numberOfWhips": 3,
+            "numberOfBullets": 5,
+            "baseBulletSpeed": 3,
+            "speedChange": 0.3,
+            "angleChange": 1,
+            "patternDelay": 40
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 600
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -10
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 10,
+      "enemies": [
         {
-          "spawnTime": 0.5, "x": 700, "y": 200, "pattern": "nwhip", "health": 999,
+          "spawnTime": 0,
+          "x": 700,
+          "y": 200,
+          "pattern": "nwhip",
+          "health": 999,
+          "patternConfig": {
+            "numberOfWhips": 5,
+            "numberOfBullets": 8,
+            "baseBulletSpeed": 4,
+            "speedChange": 1,
+            "angleChange": 2,
+            "patternDelay": 60
+          },
           "sprite": "enemy2",
-          "patternConfig": { "numberOfWhips": 5, "numberOfBullets": 8, "baseBulletSpeed": 4, "speedChange": 1, "angleChange": 2, "patternDelay": 60 },
-          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
-        },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 600
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -10
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 20,
+      "enemies": [
         {
-          "spawnTime": 1, "x": 1050, "y": 200, "pattern": "nwhip", "health": 999,
-          "patternConfig": { "numberOfWhips": 8, "numberOfBullets": 12, "baseBulletSpeed": 3, "speedChange": 0.5, "angleChange": 3, "patternDelay": 80 },
-          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+          "spawnTime": 0,
+          "x": 700,
+          "y": 200,
+          "pattern": "nwhip",
+          "health": 999,
+          "patternConfig": {
+            "numberOfWhips": 8,
+            "numberOfBullets": 12,
+            "baseBulletSpeed": 3,
+            "speedChange": 0.5,
+            "angleChange": 3,
+            "patternDelay": 80
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "Stop"
+              }
+            ]
+          }
         }
       ]
     }

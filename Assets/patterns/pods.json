@@ -1,13 +1,13 @@
 {
   "name": "pods",
-  "description": "Two pods launch outward via offset (not velocity, since bind overrides position), settle into orbit, and fire a spinning stream",
+  "description": "Two pods launch outward from the enemy via offset-bind (position derived from parent + prototype offset), settle into orbit by stepping offsetAngle, and fire a spinning stream",
   "parameters": {
-    "orbitRadius": {"type": "float", "default": 120},
-    "launchFrames": {"type": "int", "default": 30},
-    "orbitStep": {"type": "float", "default": -3},
-    "spinStep": {"type": "float", "default": 12},
-    "streamSpeed": {"type": "float", "default": 4},
-    "streamDelay": {"type": "int", "default": 1}
+    "orbitRadius": {"type": "float", "default": 120, "description": "Final orbit distance"},
+    "launchFrames": {"type": "int", "default": 30, "description": "Frames to tween outward"},
+    "orbitStep": {"type": "float", "default": -3, "description": "Offset angle step per frame (orbit speed)"},
+    "spinStep": {"type": "float", "default": 12, "description": "Stream direction rotation per frame"},
+    "streamSpeed": {"type": "float", "default": 4, "description": "Stream bullet speed"},
+    "streamDelay": {"type": "int", "default": 1, "description": "Frames between stream bullets"}
   },
   "script": [
     {"control": "Set", "prop": "offsetAngle", "value": 0},
@@ -15,7 +15,8 @@
       "control": "Rep",
       "count": 2,
       "actions": [
-        {"control": "Bind", "mode": "position"},
+        {"control": "Bind", "mode": "offset"},
+        {"control": "Set", "prop": "speed", "value": 0},
         {
           "control": "Sub",
           "actions": [
@@ -24,7 +25,9 @@
               "control": "Loop",
               "actions": [
                 {"control": "Scope", "actions": [
+                  {"control": "Set", "prop": "offsetDistance", "value": 0},
                   {"control": "Set", "prop": "speed", "value": "$streamSpeed"},
+                  {"control": "Bind", "mode": "none"},
                   {"control": "Fire", "angle": 0, "speed": 0}
                 ]},
                 {"control": "Add", "prop": "offsetAngle", "delta": "$orbitStep"},

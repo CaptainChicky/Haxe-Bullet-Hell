@@ -144,7 +144,7 @@ class CommandRegistry {
 		parsers.set("Copy", (d, c) -> new CopyPropCommand(c.str(d.from, "direction"), c.str(d.to, "direction"),
 			c.val(d.scale != null ? d.scale : 1)));
 		// {"control": "Tween", "prop": "speed", "to": 6, "frames": 30}
-		parsers.set("Tween", (d, c) -> new TweenCommand(c.str(d.prop, "direction"), c.val(d.to), c.int(d.frames)));
+		parsers.set("Tween", (d, c) -> new TweenCommand(c.str(d.prop, "direction"), c.val(d.to), c.int(d.frames), d.relative == true));
 
 		// --- Spawn placement transforms ---------------------------------------
 		// {"control": "Rotate", "degrees": 15}                   rotates (x,y) + offsetAngle
@@ -162,6 +162,7 @@ class CommandRegistry {
 		parsers.set("Bind", (d, c) -> {
 			var mode = switch (c.str(d.mode, "position")) {
 				case "full": ShotPrototype.BIND_FULL;
+				case "offset": ShotPrototype.BIND_OFFSET;
 				case "none": ShotPrototype.BIND_NONE;
 				default: ShotPrototype.BIND_POSITION;
 			};

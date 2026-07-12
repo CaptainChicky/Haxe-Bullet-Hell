@@ -29,7 +29,7 @@ class EnemyManager extends Sprite {
 		enemies.push(enemy);
 
 		// Create the shooting pattern based on type
-		var pattern:EnemyShootingPattern = createPattern(enemy, patternType, patternConfig);
+		var pattern:EnemyShootingPattern = createPattern(enemy, patternType, patternConfig, spriteName);
 		if (pattern != null) {
 			enemyPatterns.push(pattern);
 
@@ -53,7 +53,7 @@ class EnemyManager extends Sprite {
 		return enemy;
 	}
 
-	private function createPattern(enemy:Enemy, patternType:String, config:Dynamic):EnemyShootingPattern {
+	private function createPattern(enemy:Enemy, patternType:String, config:Dynamic, ?spriteName:String):EnemyShootingPattern {
 		var patternName = patternType.toLowerCase();
 		var commands:Array<IShotCommand> = null;
 
@@ -69,7 +69,7 @@ class EnemyManager extends Sprite {
 		// Create scripted pattern if we have commands
 		if (commands != null && commands.length > 0) {
 			var collisionManager = EnemyShootingPattern.getCollisionManager();
-			var pattern = new ScriptedShootingPattern(enemy, commands, collisionManager);
+			var pattern = new ScriptedShootingPattern(enemy, commands, collisionManager, spriteName);
 			return pattern;
 		}
 

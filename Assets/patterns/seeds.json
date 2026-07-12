@@ -1,37 +1,53 @@
 {
   "name": "seeds",
-  "description": "Alternating top/bottom volleys of 5-way seeds, each spawning a 12-step line of accelerating sub-seeds toward the player",
-  "parameters": {},
+  "description": "Firedancer seeds: alternating top/bottom volleys of decelerating seed bullets; each seed aims at the player and fires a 5-way fan of lineSeed children, each lineSeed also decelerates, re-aims, and fires a 12-step line of accelerating bullets",
+  "parameters": {
+    "seedSpeedMin": {"type": "float", "default": 6, "description": "Minimum seed launch speed"},
+    "seedSpeedMax": {"type": "float", "default": 9, "description": "Maximum seed launch speed"},
+    "seedDecelFrames": {"type": "int", "default": 30, "description": "Seed deceleration duration"},
+    "nwayCount": {"type": "int", "default": 5, "description": "Seed burst NWay count"},
+    "nwayArc": {"type": "float", "default": 150, "description": "Seed burst NWay arc"},
+    "nwaySpeed": {"type": "float", "default": 8, "description": "LineSeed initial speed"},
+    "lineCount": {"type": "int", "default": 12, "description": "Bullets per lineSeed burst"},
+    "lineSpeedFrom": {"type": "float", "default": 1, "description": "Line speed start"},
+    "lineSpeedTo": {"type": "float", "default": 7, "description": "Line speed end"},
+    "accelWait": {"type": "int", "default": 15, "description": "Frames before line bullets accelerate"},
+    "accelAmount": {"type": "float", "default": 5, "description": "Speed added to line bullets"},
+    "accelFrames": {"type": "int", "default": 60, "description": "Acceleration duration"},
+    "volleyDelay": {"type": "int", "default": 30, "description": "Frames between volleys"}
+  },
   "script": [
-    {
-      "control": "Sub",
-      "actions": [
+    {"control": "Sub", "actions": [
+      {"control": "Tween", "prop": "speed", "to": 1, "frames": "$seedDecelFrames"},
+      {"control": "Scope", "actions": [
+        {"control": "Set", "prop": "speed", "value": "$nwaySpeed"},
         {"control": "AimAtPlayer"},
-        {"control": "Set", "prop": "speed", "value": 8},
-        {
-          "control": "Sub",
-          "actions": [
+        {"control": "Sub", "actions": [
+          {"control": "Tween", "prop": "speed", "to": 1, "frames": "$seedDecelFrames"},
+          {"control": "Scope", "actions": [
             {"control": "AimAtPlayer"},
-            {"control": "Set", "prop": "speed", "value": 1},
-            {"control": "Line", "count": 12, "prop": "speed", "from": 1, "to": 7},
-            {"control": "Vanish"}
-          ]
-        },
-        {"control": "NWay", "count": 5, "angle": 150, "speed": 0},
-        {"control": "Vanish"}
-      ]
-    },
+            {"control": "Sub", "actions": [
+              {"control": "Wait", "frames": "$accelWait"},
+              {"control": "Tween", "prop": "speed", "to": "$accelAmount", "frames": "$accelFrames", "relative": true}
+            ]},
+            {"control": "Line", "count": "$lineCount", "prop": "speed", "from": "$lineSpeedFrom", "to": "$lineSpeedTo"}
+          ]},
+          {"control": "Vanish"}
+        ]},
+        {"control": "NWay", "count": "$nwayCount", "angle": "$nwayArc", "speed": 0}
+      ]},
+      {"control": "Vanish"}
+    ]},
     {
-      "control": "Loop",
-      "actions": [
-        {"control": "Random", "prop": "speed", "min": 6, "max": 9},
-        {"control": "Set", "prop": "direction", "value": 90},
+      "control": "Loop", "actions": [
+        {"control": "Set", "prop": "speed", "value": "random.between($seedSpeedMin, $seedSpeedMax)"},
+        {"control": "Set", "prop": "direction", "value": "90 + random.angle(4)"},
         {"control": "Fire", "angle": 0, "speed": 0},
-        {"control": "Wait", "frames": 30},
-        {"control": "Random", "prop": "speed", "min": 6, "max": 9},
-        {"control": "Set", "prop": "direction", "value": 270},
+        {"control": "Wait", "frames": "$volleyDelay"},
+        {"control": "Set", "prop": "speed", "value": "random.between($seedSpeedMin, $seedSpeedMax)"},
+        {"control": "Set", "prop": "direction", "value": "270 + random.angle(4)"},
         {"control": "Fire", "angle": 0, "speed": 0},
-        {"control": "Wait", "frames": 30}
+        {"control": "Wait", "frames": "$volleyDelay"}
       ]
     }
   ]

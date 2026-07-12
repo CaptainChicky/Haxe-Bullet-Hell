@@ -22,8 +22,9 @@ import openfl.Assets;
 class BulletEnemy extends Sprite {
 	public static inline final ROTATION_SPEED:Float = 90.0; // Sprite spin, degrees per second (visual only)
 
-	/** Cached texture - loading BitmapData per bullet was a per-spawn cost. */
+	/** Cached textures - one per bullet variant. */
 	private static var cachedBitmapData:BitmapData = null;
+	private static var cachedBitmapData2:BitmapData = null;
 
 	// Kept public for compatibility with any external velocity reads.
 	public var velocityX:Float = 0;
@@ -42,6 +43,9 @@ class BulletEnemy extends Sprite {
 	/** Optional script this bullet runs itself (nested patterns). */
 	private var script:ScriptRunner = null;
 
+	/** Which bullet sprite variant this bullet (and its children) use. */
+	public var bulletSprite:String = null;
+
 	// --- Binding (see ShotPrototype.bindMode) --------------------------------
 	private var bindMode:Int = ShotPrototype.BIND_NONE;
 	private var bindAnchor:IShotEmitter = null; // parent position/liveness source
@@ -54,7 +58,7 @@ class BulletEnemy extends Sprite {
 	// Random salt so bullet sprite spin isn't uniform across bullets.
 	private var salt:Float = Math.random() * 20;
 
-	public function new(?prototype:ShotPrototype) {
+	public function new(?prototype:ShotPrototype, ?bulletSpriteVariant:String) {
 		super();
 
 		if (prototype == null) prototype = new ShotPrototype();
@@ -65,12 +69,20 @@ class BulletEnemy extends Sprite {
 		minSpeed = prototype.minSpeed;
 		maxSpeed = prototype.maxSpeed;
 		lifetime = prototype.lifetime;
+		bulletSprite = bulletSpriteVariant;
 		updateVelocity();
 
-		if (cachedBitmapData == null) {
-			cachedBitmapData = Assets.getBitmapData("assets/BulletEnemy.png");
+		var bmd:BitmapData;
+		if (bulletSpriteVariant == "enemy2") {
+			if (cachedBitmapData2 == null)
+				cachedBitmapData2 = Assets.getBitmapData("assets/BulletEnemy(second).png");
+			bmd = cachedBitmapData2;
+		} else {
+			if (cachedBitmapData == null)
+				cachedBitmapData = Assets.getBitmapData("assets/BulletEnemy.png");
+			bmd = cachedBitmapData;
 		}
-		var bitmap:Bitmap = new Bitmap(cachedBitmapData);
+		var bitmap:Bitmap = new Bitmap(bmd);
 		bitmap.x = -bitmap.width / 2;
 		bitmap.y = -bitmap.height / 2;
 		addChild(bitmap);
@@ -187,8 +199,29 @@ class BulletEnemy extends Sprite {
 		}
 		updateVelocity();
 
-		x += velocityX + bindDX;
-		y += velocityY + bindDY;
+		// BIND_OFFSET: position is directly parent + polar/cartesian offset from
+		// the script's live prototype (no velocity integration). The sub-script
+		// controls the bullet's position entirely by mutating offsetDistance/
+		// offsetAngle (e.g. tweening outward, then adding angle to orbit).
+		if (bindMode == ShotPrototype.BIND_OFFSET && bindAnchor != null && script != null) {
+			var proto = script.getPrototype();
+			if (proto != null) {
+				var px = bindAnchor.getOriginX();
+				var py = bindAnchor.getOriginY();
+				if (proto.offsetDistance != 0) {
+					var rad = proto.offsetAngle * Math.PI / 180;
+					px += Math.cos(rad) * proto.offsetDistance;
+					py += Math.sin(rad) * proto.offsetDistance;
+				}
+				px += proto.x;
+				py += proto.y;
+				x = px;
+				y = py;
+			}
+		} else {
+			x += velocityX + bindDX;
+			y += velocityY + bindDY;
+		}
 
 		// Lifetime expiry.
 		age += 1;

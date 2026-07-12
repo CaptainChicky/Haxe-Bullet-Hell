@@ -1,30 +1,42 @@
 {
   "name": "flowerdup",
-  "description": "32 randomly-bearinged 9-way volleys; each shot's speed tweens up while direction settles (absolute approximation - see note)",
-  "parameters": {},
+  "description": "Firedancer flower: 32 evenly-spaced positions each fire a 9-way fan; bullets decelerate then curve 210° into petal spirals while re-accelerating (288 bullets per volley)",
+  "parameters": {
+    "copies": {"type": "int", "default": 32, "description": "Radial positions per volley"},
+    "ways": {"type": "int", "default": 9, "description": "NWay fan per position"},
+    "fanArc": {"type": "float", "default": 90, "description": "NWay arc degrees"},
+    "bulletSpeed": {"type": "float", "default": 4, "description": "Initial bullet speed"},
+    "offsetDist": {"type": "float", "default": 80, "description": "Spawn distance from emitter"},
+    "decelTo": {"type": "float", "default": 1, "description": "Speed after deceleration"},
+    "decelFrames": {"type": "int", "default": 30, "description": "Deceleration duration"},
+    "curveDeg": {"type": "float", "default": 210, "description": "Direction curve (relative) during petal phase"},
+    "curveFrames": {"type": "int", "default": 60, "description": "Petal curve/re-accel duration"},
+    "endSpeed": {"type": "float", "default": 2, "description": "Speed after re-acceleration"},
+    "volleyDelay": {"type": "int", "default": 240, "description": "Frames between volleys"}
+  },
   "script": [
-    {"control": "Set", "prop": "speed", "value": 4},
-    {"control": "Set", "prop": "offsetDistance", "value": 80},
     {
-      "control": "Loop",
-      "actions": [
-        {
-          "control": "Rep",
-          "count": 32,
-          "actions": [
-            {"control": "Random", "prop": "offsetAngle", "min": 0, "max": 360},
-            {"control": "Random", "prop": "direction", "min": 0, "max": 360},
+      "control": "Loop", "actions": [
+        {"control": "Set", "prop": "speed", "value": "$bulletSpeed"},
+        {"control": "Set", "prop": "offsetDistance", "value": "$offsetDist"},
+        {"control": "Sub", "actions": [
+          {"control": "Tween", "prop": "speed", "to": "$decelTo", "frames": "$decelFrames"},
+          {"control": "Concurrent", "share": true, "branches": [
+            [{"control": "Tween", "prop": "direction", "to": "$curveDeg", "frames": "$curveFrames", "relative": true}],
+            [{"control": "Tween", "prop": "speed", "to": "$endSpeed", "frames": "$curveFrames"}]
+          ]}
+        ]},
+        {"control": "Set", "prop": "cnt", "value": 0},
+        {"control": "Scope", "actions": [
+          {"control": "Rep", "count": "$copies", "actions": [
+            {"control": "Copy", "from": "cnt", "to": "offsetAngle", "scale": "360 / $copies"},
+            {"control": "Copy", "from": "cnt", "to": "direction", "scale": "360 / $copies"},
             {"control": "Add", "prop": "direction", "delta": 90},
-            {
-              "control": "Sub",
-              "actions": [
-                {"control": "Tween", "prop": "speed", "to": 2, "frames": 30}
-              ]
-            },
-            {"control": "NWay", "count": 9, "angle": 90, "speed": 1}
-          ]
-        },
-        {"control": "Wait", "frames": 240}
+            {"control": "NWay", "count": "$ways", "angle": "$fanArc", "speed": 0},
+            {"control": "Add", "prop": "cnt", "delta": 1}
+          ]}
+        ]},
+        {"control": "Wait", "frames": "$volleyDelay"}
       ]
     }
   ]

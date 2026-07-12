@@ -49,6 +49,7 @@ class ShotPrototype {
 	public static inline final BIND_NONE:Int = 0;
 	public static inline final BIND_POSITION:Int = 1;
 	public static inline final BIND_FULL:Int = 2;
+	public static inline final BIND_OFFSET:Int = 3;
 
 	/**
 	 * How bullets fired from this prototype relate to their firer:

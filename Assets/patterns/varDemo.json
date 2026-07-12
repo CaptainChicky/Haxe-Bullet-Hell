@@ -1,5 +1,5 @@
 {
-  "name": "varDemo",
+  "name": "vardemo",
   "description": "Direction stepped by an incrementing counter variable via Copy+scale",
   "parameters": {
     "speed": {"type": "float", "default": 5},

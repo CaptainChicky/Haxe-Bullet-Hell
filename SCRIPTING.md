@@ -60,10 +60,11 @@ New generic controls:
 {"control": "Random", "prop": "speed", "min": 2, "max": 6}
 {"control": "Copy",   "from": "direction", "to": "offsetAngle"}
 {"control": "Tween",  "prop": "speed", "to": 6, "frames": 30}   // linear interp over N frames
+{"control": "Tween",  "prop": "direction", "to": 210, "frames": 60, "relative": true}  // add 210° to current over 60 frames
 {"control": "Vanish"}                                            // bullet removes itself mid-flight
 ```
 
-`Tween` is stateful: it interpolates the property one step per frame and lands exactly on `to` after `frames` frames, then the script continues. To run two tweens simultaneously on the *same* upcoming bullet, use `Concurrent` with `"share": true` (branches normally clone the prototype; `share` makes them mutate the parent's):
+`Tween` is stateful: it interpolates the property one step per frame and lands exactly on `to` after `frames` frames, then the script continues. With `"relative": true`, the target is interpreted as *current value + to* rather than an absolute value — essential when many bullets start at different directions/speeds but all need the same delta (e.g. every petal curves +210° from its own starting direction). To run two tweens simultaneously on the *same* upcoming bullet, use `Concurrent` with `"share": true` (branches normally clone the prototype; `share` makes them mutate the parent's):
 
 ```jsonc
 {"control": "Concurrent", "share": true, "branches": [
@@ -125,7 +126,7 @@ Rotation follows the engine's angle convention (0° = +x, 90° = +y/down), so ro
 ### Bind (bullets that follow their parent)
 
 ```jsonc
-{"control": "Bind", "mode": "position"}   // or "full", or "none" to clear
+{"control": "Bind", "mode": "position"}   // or "full", "offset", or "none" to clear
 {"control": "Fire", "angle": 0, "speed": 0}
 ```
 
@@ -133,6 +134,7 @@ Every bullet fired while `bindMode` is set stays attached to the emitter that fi
 
 - **`position`** — the bullet moves in its parent's frame of reference: the parent's translation carries it along each frame while the bullet's own direction/speed/accel/turn still integrate on top. A pattern fired by a moving boss travels with the boss.
 - **`full`** — position binding *plus* flight state (direction, speed, accel, turn, speed clamps) re-derived every frame from the parent script's **live root prototype**. Mutate the parent's prototype and every fully-bound bullet re-steers in unison. Because the source is the *root* prototype, parent-side `Scope` blocks (burst configuration) are invisible to bound children — the same ownership rule as bullet steering. A fully-bound bullet's own sub-script can still fire children or `Vanish`, but cannot steer (**bind wins**).
+- **`offset`** — the bullet's position is directly computed as `parent_origin + polar_offset + cartesian_offset` every frame, reading `offsetDistance`/`offsetAngle`/`x`/`y` from the sub-script's live prototype. The bullet's own velocity is **not** integrated; movement comes entirely from the sub-script mutating the offset (e.g. tweening `offsetDistance` to launch outward, then adding to `offsetAngle` to orbit). Children fired from an offset-bound bullet should `Scope` and reset `offsetDistance` to 0 so they spawn at the pod's position, not at pod + orbitRadius. See `Assets/patterns/pods.json` for the canonical example.
 
 Rules and behaviors:
 

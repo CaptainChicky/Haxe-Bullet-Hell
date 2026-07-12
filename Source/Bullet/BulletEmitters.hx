@@ -15,9 +15,11 @@ import openfl.Lib;
  */
 private class EmitterBase {
 	private var collisionManager:CollisionManager;
+	public var bulletSprite:String = null;
 
-	private function new(collisionManager:CollisionManager) {
+	private function new(collisionManager:CollisionManager, ?bulletSprite:String) {
 		this.collisionManager = collisionManager;
+		this.bulletSprite = bulletSprite;
 	}
 
 	/** Vanish is a no-op for enemy emitters; BulletSubEmitter overrides. */
@@ -31,7 +33,7 @@ private class EmitterBase {
 	}
 
 	public function spawn(prototype:ShotPrototype, x:Float, y:Float):Void {
-		var bullet = new BulletEnemy(prototype);
+		var bullet = new BulletEnemy(prototype, bulletSprite);
 		bullet.x = x;
 		bullet.y = y;
 
@@ -59,7 +61,7 @@ private class EmitterBase {
 			// A bound bullet's own children do not implicitly bind to it;
 			// a chain must opt in with an explicit Bind in the sub-script.
 			subProto.bindMode = ShotPrototype.BIND_NONE;
-			var runner = new ScriptRunner(new BulletSubEmitter(bullet, collisionManager), prototype.subCommands, subProto);
+			var runner = new ScriptRunner(new BulletSubEmitter(bullet, collisionManager, bulletSprite), prototype.subCommands, subProto);
 			bullet.attachScript(runner);
 		}
 	}
@@ -69,8 +71,8 @@ private class EmitterBase {
 class EnemyBulletEmitter extends EmitterBase implements IShotEmitter {
 	private var enemy:Enemy;
 
-	public function new(enemy:Enemy, collisionManager:CollisionManager) {
-		super(collisionManager);
+	public function new(enemy:Enemy, collisionManager:CollisionManager, ?bulletSprite:String) {
+		super(collisionManager, bulletSprite);
 		this.enemy = enemy;
 	}
 
@@ -87,8 +89,8 @@ class EnemyBulletEmitter extends EmitterBase implements IShotEmitter {
 class BulletSubEmitter extends EmitterBase implements IShotEmitter {
 	private var bullet:BulletEnemy;
 
-	public function new(bullet:BulletEnemy, collisionManager:CollisionManager) {
-		super(collisionManager);
+	public function new(bullet:BulletEnemy, collisionManager:CollisionManager, ?bulletSprite:String) {
+		super(collisionManager, bulletSprite);
 		this.bullet = bullet;
 	}
 

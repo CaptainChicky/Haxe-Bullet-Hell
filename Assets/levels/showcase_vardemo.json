@@ -1,5 +1,5 @@
 {
-  "name": "Showcase: pods",
+  "name": "Showcase: vardemo",
   "waves": [
     {
       "startTime": 0,
@@ -8,14 +8,12 @@
           "spawnTime": 0,
           "x": 700,
           "y": 200,
-          "pattern": "pods",
+          "pattern": "vardemo",
           "health": 999,
           "patternConfig": {
-            "orbitRadius": 80,
-            "orbitStep": -2,
-            "spinStep": 8,
-            "streamSpeed": 3,
-            "streamDelay": 2
+            "speed": 4,
+            "angleStep": 10,
+            "fireDelay": 3
           },
           "movementScript": {
             "loop": false,
@@ -44,14 +42,12 @@
           "spawnTime": 0,
           "x": 700,
           "y": 200,
-          "pattern": "pods",
+          "pattern": "vardemo",
           "health": 999,
           "patternConfig": {
-            "orbitRadius": 120,
-            "orbitStep": -3,
-            "spinStep": 12,
-            "streamSpeed": 4,
-            "streamDelay": 1
+            "speed": 5,
+            "angleStep": 20,
+            "fireDelay": 4
           },
           "sprite": "enemy2",
           "movementScript": {
@@ -81,14 +77,12 @@
           "spawnTime": 0,
           "x": 700,
           "y": 200,
-          "pattern": "pods",
+          "pattern": "vardemo",
           "health": 999,
           "patternConfig": {
-            "orbitRadius": 160,
-            "orbitStep": -5,
-            "spinStep": 20,
-            "streamSpeed": 5,
-            "streamDelay": 1
+            "speed": 6,
+            "angleStep": 37,
+            "fireDelay": 2
           },
           "movementScript": {
             "loop": false,

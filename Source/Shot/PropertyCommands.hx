@@ -178,20 +178,23 @@ class TweenCommand implements IShotCommand {
 	private var prop:String;
 	private var target:NumValue;
 	private var frames:Int;
+	private var relative:Bool;
 
-	public function new(prop:String, target:NumValue, frames:Int) {
+	public function new(prop:String, target:NumValue, frames:Int, relative:Bool = false) {
 		this.prop = prop;
 		this.target = target;
 		this.frames = frames;
+		this.relative = relative;
 	}
 
 	public function run(ctx:ShotContext, runner:ScriptRunner):Void {
 		var to = target.get();
+		var start = ctx.prototype.getProp(prop);
+		if (relative) to = start + to;
 		if (frames <= 0) {
 			ctx.prototype.setProp(prop, to);
 			return;
 		}
-		var start = ctx.prototype.getProp(prop);
 		ctx.frames.push(new shot.ShotContext.ShotFrame([new TweenStepCommand(prop, start, to, frames)], frames));
 	}
 }

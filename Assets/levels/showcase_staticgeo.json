@@ -1,5 +1,5 @@
 {
-  "name": "Showcase: pods",
+  "name": "Showcase: staticgeo",
   "waves": [
     {
       "startTime": 0,
@@ -8,15 +8,9 @@
           "spawnTime": 0,
           "x": 700,
           "y": 200,
-          "pattern": "pods",
+          "pattern": "staticgeo",
           "health": 999,
-          "patternConfig": {
-            "orbitRadius": 80,
-            "orbitStep": -2,
-            "spinStep": 8,
-            "streamSpeed": 3,
-            "streamDelay": 2
-          },
+          "patternConfig": {},
           "movementScript": {
             "loop": false,
             "actions": [
@@ -44,15 +38,9 @@
           "spawnTime": 0,
           "x": 700,
           "y": 200,
-          "pattern": "pods",
+          "pattern": "staticgeo",
           "health": 999,
-          "patternConfig": {
-            "orbitRadius": 120,
-            "orbitStep": -3,
-            "spinStep": 12,
-            "streamSpeed": 4,
-            "streamDelay": 1
-          },
+          "patternConfig": {},
           "sprite": "enemy2",
           "movementScript": {
             "loop": false,
@@ -81,15 +69,9 @@
           "spawnTime": 0,
           "x": 700,
           "y": 200,
-          "pattern": "pods",
+          "pattern": "staticgeo",
           "health": 999,
-          "patternConfig": {
-            "orbitRadius": 160,
-            "orbitStep": -5,
-            "spinStep": 20,
-            "streamSpeed": 5,
-            "streamDelay": 1
-          },
+          "patternConfig": {},
           "movementScript": {
             "loop": false,
             "actions": [

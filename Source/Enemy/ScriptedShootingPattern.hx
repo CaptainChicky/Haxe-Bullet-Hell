@@ -13,9 +13,9 @@ import openfl.events.Event;
 class ScriptedShootingPattern extends EnemyShootingPattern {
 	private var runner:ScriptRunner;
 
-	public function new(enemy:Enemy, commands:Array<IShotCommand>, collisionManager:CollisionManager) {
+	public function new(enemy:Enemy, commands:Array<IShotCommand>, collisionManager:CollisionManager, ?bulletSprite:String) {
 		super(enemy);
-		var emitter = new EnemyBulletEmitter(enemy, collisionManager);
+		var emitter = new EnemyBulletEmitter(enemy, collisionManager, bulletSprite);
 		this.runner = new ScriptRunner(emitter, commands);
 	}
 

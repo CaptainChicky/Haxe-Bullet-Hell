@@ -136,8 +136,25 @@ class HeadlessTestBullet {
 			}
 		}
 		var rad = direction * Math.PI / 180;
-		x += Math.cos(rad) * speed + bindDX;
-		y += Math.sin(rad) * speed + bindDY;
+		if (bindMode == ShotPrototype.BIND_OFFSET && bindAnchor != null && script != null) {
+			var proto = script.getPrototype();
+			if (proto != null) {
+				var px = bindAnchor.getOriginX();
+				var py = bindAnchor.getOriginY();
+				if (proto.offsetDistance != 0) {
+					var orad = proto.offsetAngle * Math.PI / 180;
+					px += Math.cos(orad) * proto.offsetDistance;
+					py += Math.sin(orad) * proto.offsetDistance;
+				}
+				px += proto.x;
+				py += proto.y;
+				x = px;
+				y = py;
+			}
+		} else {
+			x += Math.cos(rad) * speed + bindDX;
+			y += Math.sin(rad) * speed + bindDY;
+		}
 	}
 }
 
