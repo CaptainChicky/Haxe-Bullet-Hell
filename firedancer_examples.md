@@ -1,18 +1,3 @@
-Control Flow:
-```
-// Elements in an array are executed sequentially.
-
-[
-  shot.velocity.set(4, 180), // (see other examples)
-  loop([ // infinite loop
-    wait(60), // wait 60 frames = 1 second
-    rep(8, [ // repeat 8 times
-      fire(), // emit a new actor (= bullet, enemy etc.)
-      wait(10)
-    ])
-  ])
-];
-```
 Move:
 ```
 /*
@@ -44,56 +29,6 @@ loop([
   speed.set(0).frames(60),
   wait(30),
 ]);
-```
-Shot Speed:
-```
-loop([
-  shot.velocity.set(5, 180),
-  rep(30, [
-    fire(),
-    shot.speed.add(1),
-    wait(1)
-  ]),
-  wait(60)
-]);
-```
-Nway/Radial/Line:
-```
-loop([
-  shot.velocity.set(4, 180),
-  nWay(10, { angle: 90 }),
-  wait(60),
-  radial(36),
-  wait(60),
-  line(10, { shotSpeedChange: 10 }),
-  wait(60)
-]);
-
-/*
-  nWay() and line() are shorthands for dup() with limited parameters.
-*/
-```
-Parallel:
-```
-/*
-  parallel() waits until all threads are completed, while
-  async() does not.
-*/
-
-[
-  shot.velocity.set(5, 180),
-  parallel([
-    loop([
-      fire(),
-      wait(8)
-    ]),
-    loop([
-      fire(),
-      shot.direction.add(32),
-      wait(4)
-    ])
-  ])
-];
 ```
 Fire with Pattern (Shifter):
 ```
