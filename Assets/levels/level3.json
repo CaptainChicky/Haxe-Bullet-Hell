@@ -11654,104 +11654,104 @@
                   "value": 90
                 },
                 {
-                  "control": "Loop",
-                  "actions": [
-                    {
-                      "control": "Concurrent",
-                      "share": true,
-                      "branches": [
-                        [
+                  "control": "Concurrent",
+                  "share": true,
+                  "branches": [
+                    [
+                      {
+                        "control": "Loop",
+                        "actions": [
                           {
-                            "control": "Loop",
-                            "actions": [
-                              {
-                                "control": "Set",
-                                "prop": "direction",
-                                "value": 180
-                              },
-                              {
-                                "control": "Tween",
-                                "prop": "speed",
-                                "to": 2.6,
-                                "frames": 40
-                              },
-                              {
-                                "control": "Tween",
-                                "prop": "speed",
-                                "to": 0,
-                                "frames": 40
-                              },
-                              {
-                                "control": "Wait",
-                                "frames": 12
-                              },
-                              {
-                                "control": "Set",
-                                "prop": "direction",
-                                "value": 0
-                              },
-                              {
-                                "control": "Tween",
-                                "prop": "speed",
-                                "to": 2.6,
-                                "frames": 40
-                              },
-                              {
-                                "control": "Tween",
-                                "prop": "speed",
-                                "to": 0,
-                                "frames": 40
-                              },
-                              {
-                                "control": "Wait",
-                                "frames": 12
-                              },
-                              {
-                                "control": "Set",
-                                "prop": "direction",
-                                "value": 90
-                              },
-                              {
-                                "control": "Tween",
-                                "prop": "speed",
-                                "to": 3,
-                                "frames": 26
-                              },
-                              {
-                                "control": "Tween",
-                                "prop": "speed",
-                                "to": 0,
-                                "frames": 26
-                              },
-                              {
-                                "control": "Wait",
-                                "frames": 20
-                              },
-                              {
-                                "control": "Set",
-                                "prop": "direction",
-                                "value": 270
-                              },
-                              {
-                                "control": "Tween",
-                                "prop": "speed",
-                                "to": 3,
-                                "frames": 26
-                              },
-                              {
-                                "control": "Tween",
-                                "prop": "speed",
-                                "to": 0,
-                                "frames": 26
-                              },
-                              {
-                                "control": "Wait",
-                                "frames": 12
-                              }
-                            ]
+                            "control": "Set",
+                            "prop": "direction",
+                            "value": 180
+                          },
+                          {
+                            "control": "Tween",
+                            "prop": "speed",
+                            "to": 2.6,
+                            "frames": 40
+                          },
+                          {
+                            "control": "Tween",
+                            "prop": "speed",
+                            "to": 0,
+                            "frames": 40
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 12
+                          },
+                          {
+                            "control": "Set",
+                            "prop": "direction",
+                            "value": 0
+                          },
+                          {
+                            "control": "Tween",
+                            "prop": "speed",
+                            "to": 2.6,
+                            "frames": 40
+                          },
+                          {
+                            "control": "Tween",
+                            "prop": "speed",
+                            "to": 0,
+                            "frames": 40
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 12
+                          },
+                          {
+                            "control": "Set",
+                            "prop": "direction",
+                            "value": 90
+                          },
+                          {
+                            "control": "Tween",
+                            "prop": "speed",
+                            "to": 3,
+                            "frames": 26
+                          },
+                          {
+                            "control": "Tween",
+                            "prop": "speed",
+                            "to": 0,
+                            "frames": 26
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 20
+                          },
+                          {
+                            "control": "Set",
+                            "prop": "direction",
+                            "value": 270
+                          },
+                          {
+                            "control": "Tween",
+                            "prop": "speed",
+                            "to": 3,
+                            "frames": 26
+                          },
+                          {
+                            "control": "Tween",
+                            "prop": "speed",
+                            "to": 0,
+                            "frames": 26
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 12
                           }
-                        ],
-                        [
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "control": "Loop",
+                        "actions": [
                           {
                             "control": "AimAtPlayer"
                           },
@@ -11819,8 +11819,8 @@
                             "frames": 40
                           }
                         ]
-                      ]
-                    }
+                      }
+                    ]
                   ]
                 }
               ]
