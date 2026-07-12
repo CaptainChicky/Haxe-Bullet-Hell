@@ -1,0 +1,39 @@
+{
+  "name": "sincos",
+  "description": "Firedancer 'Sin/Cos': a chain of bullets orbits the enemy along a flattened ellipse. Each offset-bound bullet computes its Cartesian offset per frame as (cos(bearing)*radiusX, sin(bearing)*radiusY) from its own bearing variable - runtime var access in expressions.",
+  "parameters": {
+    "radiusX": {"type": "float", "default": 200, "description": "Ellipse horizontal semi-axis"},
+    "radiusY": {"type": "float", "default": 50, "description": "Ellipse vertical semi-axis"},
+    "count": {"type": "int", "default": 16, "description": "Bullets in the orbiting chain"},
+    "fireDelay": {"type": "int", "default": 4, "description": "Frames between chain bullets (sets their spacing on the ellipse)"},
+    "bearingStep": {"type": "float", "default": 4, "description": "Degrees each bullet advances along the ellipse per frame"}
+  },
+  "script": [
+    {"control": "Set", "prop": "speed", "value": 0},
+    {"control": "Set", "prop": "x", "value": "$radiusX"},
+    {
+      "control": "Sub",
+      "actions": [
+        {"control": "Set", "prop": "bearing", "value": 0},
+        {
+          "control": "Loop",
+          "actions": [
+            {"control": "Set", "prop": "x", "value": "cos(bearing) * $radiusX"},
+            {"control": "Set", "prop": "y", "value": "sin(bearing) * $radiusY"},
+            {"control": "Wait", "frames": 1},
+            {"control": "Add", "prop": "bearing", "delta": "$bearingStep"}
+          ]
+        }
+      ]
+    },
+    {"control": "Bind", "mode": "offset"},
+    {
+      "control": "Rep",
+      "count": "$count",
+      "actions": [
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "Wait", "frames": "$fireDelay"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "name": "Showcase: laundry",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 700,
+          "y": 250,
+          "pattern": "laundry",
+          "health": 999,
+          "patternConfig": {
+            "bulletSpeed": 12,
+            "bigCount": 10,
+            "bigStep": 8,
+            "bigDelay": 4,
+            "smallCount": 4,
+            "smallStep": 4,
+            "smallDelay": 2
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 600
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -10
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 10,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 700,
+          "y": 250,
+          "pattern": "laundry",
+          "health": 999,
+          "patternConfig": {
+            "bulletSpeed": 7,
+            "bigCount": 12,
+            "bigStep": 11,
+            "bigDelay": 5,
+            "smallCount": 5,
+            "smallStep": 6,
+            "smallDelay": 3
+          },
+          "sprite": "enemy2",
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 600
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -10
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 20,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 700,
+          "y": 250,
+          "pattern": "laundry",
+          "health": 999,
+          "patternConfig": {
+            "bulletSpeed": 4,
+            "bigCount": 8,
+            "bigStep": 14,
+            "bigDelay": 6,
+            "smallCount": 3,
+            "smallStep": 9,
+            "smallDelay": 4
+          },
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "Stop"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

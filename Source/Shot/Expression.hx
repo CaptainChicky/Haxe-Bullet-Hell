@@ -28,12 +28,24 @@ package shot;
 enum ExprNode {
 	EConst(v:Float);
 	EParam(name:String);
+	EVar(name:String);
 	EBin(op:String, l:ExprNode, r:ExprNode);
 	ENeg(e:ExprNode);
 	ECall(name:String, args:Array<ExprNode>);
 }
 
 class Expression {
+	/**
+	 * The prototype bare identifiers read from: "sin(bearing) * 40" resolves
+	 * `bearing` through currentProto.getProp() - custom script variables AND
+	 * built-in properties (direction, speed, ...) are both visible.
+	 * ScriptRunner points this at the executing context's prototype before
+	 * every command run (single-threaded execution makes this safe); inside a
+	 * Scope it is therefore the Scope's clone. Null (e.g. compile-time
+	 * resolve() of structural values) makes bare identifiers read 0.
+	 */
+	public static var currentProto:ShotPrototype = null;
+
 	/** Resolve a JSON value to a number using the given parameter map (compile-time). */
 	public static function resolve(value:Dynamic, params:Map<String, Dynamic>):Float {
 		if (value == null) return 0;
@@ -74,6 +86,8 @@ class Expression {
 					trace("Expression: parameter not found: " + name);
 					0;
 				}
+			case EVar(name):
+				(currentProto != null) ? currentProto.getProp(name) : 0;
 			case ENeg(e): -eval(e, params);
 			case EBin(op, l, r):
 				var a = eval(l, params);
@@ -109,6 +123,8 @@ class Expression {
 	private static function isVolatile(node:ExprNode, params:Map<String, Dynamic>):Bool {
 		return switch (node) {
 			case EConst(_): false;
+			// Prototype vars change at runtime - always re-evaluate.
+			case EVar(_): true;
 			case EParam(name):
 				// A parameter whose raw value is itself a string expression
 				// may contain a random call.
@@ -250,8 +266,8 @@ private class ExprParser {
 				else trace("Expression: missing ) in call to " + name);
 				return ECall(name, args);
 			}
-			trace("Expression: unexpected identifier '" + name + "' (parameters need a $ prefix)");
-			return EConst(0);
+			// Bare identifier: a live prototype variable/property reference.
+			return EVar(name);
 		}
 		trace("Expression: unexpected character '" + c + "'");
 		pos++; // consume so a malformed input cannot loop forever

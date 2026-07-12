@@ -1,0 +1,43 @@
+{
+  "name": "clover",
+  "description": "Squashed clover: offset-bound bullets trace the polar rose r = cos(2*bearing) at angle bearing+spin, then the finished rotated point is squashed per-axis in the screen frame - a four-leaf clover flattened into an ellipse. (Born as a mis-reading of firedancer's Transform chain, kept because it looks cool.) Needs runtime var access in expressions.",
+  "parameters": {
+    "radius": {"type": "float", "default": 220, "description": "Clover lobe length before scaling"},
+    "scaleX": {"type": "float", "default": 1.0, "description": "Horizontal squash factor applied after rotation (screen frame)"},
+    "scaleY": {"type": "float", "default": 0.3, "description": "Vertical squash factor applied after rotation (screen frame)"},
+    "count": {"type": "int", "default": 32, "description": "Bullets in the orbiting chain"},
+    "fireDelay": {"type": "int", "default": 4, "description": "Frames between chain bullets"},
+    "bearingStep": {"type": "float", "default": 5, "description": "Degrees bearing advances per frame (position along the curve)"},
+    "rotationStep": {"type": "float", "default": 2.5, "description": "Degrees the whole clover rotates per frame"}
+  },
+  "script": [
+    {"control": "Set", "prop": "speed", "value": 0},
+    {"control": "Set", "prop": "x", "value": "$radius * $scaleX"},
+    {
+      "control": "Sub",
+      "actions": [
+        {"control": "Set", "prop": "bearing", "value": 0},
+        {"control": "Set", "prop": "spin", "value": 0},
+        {
+          "control": "Loop",
+          "actions": [
+            {"control": "Set", "prop": "x", "value": "cos(2 * bearing) * cos(bearing + spin) * $radius * $scaleX"},
+            {"control": "Set", "prop": "y", "value": "cos(2 * bearing) * sin(bearing + spin) * $radius * $scaleY"},
+            {"control": "Wait", "frames": 1},
+            {"control": "Add", "prop": "bearing", "delta": "$bearingStep"},
+            {"control": "Add", "prop": "spin", "delta": "$rotationStep"}
+          ]
+        }
+      ]
+    },
+    {"control": "Bind", "mode": "offset"},
+    {
+      "control": "Rep",
+      "count": "$count",
+      "actions": [
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "Wait", "frames": "$fireDelay"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "name": "Showcase: move",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 300,
+          "y": 150,
+          "pattern": "move",
+          "health": 999,
+          "patternConfig": {
+            "moveSpeed": 8,
+            "legFrames": 30,
+            "pauseFrames": 30
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 10,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 700,
+          "y": 150,
+          "pattern": "move",
+          "health": 999,
+          "patternConfig": {
+            "moveSpeed": 12,
+            "legFrames": 40,
+            "pauseFrames": 15
+          },
+          "sprite": "enemy2"
+        }
+      ]
+    },
+    {
+      "startTime": 20,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 1100,
+          "y": 150,
+          "pattern": "move",
+          "health": 999,
+          "patternConfig": {
+            "moveSpeed": 5,
+            "legFrames": 60,
+            "pauseFrames": 60
+          }
+        }
+      ]
+    }
+  ]
+}

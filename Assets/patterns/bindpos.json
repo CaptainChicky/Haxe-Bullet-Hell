@@ -1,0 +1,46 @@
+{
+  "name": "bindpos",
+  "description": "Firedancer 'Bind Position': spokes of offset-bound bullets drift radially outward while rotating around the enemy and riding along with the enemy's own movement (fire().bind()). By default each bullet spirals individually (hurricane arms); bindRotation=1 also advances the volley spawn angle in lockstep with the bullets' rotation, so every spoke stays one straight radial line - set rotateSpeed to the enemy sprite's rotation speed (-40 / 60 degrees per frame) to bind the arms to the sprite's spin.",
+  "parameters": {
+    "startDistance": {"type": "float", "default": 30, "description": "Spawn distance from the enemy"},
+    "spokeCount": {"type": "int", "default": 12, "description": "Bullets per volley, evenly spread around the circle"},
+    "radialSpeed": {"type": "float", "default": 4, "description": "Outward drift per frame (pixels)"},
+    "rotateSpeed": {"type": "float", "default": 1, "description": "Bullet rotation around the enemy per frame (degrees); use -40 / 60 to match the enemy sprite"},
+    "volleyDelay": {"type": "int", "default": 30, "description": "Frames between volleys"},
+    "bindRotation": {"type": "int", "default": 0, "description": "1 = rotate the volley spawn angle at rotateSpeed too, keeping each spoke a straight radial line (bind to the enemy's rotation speed); 0 = spawn angles fixed, arms wind into spirals"}
+  },
+  "script": [
+    {"control": "Set", "prop": "speed", "value": 0},
+    {"control": "Set", "prop": "offsetDistance", "value": "$startDistance"},
+    {"control": "Set", "prop": "offsetAngle", "value": 90},
+    {
+      "control": "Sub",
+      "actions": [
+        {
+          "control": "Loop",
+          "actions": [
+            {"control": "Add", "prop": "offsetDistance", "delta": "$radialSpeed"},
+            {"control": "Add", "prop": "offsetAngle", "delta": "$rotateSpeed"},
+            {"control": "Wait", "frames": 1}
+          ]
+        }
+      ]
+    },
+    {"control": "Bind", "mode": "offset"},
+    {
+      "control": "Loop",
+      "actions": [
+        {
+          "control": "Rep",
+          "count": "$spokeCount",
+          "actions": [
+            {"control": "Fire", "angle": 0, "speed": 0},
+            {"control": "Add", "prop": "offsetAngle", "delta": "360 / $spokeCount"}
+          ]
+        },
+        {"control": "Add", "prop": "offsetAngle", "delta": "$bindRotation * $rotateSpeed * $volleyDelay"},
+        {"control": "Wait", "frames": "$volleyDelay"}
+      ]
+    }
+  ]
+}

@@ -161,8 +161,9 @@ Any numeric field accepts a literal, a `"$param"` reference, or an expression:
 - Arithmetic `+ - * /` with correct precedence and left-to-right associativity, **and parentheses**: `"2 * ($base + 4)"`.
 - Trig **in degrees** (the engine-wide convention): `"sin($phase) * 40"`, `"cos(90)"`.
 - Inline randoms: `"random.between(2, 6)"` (uniform in `[min, max)`) and `"random.angle(8)"` (one of `n` evenly spaced angles — `floor(random*n) * 360/n` — for grouping shots into discrete spokes).
+- **Live prototype reads**: a bare identifier (no `$` prefix) resolves through the executing context's prototype `getProp` — custom script variables (`"sin(bearing) * 40"`) and built-in properties (`"speed * 2"`) alike. Inside a `Scope` it reads the Scope's clone; in a sub-script, that bullet's own prototype. This is what makes parametric orbits possible: `sincos.json` and `transform.json` recompute `x`/`y` from an advancing per-bullet variable every frame.
 
-**Evaluation model**: deterministic expressions are folded to constants at compile time (zero per-frame cost, identical semantics to before). Expressions containing any `random.*` call stay live and **re-roll on every command execution** — `{"control": "Set", "prop": "speed", "value": "random.between(2, 6)"}` inside a `Loop` gives each volley a fresh speed, and a `Wait` with a volatile frame count re-rolls each iteration. Structural values (`Rep`/`Radial`/`NWay`/`Line`/`Dup` **counts**, `Tween` **frames**) are fixed at compile time.
+**Evaluation model**: deterministic expressions are folded to constants at compile time (zero per-frame cost, identical semantics to before). Expressions containing any `random.*` call **or a bare-identifier prototype read** stay live and **re-evaluate on every command execution** — `{"control": "Set", "prop": "speed", "value": "random.between(2, 6)"}` inside a `Loop` gives each volley a fresh speed, and a `Wait` with a volatile frame count re-rolls each iteration. Structural values (`Rep`/`Radial`/`NWay`/`Line`/`Dup` **counts**, `Tween` **frames**) are fixed at compile time — prototype reads there see no live prototype and evaluate to 0.
 
 `Copy` supports scaling — `dst = src * k`:
 
@@ -174,13 +175,28 @@ Any numeric field accepts a literal, a `"$param"` reference, or an expression:
 
 ### Script variables and scoping (status)
 
-`vars` remains one flat `Map<String, Float>` per prototype. **`Scope` already provides block scoping with shadowing**: a variable set inside a `Scope` (like any prototype mutation there) is discarded when the block ends, so nested blocks can reuse names freely. What `Scope` does *not* give you — and what a real scoped-variable implementation would need — is:
+`vars` remains one flat `Map<String, Float>` per prototype. **`Scope` already provides block scoping with shadowing**: a variable set inside a `Scope` (like any prototype mutation there) is discarded when the block ends, so nested blocks can reuse names freely. **Expressions can now read vars and properties directly** (bare identifiers, see "Values and expressions" above), which is what makes script variables genuinely useful. Still missing for a full scoped-variable story:
 
 1. **Write-through to outer scopes** (mutating an outer counter from inside a block): requires a variable-environment stack parallel to the `ShotFrame` stack, with reads walking up the parent chain and an explicit `Declare`/`Let` command to distinguish "new local" from "assign outer".
 2. **Types beyond Float**: `vars` and `getProp`/`setProp` are all-Float; strings/bools would need a tagged value union threaded through every generic command.
-3. **Expression access to variables**: expressions can only read `$params` today, not prototype vars/properties — scoped variables are of limited use until expressions can read them.
 
-None of these are individually hard, but together they touch `ShotContext`, `ShotPrototype`, every property command, and the expression evaluator — deliberately left out of this batch.
+Neither is individually hard, but both touch `ShotContext`, `ShotPrototype`, and every property command — deliberately left out of this batch.
+
+### Enemy self-movement (moveSelf)
+
+Setting the script variable `moveSelf` to nonzero on an **enemy-owned** script makes the enemy's velocity derive from the script's live root `direction`/`speed` every frame — the firedancer model where the same language moves the actor and fires its bullets:
+
+```jsonc
+{"control": "Set", "prop": "moveSelf", "value": 1},
+{"control": "Loop", "actions": [
+    {"control": "Set", "prop": "direction", "value": 90},
+    {"control": "Tween", "prop": "speed", "to": 16, "frames": 60},   // smooth acceleration
+    {"control": "Set", "prop": "speed", "value": 0},
+    {"control": "Wait", "frames": 30}
+]}
+```
+
+`Tween` on `speed` gives acceleration/deceleration; `Set`/`Add` on `direction` steers. Movement-only patterns fire no bullets at all (`move.json`, `move2.json`). The sync lives in `ScriptedShootingPattern` (display side), not the shot engine — bullets are unaffected, and a level `movementScript` on the same enemy would fight it (the pattern reasserts velocity every frame), so use one or the other.
 
 ## Running the tests
 

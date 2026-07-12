@@ -1,0 +1,51 @@
+{
+  "name": "laundry",
+  "description": "Firedancer 'Laundry': three radial emitters run in parallel - one wide slow-turning ring plus two tight rings counter-rotating against each other - interleaving into a washing-machine tumble.",
+  "parameters": {
+    "bulletSpeed": {"type": "float", "default": 12, "description": "Speed of every bullet"},
+    "bigCount": {"type": "int", "default": 10, "description": "Bullets per volley in the wide ring"},
+    "bigStep": {"type": "float", "default": 8, "description": "Wide ring rotation per volley (degrees)"},
+    "bigDelay": {"type": "int", "default": 4, "description": "Frames between wide-ring volleys"},
+    "smallCount": {"type": "int", "default": 4, "description": "Bullets per volley in each tight ring"},
+    "smallStep": {"type": "float", "default": 4, "description": "Tight ring rotation per volley (degrees; second ring counter-rotates)"},
+    "smallDelay": {"type": "int", "default": 2, "description": "Frames between tight-ring volleys"}
+  },
+  "script": [
+    {"control": "Set", "prop": "speed", "value": "$bulletSpeed"},
+    {
+      "control": "Concurrent",
+      "branches": [
+        [
+          {
+            "control": "Loop",
+            "actions": [
+              {"control": "Radial", "count": "$bigCount", "speed": 0},
+              {"control": "Add", "prop": "direction", "delta": "$bigStep"},
+              {"control": "Wait", "frames": "$bigDelay"}
+            ]
+          }
+        ],
+        [
+          {
+            "control": "Loop",
+            "actions": [
+              {"control": "Radial", "count": "$smallCount", "speed": 0},
+              {"control": "Add", "prop": "direction", "delta": "$smallStep"},
+              {"control": "Wait", "frames": "$smallDelay"}
+            ]
+          }
+        ],
+        [
+          {
+            "control": "Loop",
+            "actions": [
+              {"control": "Radial", "count": "$smallCount", "speed": 0},
+              {"control": "Add", "prop": "direction", "delta": "-$smallStep"},
+              {"control": "Wait", "frames": "$smallDelay"}
+            ]
+          }
+        ]
+      ]
+    }
+  ]
+}

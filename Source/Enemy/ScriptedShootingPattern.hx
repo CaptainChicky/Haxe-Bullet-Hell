@@ -23,6 +23,16 @@ class ScriptedShootingPattern extends EnemyShootingPattern {
 	override private function everyFrame(event:Event):Void {
 		if (runner != null) {
 			runner.update();
+
+			// Firedancer-style self-movement: a pattern that sets the script
+			// variable moveSelf to nonzero drives the ENEMY's velocity from the
+			// script's live direction/speed each frame (so Tween on speed gives
+			// smooth acceleration). Movement-only patterns: move.json, move2.json.
+			var proto = runner.getPrototype();
+			if (proto != null && proto.getProp("moveSelf") != 0) {
+				var rad = proto.direction * Math.PI / 180;
+				getEnemy().setVelocity(Math.cos(rad) * proto.speed, Math.sin(rad) * proto.speed);
+			}
 		}
 	}
 

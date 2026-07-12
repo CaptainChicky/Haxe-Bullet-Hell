@@ -1,0 +1,26 @@
+{
+  "name": "move2",
+  "description": "Firedancer 'Move (2)': movement-only script (fires no bullets). The enemy accelerates downward from rest, stops, pauses, then launches upward at full speed and decelerates to a stop, pauses, and repeats. Tween on speed + moveSelf = smooth acceleration.",
+  "parameters": {
+    "topSpeed": {"type": "float", "default": 16, "description": "Peak glide speed in pixels per frame"},
+    "rampFrames": {"type": "int", "default": 60, "description": "Frames to accelerate/decelerate over"},
+    "pauseFrames": {"type": "int", "default": 30, "description": "Frames to rest between legs"}
+  },
+  "script": [
+    {"control": "Set", "prop": "moveSelf", "value": 1},
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "Set", "prop": "direction", "value": 90},
+        {"control": "Set", "prop": "speed", "value": 0},
+        {"control": "Tween", "prop": "speed", "to": "$topSpeed", "frames": "$rampFrames"},
+        {"control": "Set", "prop": "speed", "value": 0},
+        {"control": "Wait", "frames": "$pauseFrames"},
+        {"control": "Set", "prop": "direction", "value": 270},
+        {"control": "Set", "prop": "speed", "value": "$topSpeed"},
+        {"control": "Tween", "prop": "speed", "to": 0, "frames": "$rampFrames"},
+        {"control": "Wait", "frames": "$pauseFrames"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "shifter",
+  "description": "Firedancer 'Fire with Pattern': a rotating stream of bullets that fly straight, wait, then kink their direction mid-flight (each bullet's own sub-script mutates direction, steering the bullet itself) and continue on to infinity.",
+  "parameters": {
+    "bulletSpeed": {"type": "float", "default": 5, "description": "Bullet speed"},
+    "startDirection": {"type": "float", "default": 90, "description": "Direction of the first bullet (90 = down)"},
+    "shiftDelay": {"type": "int", "default": 30, "description": "Frames each bullet flies before the kink"},
+    "shiftAngle": {"type": "float", "default": -120, "description": "Direction change applied at the kink (degrees)"},
+    "spokeStep": {"type": "float", "default": 36, "description": "Stream rotation between shots (degrees)"},
+    "fireDelay": {"type": "int", "default": 8, "description": "Frames between shots"}
+  },
+  "script": [
+    {"control": "Set", "prop": "speed", "value": "$bulletSpeed"},
+    {"control": "Set", "prop": "direction", "value": "$startDirection"},
+    {
+      "control": "Sub",
+      "actions": [
+        {"control": "Wait", "frames": "$shiftDelay"},
+        {"control": "Add", "prop": "direction", "delta": "$shiftAngle"}
+      ]
+    },
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "Add", "prop": "direction", "delta": "$spokeStep"},
+        {"control": "Wait", "frames": "$fireDelay"}
+      ]
+    }
+  ]
+}

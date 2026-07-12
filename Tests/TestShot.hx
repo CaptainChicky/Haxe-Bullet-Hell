@@ -322,6 +322,28 @@ class TestShot {
 		em = run(vars, 1);
 		check(em.spawns[0].proto.speed == 5, "vars: unknown prop names become script variables, Copy moves them into speed");
 
+		// --- Expressions read live prototype vars/properties ------------------------
+		var exprVars = compile('[
+			{"control": "Set", "prop": "phase", "value": 90},
+			{"control": "Set", "prop": "y", "value": "sin(phase) * 40"},
+			{"control": "Set", "prop": "speed", "value": "speed + phase / 30"},
+			{"control": "Fire", "angle": 90, "speed": 0}
+		]');
+		em = run(exprVars, 1);
+		check(Math.abs(em.spawns[0].proto.y - 40) < 1e-9, "expr vars: sin(phase) reads a live script variable");
+		check(Math.abs(em.spawns[0].proto.speed - 8) < 1e-9, "expr vars: built-in properties readable too (speed + phase/30 = 8)");
+
+		var exprLive = compile('[
+			{"control": "Set", "prop": "k", "value": 0},
+			{"control": "Rep", "count": 3, "actions": [
+				{"control": "Add", "prop": "k", "delta": 1},
+				{"control": "Fire", "angle": "k * 10", "speed": 1}
+			]}
+		]');
+		em = run(exprLive, 1);
+		check(em.spawns.length == 3 && em.spawns[0].proto.direction == 10 && em.spawns[2].proto.direction == 30,
+			"expr vars: var references stay volatile, re-evaluated per execution (k*10 -> 10..30)");
+
 		// --- Sub-scripts attach to fired prototypes ---------------------------------
 		var sub = compile('[
 			{"control": "Sub", "actions": [{"control": "Wait", "frames": 10}, {"control": "Radial", "count": 8, "speed": 2}]},
@@ -340,7 +362,8 @@ class TestShot {
 		check(bulletEm.spawns.length == 8 && bulletEm.spawns[0].frame == 10, "sub: burst timing correct");
 
 		// --- Legacy pattern files compile & run ---------------------------------------
-		for (name in ["spiral", "nwhip", "orbit", "sniper", "random", "radial", "flower", "shifter", "satellite"]) {
+		for (name in ["spiral", "nwhip", "orbit", "sniper", "random", "radial", "flower", "shifter", "satellite",
+			"sincos", "transform", "clover", "laundry", "bindpos"]) {
 			var text = sys.io.File.getContent("Assets/patterns/" + name + ".json");
 			var template:Dynamic = Json.parse(text);
 			var paramMap:Map<String, Dynamic> = new Map();
@@ -351,6 +374,23 @@ class TestShot {
 			var cmds = CommandRegistry.compileList(template.script, new CompileContext(paramMap));
 			var e = run(cmds, 60);
 			check(cmds.length > 0 && e.spawns.length > 0, 'legacy pattern "$name" compiles and fires (${e.spawns.length} bullets in 60 frames)');
+		}
+
+		// --- Movement-only patterns: no bullets, moveSelf set -------------------------
+		for (name in ["move", "move2"]) {
+			var text = sys.io.File.getContent("Assets/patterns/" + name + ".json");
+			var template:Dynamic = Json.parse(text);
+			var paramMap:Map<String, Dynamic> = new Map();
+			for (f in Reflect.fields(template.parameters)) {
+				var def = Reflect.field(Reflect.field(template.parameters, f), "default");
+				if (def != null) paramMap.set(f, def);
+			}
+			var cmds = CommandRegistry.compileList(template.script, new CompileContext(paramMap));
+			var e = new FakeEmitter();
+			var r = new ScriptRunner(e, cmds);
+			for (i in 0...200) r.update();
+			check(e.spawns.length == 0 && r.getPrototype().getProp("moveSelf") == 1,
+				'movement pattern "$name" fires no bullets and sets moveSelf');
 		}
 
 		// --- Emitter death stops the runner -------------------------------------------

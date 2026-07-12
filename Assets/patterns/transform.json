@@ -1,0 +1,43 @@
+{
+  "name": "transform",
+  "description": "Firedancer 'Transform': each offset-bound bullet sits at polar(radius, bearing) squashed per-axis in the local frame, then rotated by a second advancing angle - p = R(rotation) * S(scaleX, scaleY) * polar. The anisotropic scale plus the 4:2 bearing:rotation step ratio makes every bullet trace a rounded four-petal flower around the enemy. Needs runtime var access in expressions.",
+  "parameters": {
+    "radius": {"type": "float", "default": 150, "description": "Polar radius before scaling (petal reach)"},
+    "scaleX": {"type": "float", "default": 1.0, "description": "Horizontal squash factor, applied in the local frame before rotation"},
+    "scaleY": {"type": "float", "default": 0.3, "description": "Vertical squash factor, applied in the local frame before rotation"},
+    "count": {"type": "int", "default": 24, "description": "Bullets in the orbiting chain"},
+    "fireDelay": {"type": "int", "default": 6, "description": "Frames between chain bullets"},
+    "bearingStep": {"type": "float", "default": 4, "description": "Degrees bearing advances per frame (position along the squashed orbit)"},
+    "rotationStep": {"type": "float", "default": 2, "description": "Degrees the whole frame rotates per frame"}
+  },
+  "script": [
+    {"control": "Set", "prop": "speed", "value": 0},
+    {"control": "Set", "prop": "x", "value": "$radius * $scaleX"},
+    {
+      "control": "Sub",
+      "actions": [
+        {"control": "Set", "prop": "bearing", "value": 0},
+        {"control": "Set", "prop": "spin", "value": 0},
+        {
+          "control": "Loop",
+          "actions": [
+            {"control": "Set", "prop": "x", "value": "cos(bearing) * $scaleX * cos(spin) * $radius - sin(bearing) * $scaleY * sin(spin) * $radius"},
+            {"control": "Set", "prop": "y", "value": "cos(bearing) * $scaleX * sin(spin) * $radius + sin(bearing) * $scaleY * cos(spin) * $radius"},
+            {"control": "Wait", "frames": 1},
+            {"control": "Add", "prop": "bearing", "delta": "$bearingStep"},
+            {"control": "Add", "prop": "spin", "delta": "$rotationStep"}
+          ]
+        }
+      ]
+    },
+    {"control": "Bind", "mode": "offset"},
+    {
+      "control": "Rep",
+      "count": "$count",
+      "actions": [
+        {"control": "Fire", "angle": 0, "speed": 0},
+        {"control": "Wait", "frames": "$fireDelay"}
+      ]
+    }
+  ]
+}

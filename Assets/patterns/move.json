@@ -1,0 +1,24 @@
+{
+  "name": "move",
+  "description": "Firedancer 'Move': movement-only script (fires no bullets). The enemy glides down, immediately glides back up, stops, pauses, and repeats. moveSelf makes the script's direction/speed drive the enemy itself.",
+  "parameters": {
+    "moveSpeed": {"type": "float", "default": 8, "description": "Glide speed in pixels per frame"},
+    "legFrames": {"type": "int", "default": 30, "description": "Frames spent gliding each way"},
+    "pauseFrames": {"type": "int", "default": 30, "description": "Frames to rest between round trips"}
+  },
+  "script": [
+    {"control": "Set", "prop": "moveSelf", "value": 1},
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "Set", "prop": "direction", "value": 90},
+        {"control": "Set", "prop": "speed", "value": "$moveSpeed"},
+        {"control": "Wait", "frames": "$legFrames"},
+        {"control": "Set", "prop": "direction", "value": 270},
+        {"control": "Wait", "frames": "$legFrames"},
+        {"control": "Set", "prop": "speed", "value": 0},
+        {"control": "Wait", "frames": "$pauseFrames"}
+      ]
+    }
+  ]
+}

@@ -109,6 +109,9 @@ class ScriptRunner {
 			// frames or spawn branches never touch the index.
 			var cmd = frame.commands[frame.index];
 			frame.index++;
+			// Bare identifiers in expressions read this context's prototype
+			// (kept current per command: Scope swaps ctx.prototype mid-frame).
+			Expression.currentProto = ctx.prototype;
 			cmd.run(ctx, this);
 
 			// A Concurrent command suspended us until its children finish.
