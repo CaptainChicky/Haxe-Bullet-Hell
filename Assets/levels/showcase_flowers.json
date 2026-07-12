@@ -8,7 +8,7 @@
           "spawnTime": 0, "x": 700, "y": 200, "pattern": "flowerdup", "health": 999,
           "patternConfig": {
             "copies": 20, "ways": 5, "fanArc": 48,
-            "bulletSpeed": 6, "offsetDist": 140, "tangentOffset": 35,
+            "bulletSpeed": 6, "offsetDist": 140, "trioShift": 36, "tangentOffset": 35,
             "decelTo": 0.8, "decelFrames": 40, "curveDeg": -140, "curveFrames": 80,
             "endSpeed": 3, "volleyDelay": 280
           },

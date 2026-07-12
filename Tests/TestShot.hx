@@ -877,19 +877,30 @@ class TestShot {
 					beamSpawnOk = false;
 			check(beamSpawnOk, "satellite e2e: beam bullets spawn unbound at speed 0 with the spool/stall/vanish sub-script");
 
-			// Drive one beam bullet through its full lifecycle: spool -> cruise -> stall -> vanish.
+			// Drive one beam bullet through its full lifecycle:
+			// spool -> cruise -> stop -> hang -> fuse wait -> radial explosion -> vanish.
 			var beamProto = podEm.spawns[0].proto;
 			var beam = new HeadlessTestBullet(beamProto);
+			var beamEm = new FakeBulletEmitter(beam);
 			var beamSub = beamProto.clone();
 			beamSub.subCommands = null;
-			beam.script = new ScriptRunner(new FakeBulletEmitter(beam), beamProto.subCommands, beamSub);
+			beam.script = new ScriptRunner(beamEm, beamProto.subCommands, beamSub);
 			var peak:Float = 0;
 			for (f in 0...120) {
 				beam.everyFrame();
 				if (beam.speed > peak) peak = beam.speed;
 			}
 			check(Math.abs(peak - 8) < 1e-6, 'satellite e2e: beam bullet spooled up to full speed (peak $peak)');
-			check(!beam.alive, "satellite e2e: beam bullet stalled and dissipated (Vanish)");
+			check(!beam.alive, "satellite e2e: beam bullet stopped, hung, and detonated (Vanish)");
+			var fragOk = beamEm.spawns.length == 5;
+			for (sp in beamEm.spawns)
+				if (sp.proto.speed != 3 || sp.proto.subCommands != null || sp.proto.bindMode != ShotPrototype.BIND_NONE)
+					fragOk = false;
+			check(fragOk, 'satellite e2e: detonation burst into 5 plain radial fragments at explodeSpeed (${beamEm.spawns.length})');
+			// First-fired bullet carries the LONGEST fuse: (beamCount-1)*beamGap = 12,
+			// so all 7 stopped bullets detonate the frame the last one's hang ends.
+			check(Math.abs(beamProto.getProp("fuse") - 12) < 1e-9,
+				'satellite e2e: first beam bullet cloned fuse 12 for the synchronized detonation (${beamProto.getProp("fuse")})');
 		}
 
 		Sys.println(failures == 0 ? "\nALL TESTS PASSED" : '\n$failures TEST(S) FAILED');

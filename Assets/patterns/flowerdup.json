@@ -1,13 +1,14 @@
 {
   "name": "flowerdup",
-  "description": "Firedancer flower: 32 evenly-spaced positions on a spawn ring each fire a 9-way fan outward; bullets decelerate 4->1 over 30 frames, visibly bunching into a scalloped ring of overlapping arcs that hangs in space, then curve 210deg while re-accelerating - curling the arcs into petals that collapse through the center and re-bloom (288 bullets per volley). tangentOffset rotates the launch off radial (90 = firedancer's literal tangential launch, denser/spiral look)",
+  "description": "Firedancer flower: the spawn ring carries copies/4 CHUNKS of four 9-way fans each - one arc facing outward at the chunk base, then (trioShift degrees to the right) a trio sharing one spawn point: an arc facing inward plus, above it, a left-facing and a right-facing arc. All bullets decelerate 4->1 over 30 frames (the outward arc rises, the inward arc drives toward/through the enemy, the side arcs slide left/right), hang, then curve 210deg while re-accelerating - the whole lattice twists through away-left/away-right + toward-left/toward-right diagonals, collapses, restores the 1+3 chunks and scatters outward (288 bullets per volley). tangentOffset skews every fan off its cardinal facing",
   "parameters": {
-    "copies": {"type": "int", "default": 32, "description": "Radial positions per volley"},
-    "ways": {"type": "int", "default": 9, "description": "NWay fan per position"},
+    "copies": {"type": "int", "default": 32, "description": "Total arcs per volley; 4 per chunk (out/in/left/right), so copies/4 chunks ring the circle"},
+    "ways": {"type": "int", "default": 9, "description": "NWay fan per arc"},
     "fanArc": {"type": "float", "default": 90, "description": "NWay arc degrees"},
     "bulletSpeed": {"type": "float", "default": 4, "description": "Initial bullet speed"},
     "offsetDist": {"type": "float", "default": 80, "description": "Spawn distance from emitter"},
-    "tangentOffset": {"type": "float", "default": 0, "description": "Launch angle relative to outward radial (0 = outward, 90 = tangential like the firedancer original)"},
+    "trioShift": {"type": "float", "default": 22.5, "description": "Angular shift (degrees, rightward) from a chunk's outward arc to its in/left/right trio spawn point; half the chunk pitch interleaves the spawn slots evenly"},
+    "tangentOffset": {"type": "float", "default": 0, "description": "Extra rotation applied to every fan's facing (0 = clean out/in/left/right cardinals, nonzero = pinwheel skew)"},
     "decelTo": {"type": "float", "default": 1, "description": "Speed after deceleration"},
     "decelFrames": {"type": "int", "default": 30, "description": "Deceleration duration"},
     "curveDeg": {"type": "float", "default": 210, "description": "Direction curve (relative) during petal phase"},
@@ -29,10 +30,17 @@
         ]},
         {"control": "Set", "prop": "cnt", "value": 0},
         {"control": "Scope", "actions": [
-          {"control": "Rep", "count": "$copies", "actions": [
-            {"control": "Copy", "from": "cnt", "to": "offsetAngle", "scale": "360 / $copies"},
-            {"control": "Copy", "from": "cnt", "to": "direction", "scale": "360 / $copies"},
+          {"control": "Rep", "count": "$copies / 4", "actions": [
+            {"control": "Copy", "from": "cnt", "to": "offsetAngle", "scale": "1440 / $copies"},
+            {"control": "Copy", "from": "cnt", "to": "direction", "scale": "1440 / $copies"},
             {"control": "Add", "prop": "direction", "delta": "$tangentOffset"},
+            {"control": "NWay", "count": "$ways", "angle": "$fanArc", "speed": 0},
+            {"control": "Add", "prop": "offsetAngle", "delta": "$trioShift"},
+            {"control": "Add", "prop": "direction", "delta": "$trioShift + 180"},
+            {"control": "NWay", "count": "$ways", "angle": "$fanArc", "speed": 0},
+            {"control": "Add", "prop": "direction", "delta": "-270"},
+            {"control": "NWay", "count": "$ways", "angle": "$fanArc", "speed": 0},
+            {"control": "Add", "prop": "direction", "delta": "180"},
             {"control": "NWay", "count": "$ways", "angle": "$fanArc", "speed": 0},
             {"control": "Add", "prop": "cnt", "delta": 1}
           ]}

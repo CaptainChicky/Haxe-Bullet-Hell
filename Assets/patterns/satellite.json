@@ -1,6 +1,6 @@
 {
   "name": "satellite",
-  "description": "Orbital weapon platform: offset-bound pods launch from the dish to an orbit radius (Bind offset + Tween offsetDistance, like pods.json), orbit while charging, then lock on (AimAtPlayer from the pod position, inside a Scope so the pod itself keeps its orbit state) and fire a focused beam - a short stream whose bullets spool up from speed 0, cruise, stall to a hang, then dissipate (Vanish). The central dish emits slow expanding radar-ring pulses underneath",
+  "description": "Orbital weapon platform: offset-bound pods launch from the dish to an orbit radius (Bind offset + Tween offsetDistance, like pods.json), orbit while charging, then lock on (AimAtPlayer from the pod position, inside a Scope so the pod itself keeps its orbit state) and fire a focused beam - a short stream whose bullets spool up from speed 0, cruise, then brake to a dead stop and hang. Each bullet carries a per-bullet fuse (longer for earlier shots) so the whole stopped column detonates in the same instant the LAST bullet's hang ends: every bullet bursts into an explodeCount-way radial and vanishes - the pods read as firing exploding projectiles. The central dish emits slow expanding radar-ring pulses underneath",
   "parameters": {
     "podCount": {"type": "int", "default": 3, "description": "Orbiting weapon pods"},
     "orbitRadius": {"type": "float", "default": 100, "description": "Pod orbit distance from the dish"},
@@ -12,7 +12,9 @@
     "beamSpeed": {"type": "float", "default": 8, "description": "Beam bullet speed after spool-up"},
     "spoolFrames": {"type": "int", "default": 20, "description": "Frames for a beam bullet to spool up from speed 0"},
     "cruiseFrames": {"type": "int", "default": 25, "description": "Frames a beam bullet flies at full speed"},
-    "stallFrames": {"type": "int", "default": 30, "description": "Frames a beam bullet hangs near-still before dissipating"},
+    "stallFrames": {"type": "int", "default": 30, "description": "Frames a beam bullet hangs dead-still before the synchronized detonation"},
+    "explodeCount": {"type": "int", "default": 5, "description": "Radial fragments each stopped beam bullet bursts into"},
+    "explodeSpeed": {"type": "float", "default": 3, "description": "Explosion fragment speed"},
     "pulseCount": {"type": "int", "default": 12, "description": "Bullets per dish radar ring"},
     "pulseSpeed": {"type": "float", "default": 0.8, "description": "Radar ring expansion speed"},
     "pulseLife": {"type": "int", "default": 150, "description": "Radar ring bullet lifetime"},
@@ -43,15 +45,22 @@
                   {"control": "Bind", "mode": "none"},
                   {"control": "AimAtPlayer"},
                   {"control": "Set", "prop": "speed", "value": 0},
+                  {"control": "Set", "prop": "fuse", "value": "($beamCount - 1) * $beamGap"},
                   {"control": "Sub", "actions": [
                     {"control": "Tween", "prop": "speed", "to": "$beamSpeed", "frames": "$spoolFrames"},
                     {"control": "Wait", "frames": "$cruiseFrames"},
-                    {"control": "Tween", "prop": "speed", "to": 0.3, "frames": 12},
+                    {"control": "Tween", "prop": "speed", "to": 0, "frames": 12},
                     {"control": "Wait", "frames": "$stallFrames"},
+                    {"control": "Wait", "frames": "fuse"},
+                    {"control": "Scope", "actions": [
+                      {"control": "Set", "prop": "speed", "value": "$explodeSpeed"},
+                      {"control": "Radial", "count": "$explodeCount", "speed": 0}
+                    ]},
                     {"control": "Vanish"}
                   ]},
                   {"control": "Rep", "count": "$beamCount", "actions": [
                     {"control": "Fire", "angle": 0, "speed": 0},
+                    {"control": "Add", "prop": "fuse", "delta": "-$beamGap"},
                     {"control": "Wait", "frames": "$beamGap"}
                   ]}
                 ]}

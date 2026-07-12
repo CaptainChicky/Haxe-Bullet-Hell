@@ -10,6 +10,7 @@
             "podCount": 2, "orbitRadius": 70, "launchFrames": 25, "orbitStep": 3,
             "chargeFrames": 50, "beamCount": 5, "beamGap": 2, "beamSpeed": 10,
             "spoolFrames": 12, "cruiseFrames": 20, "stallFrames": 20,
+            "explodeCount": 5, "explodeSpeed": 4,
             "pulseCount": 8, "pulseSpeed": 1, "pulseLife": 100, "pulseDelay": 70
           },
           "movementScript": { "loop": false, "actions": [
@@ -47,6 +48,7 @@
             "podCount": 5, "orbitRadius": 140, "launchFrames": 60, "orbitStep": 0.8,
             "chargeFrames": 100, "beamCount": 10, "beamGap": 3, "beamSpeed": 6,
             "spoolFrames": 35, "cruiseFrames": 30, "stallFrames": 50,
+            "explodeCount": 5, "explodeSpeed": 2,
             "pulseCount": 16, "pulseSpeed": 0.6, "pulseLife": 200, "pulseDelay": 70
           },
           "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
