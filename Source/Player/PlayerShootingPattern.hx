@@ -18,23 +18,35 @@ class PlayerShootingPattern extends Sprite {
 	}
 
 	private function spawnPlayerBullet():Void {
-		var bullet:BulletPlayer = new BulletPlayer();
-		bullet.x = player.x;
-		bullet.y = player.y;
+		// 5 bullets: 3 center (tight, parallel) + 2 flankers (angled spreads)
+		var bulletConfigs = [
+			{offsetX: -30, velX: -1, velY: -10}, // Left flanker (angled out)
+			{offsetX: -7, velX: 0, velY: -20},  // Left center (parallel)
+			{offsetX: 0, velX: 0, velY: -20},    // Center (parallel)
+			{offsetX: 7, velX: 0, velY: -20},   // Right center (parallel)
+			{offsetX: 30, velX: 1, velY: -10}    // Right flanker (angled out)
+		];
+		
+		for (config in bulletConfigs) {
+			var bullet:BulletPlayer = new BulletPlayer();
+			bullet.x = player.x + config.offsetX;
+			bullet.y = player.y;
 
-		// Calculate the velocity of the bullet to move towards the top of the board
-		var bulletVelocityX:Float = 0;
-		var bulletVelocityY:Float = -3; // Adjust the speed as needed
+			// Calculate the velocity of the bullet to move towards the top of the board
+			// Adjust the speed as needed
+			var bulletVelocityX:Float = config.velX;
+			var bulletVelocityY:Float = config.velY;
 
-		// Set the velocity of the bullet
-		bullet.velocityX = bulletVelocityX;
-		bullet.velocityY = bulletVelocityY;
+			// Set the velocity of the bullet
+			bullet.velocityX = bulletVelocityX;
+			bullet.velocityY = bulletVelocityY;
 
-		Lib.current.addChild(bullet); // Add the bullet to the stage
+			Lib.current.addChild(bullet); // Add the bullet to the stage
 
-		// Register bullet with collision manager
-		if (collisionManager != null) {
-			collisionManager.registerPlayerBullet(bullet);
+			// Register bullet with collision manager
+			if (collisionManager != null) {
+				collisionManager.registerPlayerBullet(bullet);
+			}
 		}
 	}
 
