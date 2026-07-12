@@ -1,6 +1,6 @@
 package enemy;
 
-import enemy.Enemy;
+import shot.GhostOrigin.IMovable;
 
 // Movement action types
 enum MovementAction {
@@ -10,7 +10,7 @@ enum MovementAction {
 }
 
 class MovementScript {
-	private var enemy:Enemy;
+	private var target:IMovable;
 	private var actions:Array<MovementAction>;
 	private var currentActionIndex:Int = 0;
 	private var waitFramesRemaining:Int = 0;
@@ -18,14 +18,24 @@ class MovementScript {
 	private var isPaused:Bool = false;
 	private var loop:Bool = false;
 
-	public function new(enemy:Enemy, loop:Bool = false) {
-		this.enemy = enemy;
+	public function new(target:IMovable, loop:Bool = false) {
+		this.target = target;
 		this.actions = new Array<MovementAction>();
 		this.loop = loop;
 	}
 
 	public function addAction(action:MovementAction):Void {
 		actions.push(action);
+	}
+
+	/** Redirect the script's velocity writes (e.g. to a GhostOrigin after death). */
+	public function retarget(newTarget:IMovable):Void {
+		target = newTarget;
+	}
+
+	/** Force loop off so a looping path plays once and leaves (ghost mode). */
+	public function disableLoop():Void {
+		loop = false;
 	}
 
 	public function start():Void {
@@ -41,7 +51,7 @@ class MovementScript {
 	public function pause():Void {
 		isPaused = true;
 		// Stop enemy movement when pausing
-		enemy.setVelocity(0, 0);
+		target.setVelocity(0, 0);
 	}
 
 	public function resume():Void {
@@ -53,9 +63,9 @@ class MovementScript {
 				// Only restore velocity if not in the middle of a Wait
 				switch (action) {
 					case SetVelocity(vx, vy):
-						enemy.setVelocity(vx, vy);
+						target.setVelocity(vx, vy);
 					case Stop:
-						enemy.setVelocity(0, 0);
+						target.setVelocity(0, 0);
 					case Wait(_):
 						// Don't restore velocity during wait
 				}
@@ -90,7 +100,7 @@ class MovementScript {
 
 		switch (action) {
 			case SetVelocity(vx, vy):
-				enemy.setVelocity(vx, vy);
+				target.setVelocity(vx, vy);
 				nextAction(); // Immediately go to next action
 
 			case Wait(frames):
@@ -98,7 +108,7 @@ class MovementScript {
 				// Don't go to next action yet, wait for frames to count down
 
 			case Stop:
-				enemy.setVelocity(0, 0);
+				target.setVelocity(0, 0);
 				nextAction(); // Immediately go to next action
 		}
 	}

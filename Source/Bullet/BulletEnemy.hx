@@ -1,5 +1,7 @@
 package bullet;
 
+import shot.GhostOrigin;
+import shot.GhostOrigin.IGhostAnchor;
 import shot.ShotPrototype;
 import shot.ScriptRunner;
 import shot.ShotEmitter.IShotEmitter;
@@ -52,6 +54,8 @@ class BulletEnemy extends Sprite {
 	private var bindSource:ShotPrototype = null; // parent's live prototype (full mode)
 	private var anchorLastX:Float = 0;
 	private var anchorLastY:Float = 0;
+	private var ghostOrigin:GhostOrigin = null; // dead parent's ghost (offset mode)
+	private var bindRetained:Bool = false; // holds a refcount on the anchor
 
 	private var spawnTime:Int = Lib.getTimer();
 
@@ -106,6 +110,19 @@ class BulletEnemy extends Sprite {
 		bindSource = source;
 		anchorLastX = anchor.getOriginX();
 		anchorLastY = anchor.getOriginY();
+		// Offset-bound bullets never integrate their own velocity, so the
+		// anchor must outlive its owner as a ghost origin: refcount while bound.
+		if (mode == ShotPrototype.BIND_OFFSET && Std.isOfType(anchor, IGhostAnchor)) {
+			cast(anchor, IGhostAnchor).retainBound();
+			bindRetained = true;
+		}
+	}
+
+	private function releaseBind():Void {
+		if (bindRetained) {
+			bindRetained = false;
+			cast(bindAnchor, IGhostAnchor).releaseBound();
+		}
 	}
 
 	private inline function updateVelocity():Void {
@@ -118,6 +135,7 @@ class BulletEnemy extends Sprite {
 		// Check if bullet was removed (e.g., by collision)
 		if (parent == null) {
 			removeEventListener(Event.ENTER_FRAME, everyFrame);
+			releaseBind();
 			return;
 		}
 
@@ -131,6 +149,7 @@ class BulletEnemy extends Sprite {
 			// The script may have despawned this bullet (Vanish command).
 			if (parent == null) {
 				removeEventListener(Event.ENTER_FRAME, everyFrame);
+				releaseBind();
 				return;
 			}
 
@@ -155,11 +174,24 @@ class BulletEnemy extends Sprite {
 		var bindDY:Float = 0;
 		if (bindAnchor != null) {
 			if (!bindAnchor.isAlive()) {
-				// Orphan-release: parent gone -> keep current state and
-				// continue as a normal independent bullet.
-				bindAnchor = null;
-				bindSource = null;
-				bindMode = ShotPrototype.BIND_NONE;
+				// Parent died. Offset-bound bullets retarget their origin to
+				// the parent's ghost (see shot.GhostOrigin) and stay bound so
+				// the pattern keeps running; everything else orphan-releases:
+				// keep current state, continue as a normal independent bullet.
+				if (ghostOrigin == null && bindMode == ShotPrototype.BIND_OFFSET && Std.isOfType(bindAnchor, IGhostAnchor)) {
+					ghostOrigin = cast(bindAnchor, IGhostAnchor).getGhost();
+				}
+				if (ghostOrigin == null) {
+					releaseBind();
+					bindAnchor = null;
+					bindSource = null;
+					bindMode = ShotPrototype.BIND_NONE;
+				} else if (ghostOrigin.expired) {
+					// Ghost hit maxOrphanFrames with this bullet still bound:
+					// force-resolve by vanishing (no immortal bullets).
+					despawn();
+					return;
+				}
 			} else {
 				if (bindMode == ShotPrototype.BIND_FULL && bindSource != null) {
 					direction = bindSource.direction;
@@ -206,8 +238,8 @@ class BulletEnemy extends Sprite {
 		if (bindMode == ShotPrototype.BIND_OFFSET && bindAnchor != null && script != null) {
 			var proto = script.getPrototype();
 			if (proto != null) {
-				var px = bindAnchor.getOriginX();
-				var py = bindAnchor.getOriginY();
+				var px = (ghostOrigin != null) ? ghostOrigin.x : bindAnchor.getOriginX();
+				var py = (ghostOrigin != null) ? ghostOrigin.y : bindAnchor.getOriginY();
 				if (proto.offsetDistance != 0) {
 					var rad = proto.offsetAngle * Math.PI / 180;
 					px += Math.cos(rad) * proto.offsetDistance;
@@ -250,6 +282,7 @@ class BulletEnemy extends Sprite {
 
 	private function despawn():Void {
 		removeEventListener(Event.ENTER_FRAME, everyFrame);
+		releaseBind();
 		if (script != null) {
 			script.stop();
 			script = null;

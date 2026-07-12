@@ -7,8 +7,9 @@ import openfl.display.BitmapData;
 import openfl.display.Sprite;
 import openfl.Assets;
 import enemy.MovementScript;
+import shot.GhostOrigin.IMovable;
 
-class Enemy extends Sprite {
+class Enemy extends Sprite implements IMovable {
 	public static inline final ROTATION_SPEED:Float = -40.0; // Rotation speed in degrees per second
 
 	private var spawnTime:Int = Lib.getTimer(); // To store the time of enemy spawn
@@ -65,6 +66,18 @@ class Enemy extends Sprite {
 		this.movementScript = script;
 	}
 
+	public function getMovementScript():MovementScript {
+		return movementScript;
+	}
+
+	public function getVelocityX():Float {
+		return velocityX;
+	}
+
+	public function getVelocityY():Float {
+		return velocityY;
+	}
+
 	public function takeDamage(damage:Int):Void {
 		currentHealth -= damage;
 		trace("Enemy hit! Health: " + currentHealth + "/" + maxHealth);
@@ -85,6 +98,10 @@ class Enemy extends Sprite {
 	private function die():Void {
 		trace("Enemy destroyed!");
 
+		// Off-screen removal reaches here with health remaining; zero it so
+		// isAlive() is false on every death path (bound bullets key off it).
+		currentHealth = 0;
+
 		// Stop the shooting pattern
 		if (shootingPattern != null) {
 			shootingPattern.stopShooting();
@@ -93,6 +110,13 @@ class Enemy extends Sprite {
 		removeEventListener(Event.ENTER_FRAME, everyFrame);
 		if (parent != null) {
 			parent.removeChild(this);
+		}
+
+		// After the enemy is fully dead (not drawn, not collidable, not
+		// targetable), the pattern may stand up a ghost origin for any
+		// offset-bound bullets still deriving position from this enemy.
+		if (shootingPattern != null) {
+			shootingPattern.onOwnerDied();
 		}
 	}
 

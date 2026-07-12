@@ -1,12 +1,16 @@
+import shot.GhostOrigin;
+import shot.GhostOrigin.IGhostAnchor;
 import shot.ShotPrototype;
 import shot.ShotCommand.IShotCommand;
 import shot.ScriptRunner;
 import shot.ShotEmitter;
 import shot.CommandRegistry;
 import shot.Expression;
+import enemy.MovementScript;
+import enemy.MovementScript.MovementAction;
 import haxe.Json;
 
-class FakeEmitter implements IShotEmitter {
+class FakeEmitter implements IShotEmitter implements IGhostAnchor {
 	public var spawns:Array<{proto:ShotPrototype, x:Float, y:Float, frame:Int}> = [];
 	public var frame:Int = 0;
 	public var alive:Bool = true;
@@ -15,7 +19,27 @@ class FakeEmitter implements IShotEmitter {
 	public var originX:Float = 0;
 	public var originY:Float = 0;
 
+	// Ghost-parent bookkeeping (mirrors EmitterBase in BulletEmitters.hx).
+	var boundCount:Int = 0;
+	var ghost:GhostOrigin = null;
+
 	public function new() {}
+
+	public function retainBound():Void boundCount++;
+
+	public function releaseBound():Void {
+		boundCount--;
+		if (boundCount <= 0) ghost = null;
+	}
+
+	public function getGhost():GhostOrigin return ghost;
+
+	public function getBoundCount():Int return boundCount;
+
+	public function beginGhost(x:Float, y:Float, vx:Float, vy:Float, maxOrphanFrames:Int = GhostOrigin.DEFAULT_MAX_ORPHAN_FRAMES):GhostOrigin {
+		ghost = new GhostOrigin(x, y, vx, vy, maxOrphanFrames);
+		return ghost;
+	}
 
 	public function getOriginX():Float return originX;
 
@@ -62,6 +86,8 @@ class HeadlessTestBullet {
 	public var bindSource:ShotPrototype = null;
 	var anchorLastX:Float = 0;
 	var anchorLastY:Float = 0;
+	public var ghostOrigin:GhostOrigin = null;
+	var bindRetained:Bool = false;
 
 	public function new(p:ShotPrototype) {
 		direction = p.direction;
@@ -78,10 +104,30 @@ class HeadlessTestBullet {
 		bindSource = source;
 		anchorLastX = anchor.getOriginX();
 		anchorLastY = anchor.getOriginY();
+		if (mode == ShotPrototype.BIND_OFFSET && Std.isOfType(anchor, IGhostAnchor)) {
+			cast(anchor, IGhostAnchor).retainBound();
+			bindRetained = true;
+		}
+	}
+
+	function releaseBind():Void {
+		if (bindRetained) {
+			bindRetained = false;
+			cast(bindAnchor, IGhostAnchor).releaseBound();
+		}
+	}
+
+	/** Mirrors BulletEnemy.despawn (Vanish / collision / cull). */
+	public function destroy():Void {
+		alive = false;
+		releaseBind();
 	}
 
 	public function everyFrame():Void {
-		if (!alive) return;
+		if (!alive) {
+			releaseBind();
+			return;
+		}
 		if (script != null) {
 			script.update();
 			if (!alive) return;
@@ -103,10 +149,21 @@ class HeadlessTestBullet {
 		var bindDY:Float = 0;
 		if (bindAnchor != null) {
 			if (!bindAnchor.isAlive()) {
-				// Orphan-release.
-				bindAnchor = null;
-				bindSource = null;
-				bindMode = ShotPrototype.BIND_NONE;
+				// Parent died: offset-bound bullets retarget to the ghost
+				// origin and stay bound; everything else orphan-releases.
+				if (ghostOrigin == null && bindMode == ShotPrototype.BIND_OFFSET && Std.isOfType(bindAnchor, IGhostAnchor)) {
+					ghostOrigin = cast(bindAnchor, IGhostAnchor).getGhost();
+				}
+				if (ghostOrigin == null) {
+					releaseBind();
+					bindAnchor = null;
+					bindSource = null;
+					bindMode = ShotPrototype.BIND_NONE;
+				} else if (ghostOrigin.expired) {
+					// maxOrphanFrames cap: force-vanish.
+					destroy();
+					return;
+				}
 			} else {
 				if (bindMode == ShotPrototype.BIND_FULL && bindSource != null) {
 					direction = bindSource.direction;
@@ -139,8 +196,8 @@ class HeadlessTestBullet {
 		if (bindMode == ShotPrototype.BIND_OFFSET && bindAnchor != null && script != null) {
 			var proto = script.getPrototype();
 			if (proto != null) {
-				var px = bindAnchor.getOriginX();
-				var py = bindAnchor.getOriginY();
+				var px = (ghostOrigin != null) ? ghostOrigin.x : bindAnchor.getOriginX();
+				var py = (ghostOrigin != null) ? ghostOrigin.y : bindAnchor.getOriginY();
 				if (proto.offsetDistance != 0) {
 					var orad = proto.offsetAngle * Math.PI / 180;
 					px += Math.cos(orad) * proto.offsetDistance;
@@ -210,6 +267,23 @@ class TestShot {
 			runner.update();
 		}
 		return em;
+	}
+
+	/** Materialize a recorded spawn as a live bullet with its sub-script,
+	 *  exactly like EmitterBase.spawn does. */
+	static function materialize(em:FakeEmitter, s:{proto:ShotPrototype, x:Float, y:Float, frame:Int}):HeadlessTestBullet {
+		var b = new HeadlessTestBullet(s.proto);
+		b.x = s.x;
+		b.y = s.y;
+		if (s.proto.bindMode != ShotPrototype.BIND_NONE)
+			b.bindTo(em, s.proto.bindMode, s.proto.bindSource);
+		if (s.proto.subCommands != null) {
+			var subProto = s.proto.clone();
+			subProto.subCommands = null;
+			subProto.bindMode = ShotPrototype.BIND_NONE;
+			b.script = new ScriptRunner(new FakeBulletEmitter(b), s.proto.subCommands, subProto);
+		}
+		return b;
 	}
 
 	public static function main() {
@@ -363,7 +437,7 @@ class TestShot {
 
 		// --- Legacy pattern files compile & run ---------------------------------------
 		for (name in ["spiral", "nwhip", "orbit", "sniper", "random", "radial", "flower", "shifter", "satellite",
-			"sincos", "transform", "clover", "laundry", "bindpos"]) {
+			"sincos", "transform", "clover", "laundry", "bindpos", "pods"]) {
 			var text = sys.io.File.getContent("Assets/patterns/" + name + ".json");
 			var template:Dynamic = Json.parse(text);
 			var paramMap:Map<String, Dynamic> = new Map();
@@ -901,6 +975,188 @@ class TestShot {
 			// so all 7 stopped bullets detonate the frame the last one's hang ends.
 			check(Math.abs(beamProto.getProp("fuse") - 12) < 1e-9,
 				'satellite e2e: first beam bullet cloned fuse 12 for the synchronized detonation (${beamProto.getProp("fuse")})');
+		}
+
+		// ======================================================================
+		// Ghost-parent orphan handling (offset-bound bullets outlive the enemy)
+		// ======================================================================
+		// pods.json-shaped script: launch a speed-0 offset-bound pod out to a
+		// 100px orbit, then orbit forever via an infinite Loop in the sub-script.
+		var orbitBind = compile('[
+			{"control": "Bind", "mode": "offset"},
+			{"control": "Set", "prop": "speed", "value": 0},
+			{"control": "Sub", "actions": [
+				{"control": "Tween", "prop": "offsetDistance", "to": 100, "frames": 10},
+				{"control": "Loop", "actions": [
+					{"control": "Add", "prop": "offsetAngle", "delta": 3},
+					{"control": "Wait", "frames": 1}
+				]}
+			]},
+			{"control": "Fire", "angle": 0, "speed": 0}
+		]');
+
+		// Living parent: the bound pattern runs indefinitely - no self-timeout.
+		{
+			var gEm = new FakeEmitter();
+			var runner = new ScriptRunner(gEm, orbitBind);
+			runner.update();
+			var pod = materialize(gEm, gEm.spawns[0]);
+			for (f in 0...700) pod.everyFrame();
+			check(pod.alive && pod.bindMode == ShotPrototype.BIND_OFFSET && pod.ghostOrigin == null,
+				"ghost: living parent - bound pattern still running past 600 frames (no self-timeout)");
+		}
+
+		// (a)+(b)+(e)+(f): parent death mid-pattern -> ghost keeps the origin,
+		// the movement carries the formation off-screen, teardown at refcount 0.
+		{
+			var gEm = new FakeEmitter();
+			gEm.originX = 400;
+			gEm.originY = 300;
+			var runner = new ScriptRunner(gEm, orbitBind);
+			runner.update();
+			var pod = materialize(gEm, gEm.spawns[0]);
+			for (f in 0...20) pod.everyFrame();
+			check(gEm.getBoundCount() == 1, "ghost: offset-bound bullet holds a refcount on its parent anchor");
+
+			// The enemy dies; the display side stands the ghost up at the corpse.
+			gEm.alive = false;
+			var ghost = gEm.beginGhost(gEm.originX, gEm.originY, 0, 0);
+			var angleBefore = pod.script.getPrototype().offsetAngle;
+			for (f in 0...30) {
+				ghost.tick();
+				pod.everyFrame();
+			}
+			check(pod.alive && pod.bindMode == ShotPrototype.BIND_OFFSET && pod.ghostOrigin == ghost,
+				"ghost (a): speed-0 offset bullet survives parent death, still bound - to the ghost");
+			var proto = pod.script.getPrototype();
+			check(proto.offsetAngle > angleBefore, "ghost (a): infinite-Loop sub-script keeps running after parent death");
+			var rad = proto.offsetAngle * Math.PI / 180;
+			check(Math.abs(pod.x - (ghost.x + Math.cos(rad) * proto.offsetDistance + proto.x)) < 1e-9
+				&& Math.abs(pod.y - (ghost.y + Math.sin(rad) * proto.offsetDistance + proto.y)) < 1e-9,
+				"ghost (a): position derives from ghost origin + live offset (not frozen)");
+
+			check(!gEm.isAlive(), "ghost (f): emitter reports dead the instant the enemy dies, ghost or not");
+			var spawnsBefore = gEm.spawns.length;
+			runner.update();
+			runner.update();
+			check(gEm.spawns.length == spawnsBefore, "ghost (f): dead enemy's own script fires nothing more");
+
+			// (b) the enemy's movementScript, retargeted to the ghost, keeps
+			// advancing the origin so the formation drifts off-screen.
+			var ms = new MovementScript(ghost);
+			ms.addAction(SetVelocity(25, 0));
+			ms.addAction(Wait(600));
+			ms.start();
+			for (f in 0...60) {
+				ms.update();
+				ghost.tick();
+				pod.everyFrame();
+			}
+			check(pod.x > 800 + 100, "ghost (b): moving ghost carried the bullet's DERIVED position past the stage cull bound");
+			pod.destroy(); // the off-screen cull
+			check(gEm.getBoundCount() == 0 && gEm.getGhost() == null,
+				"ghost (e): cull released the refcount; refcount 0 tore the ghost down");
+		}
+
+		// (c) a looping movement path is forced to play once on the ghost.
+		{
+			var ghost = new GhostOrigin(100, 100);
+			var ms = new MovementScript(ghost, true); // "loop": true, as in satellite's level entry
+			ms.addAction(SetVelocity(0, -2));
+			ms.addAction(Wait(10));
+			ms.addAction(SetVelocity(0, 2));
+			ms.addAction(Wait(10));
+			ms.disableLoop(); // what the ghost driver forces
+			ms.start();
+			for (f in 0...30) {
+				ms.update();
+				ghost.tick();
+			}
+			check(!ms.isRunning(), "ghost (c): looping movementScript plays once with loop forced off");
+			var yBefore = ghost.y;
+			for (f in 0...10) ghost.tick();
+			check(ghost.y - yBefore == 20, "ghost (c): final leg's velocity persists - origin drifts away instead of orbiting");
+		}
+
+		// (d) degenerate stationary origin: maxOrphanFrames force-vanishes the bullet.
+		{
+			var gEm = new FakeEmitter();
+			var runner = new ScriptRunner(gEm, orbitBind);
+			runner.update();
+			var pod = materialize(gEm, gEm.spawns[0]);
+			for (f in 0...5) pod.everyFrame();
+			gEm.alive = false;
+			var ghost = gEm.beginGhost(0, 0, 0, 0, 30); // never leaves screen, cap 30
+			var frames = 0;
+			while (pod.alive && frames < 100) {
+				ghost.tick();
+				pod.everyFrame();
+				frames++;
+			}
+			check(!pod.alive, "ghost (d): stationary origin force-vanishes its bullet at maxOrphanFrames");
+			check(frames <= 32, 'ghost (d): vanish fired at the cap (frame $frames), not later');
+			check(gEm.getBoundCount() == 0 && gEm.getGhost() == null,
+				"ghost (d): force-vanish released the refcount and tore down the ghost");
+		}
+
+		// (e) refcount tracks multiple bullets; ghost survives until the LAST one dies.
+		{
+			var gEm = new FakeEmitter();
+			var runner = new ScriptRunner(gEm, compile('[
+				{"control": "Bind", "mode": "offset"},
+				{"control": "Set", "prop": "speed", "value": 0},
+				{"control": "Sub", "actions": [{"control": "Loop", "actions": [
+					{"control": "Add", "prop": "offsetAngle", "delta": 5},
+					{"control": "Wait", "frames": 1}
+				]}]},
+				{"control": "Fire", "angle": 0, "speed": 0},
+				{"control": "Add", "prop": "offsetAngle", "delta": 180},
+				{"control": "Fire", "angle": 0, "speed": 0}
+			]'));
+			runner.update();
+			var b1 = materialize(gEm, gEm.spawns[0]);
+			var b2 = materialize(gEm, gEm.spawns[1]);
+			check(gEm.getBoundCount() == 2, "ghost (e): refcount counts every bound bullet");
+			gEm.alive = false;
+			var ghost = gEm.beginGhost(0, 0, 0, 0);
+			b1.everyFrame();
+			b2.everyFrame();
+			b1.destroy();
+			check(gEm.getBoundCount() == 1 && gEm.getGhost() == ghost,
+				"ghost (e): first bullet's death keeps the ghost alive for the survivor");
+			b2.everyFrame();
+			check(b2.alive && b2.ghostOrigin == ghost, "ghost (e): surviving sibling stays bound to the ghost");
+			b2.destroy();
+			check(gEm.getBoundCount() == 0 && gEm.getGhost() == null, "ghost (e): last release tears the ghost down");
+		}
+
+		// sincos e2e: the Cartesian (x/y expression) offset chains follow the
+		// ghost too, and the moving origin carries them past the cull bound.
+		{
+			var text = sys.io.File.getContent("Assets/patterns/sincos.json");
+			var template:Dynamic = Json.parse(text);
+			var paramMap:Map<String, Dynamic> = new Map();
+			for (f in Reflect.fields(template.parameters))
+				paramMap.set(f, Reflect.field(Reflect.field(template.parameters, f), "default"));
+			var cmds = CommandRegistry.compileList(template.script, new CompileContext(paramMap));
+			var gEm = new FakeEmitter();
+			gEm.originX = 300;
+			gEm.originY = 200;
+			var runner = new ScriptRunner(gEm, cmds);
+			runner.update();
+			check(gEm.spawns[0].proto.bindMode == ShotPrototype.BIND_OFFSET, "sincos ghost: chain bullets are offset-bound");
+			var b = materialize(gEm, gEm.spawns[0]);
+			for (f in 0...10) b.everyFrame();
+			gEm.alive = false;
+			var ghost = gEm.beginGhost(gEm.originX, gEm.originY, -6, 0); // carrier was drifting left
+			for (f in 0...100) {
+				ghost.tick();
+				b.everyFrame();
+			}
+			var proto = b.script.getPrototype();
+			check(b.alive && Math.abs(b.x - (ghost.x + proto.x)) < 1e-9 && Math.abs(b.y - (ghost.y + proto.y)) < 1e-9,
+				"sincos ghost: bullet still traces its ellipse around the moving ghost");
+			check(b.x <= -100, "sincos ghost: derived position crossed the off-screen cull bound (despawns on its own)");
 		}
 
 		Sys.println(failures == 0 ? "\nALL TESTS PASSED" : '\n$failures TEST(S) FAILED');

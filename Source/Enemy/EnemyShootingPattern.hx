@@ -52,6 +52,10 @@ abstract class EnemyShootingPattern extends Sprite {
 		removeEventListener(Event.ENTER_FRAME, everyFrame);
 	}
 
+	/** Called by Enemy.die() after the enemy is fully dead. Subclasses may
+	 *  keep a ghost origin alive for still-bound bullets. */
+	public function onOwnerDied():Void {}
+
 	// Accessor for subclasses to get the enemy reference
 	private function getEnemy():Enemy {
 		return enemy;

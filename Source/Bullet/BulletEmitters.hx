@@ -2,6 +2,8 @@ package bullet;
 
 import enemy.Enemy;
 import manager.CollisionManager;
+import shot.GhostOrigin;
+import shot.GhostOrigin.IGhostAnchor;
 import shot.ShotPrototype;
 import shot.ScriptRunner;
 import shot.ShotEmitter;
@@ -13,13 +15,43 @@ import openfl.Lib;
  * if the prototype carries a sub-script - attaches a ScriptRunner so the
  * bullet executes its own pattern after spawning.
  */
-private class EmitterBase {
+private class EmitterBase implements IGhostAnchor {
 	private var collisionManager:CollisionManager;
 	public var bulletSprite:String = null;
+
+	// Ghost-parent bookkeeping (see shot.GhostOrigin): offset-bound bullets
+	// retain while bound; the ghost stands in for the owner after death and is
+	// dropped once the last bound bullet releases.
+	private var boundCount:Int = 0;
+	private var ghost:GhostOrigin = null;
 
 	private function new(collisionManager:CollisionManager, ?bulletSprite:String) {
 		this.collisionManager = collisionManager;
 		this.bulletSprite = bulletSprite;
+	}
+
+	public function retainBound():Void {
+		boundCount++;
+	}
+
+	public function releaseBound():Void {
+		boundCount--;
+		if (boundCount <= 0) ghost = null;
+	}
+
+	public function getGhost():GhostOrigin {
+		return ghost;
+	}
+
+	public function getBoundCount():Int {
+		return boundCount;
+	}
+
+	/** Stand up the ghost origin at owner death (called by the display side,
+	 *  which also ticks it every frame while it lives). */
+	public function beginGhost(x:Float, y:Float, vx:Float, vy:Float, maxOrphanFrames:Int = GhostOrigin.DEFAULT_MAX_ORPHAN_FRAMES):GhostOrigin {
+		ghost = new GhostOrigin(x, y, vx, vy, maxOrphanFrames);
+		return ghost;
 	}
 
 	/** Vanish is a no-op for enemy emitters; BulletSubEmitter overrides. */
