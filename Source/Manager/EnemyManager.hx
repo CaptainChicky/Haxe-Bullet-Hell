@@ -20,8 +20,8 @@ class EnemyManager extends Sprite {
 		movementScripts = new Array<MovementScript>();
 	}
 
-	public function spawnEnemy(x:Float, y:Float, patternType:String, patternConfig:Dynamic, health:Int = 1, velocityX:Float = 0, velocityY:Float = 0, movementScriptData:Dynamic = null):Enemy {
-		var enemy:Enemy = new Enemy(health);
+	public function spawnEnemy(x:Float, y:Float, patternType:String, patternConfig:Dynamic, health:Int = 1, velocityX:Float = 0, velocityY:Float = 0, movementScriptData:Dynamic = null, ?spriteName:String):Enemy {
+		var enemy:Enemy = new Enemy(health, spriteName);
 		enemy.x = x;
 		enemy.y = y;
 		enemy.setVelocity(velocityX, velocityY);

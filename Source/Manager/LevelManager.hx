@@ -131,6 +131,7 @@ class LevelManager extends Sprite {
 		var health:Int = (spawnData.health != null) ? spawnData.health : 1;
 		var vx:Float = (spawnData.velocityX != null) ? spawnData.velocityX : 0;
 		var vy:Float = (spawnData.velocityY != null) ? spawnData.velocityY : 0;
+		var sprite:String = spawnData.sprite;
 		trace("Spawning enemy at (" + spawnData.x + ", " + spawnData.y + ") with pattern: " + spawnData.pattern + ", health: " + health + ", velocity: (" + vx + ", " + vy + ")");
 		enemyManager.spawnEnemy(
 			spawnData.x,
@@ -140,7 +141,8 @@ class LevelManager extends Sprite {
 			health,
 			vx,
 			vy,
-			spawnData.movementScript
+			spawnData.movementScript,
+			sprite
 		);
 	}
 

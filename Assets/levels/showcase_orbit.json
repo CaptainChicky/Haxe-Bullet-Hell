@@ -1,0 +1,26 @@
+{
+  "name": "Showcase: orbit",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0, "x": 350, "y": 200, "pattern": "orbit", "health": 999,
+          "patternConfig": { "orbitDistance": 60, "bulletSpeed": 4, "rotationSpeed": 6, "fireDelay": 2 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        },
+        {
+          "spawnTime": 0.5, "x": 700, "y": 200, "pattern": "orbit", "health": 999,
+          "sprite": "enemy2",
+          "patternConfig": { "orbitDistance": 120, "bulletSpeed": 5, "rotationSpeed": 10, "fireDelay": 1 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        },
+        {
+          "spawnTime": 1, "x": 1050, "y": 200, "pattern": "orbit", "health": 999,
+          "patternConfig": { "orbitDistance": 200, "bulletSpeed": 3, "rotationSpeed": 3, "fireDelay": 3 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        }
+      ]
+    }
+  ]
+}

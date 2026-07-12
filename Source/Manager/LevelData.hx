@@ -22,6 +22,7 @@ typedef EnemySpawnData = {
 	@:optional var velocityX:Float; // X velocity (pixels per frame, defaults to 0)
 	@:optional var velocityY:Float; // Y velocity (pixels per frame, defaults to 0)
 	@:optional var movementScript:MovementScriptData; // Scripted movement pattern
+	@:optional var sprite:String; // "enemy2" uses Enemy(second).png; null/absent = default Enemy.png
 }
 
 typedef MovementScriptData = {

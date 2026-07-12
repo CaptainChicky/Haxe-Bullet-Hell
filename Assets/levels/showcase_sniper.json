@@ -1,0 +1,26 @@
+{
+  "name": "Showcase: sniper",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0, "x": 350, "y": 200, "pattern": "sniper", "health": 999,
+          "patternConfig": { "bulletSpeed": 10, "burstCount": 3, "burstDelay": 2, "orbitDistance": 80, "patternDelay": 60 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        },
+        {
+          "spawnTime": 0.5, "x": 700, "y": 200, "pattern": "sniper", "health": 999,
+          "sprite": "enemy2",
+          "patternConfig": { "bulletSpeed": 15, "burstCount": 5, "burstDelay": 1, "orbitDistance": 150, "patternDelay": 40 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        },
+        {
+          "spawnTime": 1, "x": 1050, "y": 200, "pattern": "sniper", "health": 999,
+          "patternConfig": { "bulletSpeed": 8, "burstCount": 10, "burstDelay": 3, "orbitDistance": 200, "patternDelay": 90 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        }
+      ]
+    }
+  ]
+}

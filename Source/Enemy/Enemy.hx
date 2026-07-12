@@ -28,14 +28,15 @@ class Enemy extends Sprite {
 	private var velocityY:Float = 0;
 	private var movementScript:MovementScript;
 
-	public function new(health:Int = 1) {
+	public function new(health:Int = 1, ?spriteName:String) {
 		super();
 
 		this.maxHealth = health;
 		this.currentHealth = health;
 
 		// Load the image from the assets folder
-		var bitmapData:BitmapData = Assets.getBitmapData("assets/Enemy.png");
+		var assetPath:String = (spriteName == "enemy2") ? "assets/Enemy(second).png" : "assets/Enemy.png";
+		var bitmapData:BitmapData = Assets.getBitmapData(assetPath);
 
 		// Create a Bitmap using the loaded image
 		var bitmap:Bitmap = new Bitmap(bitmapData);

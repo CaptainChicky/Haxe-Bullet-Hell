@@ -1,0 +1,26 @@
+{
+  "name": "Showcase: pods [KNOWN BROKEN — pods don't orbit, offsetDistance doesn't move the bullet itself]",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0, "x": 350, "y": 250, "pattern": "pods", "health": 999,
+          "patternConfig": { "orbitRadius": 80, "orbitStep": -2, "spinStep": 8, "streamSpeed": 3, "streamDelay": 2 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        },
+        {
+          "spawnTime": 0.5, "x": 700, "y": 250, "pattern": "pods", "health": 999,
+          "sprite": "enemy2",
+          "patternConfig": { "orbitRadius": 120, "orbitStep": -3, "spinStep": 12, "streamSpeed": 4, "streamDelay": 1 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        },
+        {
+          "spawnTime": 1, "x": 1050, "y": 250, "pattern": "pods", "health": 999,
+          "patternConfig": { "orbitRadius": 160, "orbitStep": -5, "spinStep": 20, "streamSpeed": 5, "streamDelay": 1 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        }
+      ]
+    }
+  ]
+}

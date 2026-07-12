@@ -1,0 +1,26 @@
+{
+  "name": "Showcase: random",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0, "x": 350, "y": 200, "pattern": "random", "health": 999,
+          "patternConfig": { "minSpeed": 2, "maxSpeed": 4, "baseAngle": 90, "angleSpread": 10, "fireDelay": 3 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        },
+        {
+          "spawnTime": 0.5, "x": 700, "y": 200, "pattern": "random", "health": 999,
+          "sprite": "enemy2",
+          "patternConfig": { "minSpeed": 2, "maxSpeed": 6, "baseAngle": 90, "angleSpread": 30, "fireDelay": 5 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        },
+        {
+          "spawnTime": 1, "x": 1050, "y": 200, "pattern": "random", "health": 999,
+          "patternConfig": { "minSpeed": 1, "maxSpeed": 8, "baseAngle": 90, "angleSpread": 60, "fireDelay": 2 },
+          "movementScript": { "loop": false, "actions": [{"type": "Stop"}] }
+        }
+      ]
+    }
+  ]
+}
