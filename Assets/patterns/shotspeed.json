@@ -1,0 +1,27 @@
+{
+  "name": "shotspeed",
+  "description": "Firedancer 'Shot Speed' example: a rapid stream fired one frame apart, each bullet faster than the last, stringing the volley out along the fire direction; pause and repeat",
+  "parameters": {
+    "direction": {"type": "float", "default": 180, "description": "Fire direction (engine degrees, 180 = left toward player)"},
+    "baseSpeed": {"type": "float", "default": 2, "description": "Speed of the first bullet in each volley"},
+    "speedStep": {"type": "float", "default": 0.3, "description": "Speed added after each shot"},
+    "burstCount": {"type": "int", "default": 24, "description": "Shots per volley"},
+    "fireDelay": {"type": "int", "default": 1, "description": "Frames between shots"},
+    "volleyDelay": {"type": "int", "default": 60, "description": "Frames between volleys"}
+  },
+  "script": [
+    {"control": "Set", "prop": "direction", "value": "$direction"},
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "Set", "prop": "speed", "value": "$baseSpeed"},
+        {"control": "Rep", "count": "$burstCount", "actions": [
+          {"control": "Fire", "angle": 0, "speed": 0},
+          {"control": "Add", "prop": "speed", "delta": "$speedStep"},
+          {"control": "Wait", "frames": "$fireDelay"}
+        ]},
+        {"control": "Wait", "frames": "$volleyDelay"}
+      ]
+    }
+  ]
+}

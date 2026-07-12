@@ -1,0 +1,29 @@
+{
+  "name": "nwayline",
+  "description": "Firedancer 'Nway/Radial/Line' example: cycles through an nWay fan, a full radial ring, and a speed-strung line of bullets",
+  "parameters": {
+    "direction": {"type": "float", "default": 180, "description": "Base fire direction (engine degrees, 180 = left toward player)"},
+    "shotSpeed": {"type": "float", "default": 4, "description": "Base bullet speed"},
+    "nwayCount": {"type": "int", "default": 10, "description": "Bullets in the nWay fan"},
+    "nwaySpread": {"type": "float", "default": 90, "description": "Total fan spread in degrees"},
+    "radialCount": {"type": "int", "default": 36, "description": "Bullets in the radial ring"},
+    "lineCount": {"type": "int", "default": 10, "description": "Bullets in the line volley"},
+    "lineSpeedBoost": {"type": "float", "default": 6, "description": "Speed range of the line (from shotSpeed to shotSpeed + boost)"},
+    "phaseDelay": {"type": "int", "default": 60, "description": "Frames between the three phases"}
+  },
+  "script": [
+    {"control": "Set", "prop": "direction", "value": "$direction"},
+    {"control": "Set", "prop": "speed", "value": "$shotSpeed"},
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "NWay", "count": "$nwayCount", "angle": "$nwaySpread", "speed": 0},
+        {"control": "Wait", "frames": "$phaseDelay"},
+        {"control": "Radial", "count": "$radialCount", "speed": 0},
+        {"control": "Wait", "frames": "$phaseDelay"},
+        {"control": "Line", "count": "$lineCount", "prop": "speed", "from": "$shotSpeed", "to": "$shotSpeed + $lineSpeedBoost"},
+        {"control": "Wait", "frames": "$phaseDelay"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "parallel",
+  "description": "Firedancer 'Parallel' example: two concurrent threads — one fires a steady aimed stream, the other fires while rotating its direction every few frames (Concurrent branches run as independent contexts with cloned prototypes)",
+  "parameters": {
+    "shotSpeed": {"type": "float", "default": 3, "description": "Bullet speed for both threads"},
+    "direction": {"type": "float", "default": 180, "description": "Initial fire direction (engine degrees, 180 = left toward player)"},
+    "steadyDelay": {"type": "int", "default": 8, "description": "Frames between shots in the steady thread"},
+    "spinDelay": {"type": "int", "default": 4, "description": "Frames between shots in the spinning thread"},
+    "spinStep": {"type": "float", "default": 32, "description": "Direction change per shot in the spinning thread"}
+  },
+  "script": [
+    {"control": "Set", "prop": "speed", "value": "$shotSpeed"},
+    {"control": "Set", "prop": "direction", "value": "$direction"},
+    {
+      "control": "Concurrent",
+      "branches": [
+        [
+          {"control": "Loop", "actions": [
+            {"control": "Fire", "angle": 0, "speed": 0},
+            {"control": "Wait", "frames": "$steadyDelay"}
+          ]}
+        ],
+        [
+          {"control": "Loop", "actions": [
+            {"control": "Fire", "angle": 0, "speed": 0},
+            {"control": "Add", "prop": "direction", "delta": "$spinStep"},
+            {"control": "Wait", "frames": "$spinDelay"}
+          ]}
+        ]
+      ]
+    }
+  ]
+}

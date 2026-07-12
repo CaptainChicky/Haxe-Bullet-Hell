@@ -1,0 +1,25 @@
+{
+  "name": "controlflow",
+  "description": "Firedancer 'Control Flow' example: infinite loop that waits, then fires a burst of shots a few frames apart (sequential execution + Loop + Rep)",
+  "parameters": {
+    "shotSpeed": {"type": "float", "default": 4, "description": "Bullet speed"},
+    "direction": {"type": "float", "default": 180, "description": "Fire direction (engine degrees, 180 = left toward player)"},
+    "volleyDelay": {"type": "int", "default": 60, "description": "Frames to wait before each burst"},
+    "burstCount": {"type": "int", "default": 8, "description": "Shots per burst"},
+    "burstDelay": {"type": "int", "default": 10, "description": "Frames between shots within a burst"}
+  },
+  "script": [
+    {"control": "Set", "prop": "speed", "value": "$shotSpeed"},
+    {"control": "Set", "prop": "direction", "value": "$direction"},
+    {
+      "control": "Loop",
+      "actions": [
+        {"control": "Wait", "frames": "$volleyDelay"},
+        {"control": "Rep", "count": "$burstCount", "actions": [
+          {"control": "Fire", "angle": 0, "speed": 0},
+          {"control": "Wait", "frames": "$burstDelay"}
+        ]}
+      ]
+    }
+  ]
+}
