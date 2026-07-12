@@ -1,5 +1,5 @@
 {
-  "name": "static_geometry",
+  "name": "staticGeo",
   "description": "Every 4 frames, 8 bullets fire radially; after 20 frames each splits into a narrow 2-way and vanishes",
   "parameters": {},
   "script": [
