@@ -10437,6 +10437,85 @@
               "actions": [
                 {
                   "control": "Set",
+                  "prop": "speed",
+                  "value": 3
+                },
+                {
+                  "control": "Concurrent",
+                  "branches": [
+                    [
+                      {
+                        "control": "Rep",
+                        "count": 20,
+                        "actions": [
+                          {
+                            "control": "Rep",
+                            "count": 2,
+                            "actions": [
+                              {
+                                "control": "NWay",
+                                "count": 7,
+                                "angle": 30,
+                                "speed": 0
+                              },
+                              {
+                                "control": "AddAngle",
+                                "delta": 180
+                              }
+                            ]
+                          },
+                          {
+                            "control": "AddAngle",
+                            "delta": 30
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 15
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "control": "AddAngle",
+                        "delta": 90
+                      },
+                      {
+                        "control": "Rep",
+                        "count": 20,
+                        "actions": [
+                          {
+                            "control": "Rep",
+                            "count": 2,
+                            "actions": [
+                              {
+                                "control": "Line",
+                                "count": 7,
+                                "prop": "speed",
+                                "from": 3,
+                                "to": 10.2
+                              },
+                              {
+                                "control": "AddAngle",
+                                "delta": 180
+                              }
+                            ]
+                          },
+                          {
+                            "control": "AddAngle",
+                            "delta": 30
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 15
+                          }
+                        ]
+                      }
+                    ]
+                  ]
+                },
+                {
+                  "control": "Set",
                   "prop": "moveSelf",
                   "value": 1
                 },
