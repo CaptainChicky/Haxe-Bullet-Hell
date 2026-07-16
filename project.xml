@@ -11,5 +11,8 @@
 	
 	<assets path="Assets" rename="assets" />
 	
-	<windows fps="60" autoSize="true" />
+	<window if="windows" width="1920" height="1080" fullscreen="true" />
+	<window hardware="true" />
+	<!-- may or may not be needed see if lag changes after compilation -->
+	 <window vsync="false" antialiasing="0" />
 </project>
