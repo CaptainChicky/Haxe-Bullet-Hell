@@ -35,6 +35,9 @@ class Player extends Sprite {
 	// God mode
 	private var godMode:Bool = false;
 
+	// Invincibility frames (post-respawn / bomb). Player blinks while active.
+	private var invincibleFrames:Int = 0;
+
 	// Callback for game over
 	private var onDeathCallback:Void->Void;
 
@@ -117,8 +120,17 @@ class Player extends Sprite {
 		moveRight = false;
 	}
 
+	public function setInvincible(frames:Int):Void {
+		invincibleFrames = frames;
+	}
+
+	public function isInvincible():Bool {
+		return invincibleFrames > 0;
+	}
+
 	public function takeDamage(damage:Int):Void {
 		if (!alive) return;
+		if (invincibleFrames > 0) return;
 		if (godMode) {
 			trace("Player hit but god mode is active!");
 			return;
@@ -204,5 +216,15 @@ class Player extends Sprite {
 
 		// Rotate the player
 		rotation = ROTATION_SPEED * deltaTime;
+
+		// Invincibility blink; restore base alpha when it runs out
+		if (invincibleFrames > 0) {
+			invincibleFrames--;
+			if (invincibleFrames == 0) {
+				this.alpha = godMode ? 0.5 : 1.0;
+			} else {
+				this.alpha = (Std.int(invincibleFrames / 4) % 2 == 0) ? 0.3 : 0.8;
+			}
+		}
 	}
 }

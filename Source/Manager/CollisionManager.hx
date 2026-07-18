@@ -15,6 +15,13 @@ class CollisionManager extends Sprite {
 	// Player hitbox size (the small black dot)
 	private static inline final PLAYER_HITBOX_RADIUS:Float = 3.0;
 
+	// Extra distance beyond a hit that still counts as a graze
+	private static inline final GRAZE_RADIUS:Float = 18.0;
+
+	// Scoring callbacks (set by Main)
+	public var onEnemyKilled:Enemy->Void = null;
+	public var onGraze:Void->Void = null;
+
 	public function new(player:Player, enemyManager:EnemyManager) {
 		super();
 		this.player = player;
@@ -60,9 +67,16 @@ class CollisionManager extends Sprite {
 			for (enemy in enemies) {
 				if (!enemy.isAlive()) continue;
 
-				// Simple bounding box collision
-				if (bullet.hitTestObject(enemy)) {
+				// Circle collision on cached radii (hitTestObject recomputes
+				// transformed bounds — too slow per bullet per frame on native)
+				var hitDistance:Float = bullet.collisionRadius + enemy.collisionRadius;
+				var dx:Float = bullet.x - enemy.x;
+				var dy:Float = bullet.y - enemy.y;
+				if (dx * dx + dy * dy < hitDistance * hitDistance) {
 					enemy.takeDamage(1);
+					if (!enemy.isAlive() && onEnemyKilled != null) {
+						onEnemyKilled(enemy);
+					}
 
 					// Remove the bullet
 					if (bullet.parent != null) {
@@ -84,18 +98,16 @@ class CollisionManager extends Sprite {
 		for (bullet in enemyBullets) {
 			if (bullet.parent == null) continue; // Bullet already removed
 
-			// Check if bullet sprite overlaps with player hitbox circle
-			// We need to account for the bullet's size
-			var bulletRadius:Float = Math.max(bullet.width, bullet.height) / 2;
-			var collisionDistance:Float = PLAYER_HITBOX_RADIUS + bulletRadius;
+			// Check if bullet sprite overlaps with player hitbox circle,
+			// using the radius cached at bullet construction
+			var collisionDistance:Float = PLAYER_HITBOX_RADIUS + bullet.collisionRadius;
 
 			var dx:Float = bullet.x - playerCenterX;
 			var dy:Float = bullet.y - playerCenterY;
 			var distanceSquared:Float = dx * dx + dy * dy;
 
-			if (distanceSquared < collisionDistance * collisionDistance) {
+			if (distanceSquared < collisionDistance * collisionDistance && !player.isInvincible()) {
 				// Player hit!
-				trace("COLLISION DETECTED! Bullet at (" + bullet.x + ", " + bullet.y + ") hit player at (" + playerCenterX + ", " + playerCenterY + ")");
 				player.takeDamage(1);
 
 				// Remove the bullet
@@ -104,6 +116,15 @@ class CollisionManager extends Sprite {
 				}
 
 				break; // Only need one hit to kill player
+			}
+
+			// Graze: bullet passes close by without hitting (scored once per bullet)
+			if (!bullet.grazed) {
+				var grazeDistance:Float = collisionDistance + GRAZE_RADIUS;
+				if (distanceSquared < grazeDistance * grazeDistance) {
+					bullet.grazed = true;
+					if (onGraze != null) onGraze();
+				}
 			}
 		}
 	}
@@ -129,6 +150,17 @@ class CollisionManager extends Sprite {
 
 	public function reset():Void {
 		playerBullets = new Array<BulletPlayer>();
+		enemyBullets = new Array<BulletEnemy>();
+	}
+
+	/** Despawn every live enemy bullet (bomb effect). Uses destroy() so bound
+	 *  bullets and sub-scripts tear down properly. */
+	public function clearEnemyBullets():Void {
+		for (bullet in enemyBullets) {
+			if (bullet.parent != null) {
+				bullet.destroy();
+			}
+		}
 		enemyBullets = new Array<BulletEnemy>();
 	}
 

@@ -6,6 +6,14 @@ I probably will not finish this anytime soon. If anyone wants to help, feel free
 # How to run
 Compile into html5 using `openfl build html5 -release -clean` or `openfl test html5`.
 
+For the native Windows build, use `openfl build windows -release` — the exe lands in `Export/windows/bin/BulletHell.exe` (run it from that folder; it needs `lime.ndll` and `assets/` next to it). It runs fullscreen at 60 fps with vsync. Note: `<window fps="60" />` in project.xml matters — native targets default to 30 fps and look laggy without it. Text uses the bundled Noto Sans font in `Assets/fonts/`, since system fonts like Verdana don't exist on native targets.
+
+## Controls
+- ARROW KEYS — move
+- Z — shoot
+- X — bomb (clears all enemy bullets, brief invincibility, 3 per life)
+- SPACE — start / restart
+
 # Architecture (UPDATED!)
 The codebase has been completely refactored to be data-driven and scalable!
 
@@ -14,8 +22,14 @@ The codebase has been completely refactored to be data-driven and scalable!
 - implement variables in bullet stuff maybe?
 - bullet velocity mutation
 - bind (bullet velocity follow/mutation)
-- point system
-- level switching so when you clear a level it goes to the next one after a delay
+- ~~point system~~ ✅ DONE! (kills = 100 × enemy max health, grazes = 10)
+- ~~level switching so when you clear a level it goes to the next one after a delay~~ ✅ DONE! (StageManager runs level1 → level2 → level3)
+
+## Game systems (Tier 1)
+- **Lives**: 3 per run. Death respawns you with ~3s of invincibility (blinking) and clears the bullet field; game over at 0.
+- **Bombs**: 3 per life, X key. Clears every enemy bullet, screen flash, ~2s invincibility.
+- **Scoring**: enemy kill = 100 × max health, graze = 10 (each enemy bullet can graze once). HUD top-right shows score/lives/bombs; FPS counter top-left.
+- **Stages**: StageManager sequences level1 → level2 → level3 with "Stage N" intros and "Stage Clear" transitions; beating stage 3 shows final score.
 
 man this shit is hard idk how ZUN does this lmao alone
 

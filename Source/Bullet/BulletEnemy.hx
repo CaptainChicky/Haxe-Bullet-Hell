@@ -48,6 +48,14 @@ class BulletEnemy extends Sprite {
 	/** Which bullet sprite variant this bullet (and its children) use. */
 	public var bulletSprite:String = null;
 
+	/** Collision radius, cached at construction. Reading width/height on a
+	 *  display object recomputes transformed bounds every call — far too
+	 *  expensive per bullet per frame on native. */
+	public var collisionRadius(default, null):Float = 0;
+
+	/** Set once this bullet has been graze-scored (one graze per bullet). */
+	public var grazed:Bool = false;
+
 	// --- Binding (see ShotPrototype.bindMode) --------------------------------
 	private var bindMode:Int = ShotPrototype.BIND_NONE;
 	private var bindAnchor:IShotEmitter = null; // parent position/liveness source
@@ -90,6 +98,7 @@ class BulletEnemy extends Sprite {
 		bitmap.x = -bitmap.width / 2;
 		bitmap.y = -bitmap.height / 2;
 		addChild(bitmap);
+		collisionRadius = Math.max(bmd.width, bmd.height) / 2;
 
 		spawnTime = Lib.getTimer();
 

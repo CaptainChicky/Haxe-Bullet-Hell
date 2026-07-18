@@ -10,8 +10,14 @@ import openfl.Assets;
 class BulletPlayer extends Sprite {
 	public static inline final ROTATION_SPEED:Float = 90.0; // Rotation speed in degrees per second
 
+	/** Cached texture shared by all player bullets. */
+	private static var cachedBitmapData:BitmapData = null;
+
 	public var velocityX:Float;
 	public var velocityY:Float;
+
+	/** Collision radius, cached at construction (see BulletEnemy.collisionRadius). */
+	public var collisionRadius(default, null):Float = 0;
 
 	private var spawnTime:Int = Lib.getTimer(); // To store the time of bullet spawn
 
@@ -22,7 +28,9 @@ class BulletPlayer extends Sprite {
 		super();
 
 		// Load the image from the assets folder
-		var bitmapData:BitmapData = Assets.getBitmapData("assets/BulletPlayer.png");
+		if (cachedBitmapData == null)
+			cachedBitmapData = Assets.getBitmapData("assets/BulletPlayer.png");
+		var bitmapData:BitmapData = cachedBitmapData;
 
 		// Create a Bitmap using the loaded image
 		var bitmap:Bitmap = new Bitmap(bitmapData);
@@ -33,6 +41,7 @@ class BulletPlayer extends Sprite {
 
 		// Add the Bitmap to the sprite
 		addChild(bitmap);
+		collisionRadius = Math.max(bitmapData.width, bitmapData.height) / 2;
 
 		// Register the "everyFrame" function to be called on every frame update
 		addEventListener(Event.ENTER_FRAME, everyFrame);

@@ -21,6 +21,9 @@ class Enemy extends Sprite implements IMovable {
 	private var maxHealth:Int;
 	private var currentHealth:Int;
 
+	/** Collision radius, cached at construction (see BulletEnemy.collisionRadius). */
+	public var collisionRadius(default, null):Float = 0;
+
 	// Reference to shooting pattern
 	private var shootingPattern:EnemyShootingPattern;
 
@@ -48,6 +51,7 @@ class Enemy extends Sprite implements IMovable {
 
 		// Add the Bitmap to the sprite
 		addChild(bitmap);
+		collisionRadius = Math.max(bitmapData.width, bitmapData.height) / 2;
 
 		// Subscribe to the ENTER_FRAME event to call the everyFrame function on every frame update
 		addEventListener(Event.ENTER_FRAME, everyFrame);
@@ -80,7 +84,6 @@ class Enemy extends Sprite implements IMovable {
 
 	public function takeDamage(damage:Int):Void {
 		currentHealth -= damage;
-		trace("Enemy hit! Health: " + currentHealth + "/" + maxHealth);
 
 		if (currentHealth <= 0) {
 			die();
@@ -89,6 +92,10 @@ class Enemy extends Sprite implements IMovable {
 
 	public function getHealth():Int {
 		return currentHealth;
+	}
+
+	public function getMaxHealth():Int {
+		return maxHealth;
 	}
 
 	public function isAlive():Bool {

@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	<meta title="BulletHell" package="me.theaviary.BulletHell" version="1.0.0" company="CCP" />
-	
+
 	<!-- Added app configuration -->
 	<app main="Main" path="Export" file="BulletHell"></app>
 
 	<source path="Source" />
-	
+
 	<haxelib name="openfl" />
-	
+
 	<assets path="Assets" rename="assets" />
-	
-	<window if="windows" width="1920" height="1080" fullscreen="true" />
-	<window hardware="true" />
-	<!-- may or may not be needed see if lag changes after compilation -->
-	 <window vsync="false" antialiasing="0" />
+
+	<!-- Native targets default to 30 fps unless set explicitly; the game logic
+	     is frame-based and tuned for 60. -->
+	<window fps="60" hardware="true" antialiasing="0" />
+
+	<!-- Windows: fullscreen-only for now (no fixed resolution: borderless
+	     desktop fullscreen). vsync keeps frame pacing clean at 60Hz. -->
+	<window if="windows" fullscreen="true" vsync="true" />
+
+	<!-- Strip trace() calls from release builds; per-hit traces are a real
+	     per-frame cost on native. -->
+	<haxeflag name="--no-traces" unless="debug" />
 </project>
