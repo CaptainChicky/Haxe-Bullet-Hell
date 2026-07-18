@@ -18,7 +18,13 @@ class Player extends Sprite {
 	private var moveLeft:Bool = false;
 	private var moveRight:Bool = false;
 
-	private var moveSpeed:Int = 5;
+	private static inline final NORMAL_SPEED:Int = 5;
+	private static inline final FOCUSED_SPEED:Int = 2;
+
+	private var moveSpeed:Int = NORMAL_SPEED;
+
+	// Focus mode (hold Shift): slower, precise movement + tighter shot
+	private var focused:Bool = false;
 
 	// Boundary constraints
 	private var stageWidth:Int;
@@ -82,6 +88,16 @@ class Player extends Sprite {
 
 	public function setOnDeathCallback(callback:Void->Void):Void {
 		this.onDeathCallback = callback;
+	}
+
+	/** Hold Shift: focused = slow precise movement (+ tighter shot pattern). */
+	public function setFocused(value:Bool):Void {
+		focused = value;
+		moveSpeed = focused ? FOCUSED_SPEED : NORMAL_SPEED;
+	}
+
+	public function isFocused():Bool {
+		return focused;
 	}
 
 	public function toggleGodMode():Void {

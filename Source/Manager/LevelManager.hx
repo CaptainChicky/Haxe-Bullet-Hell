@@ -29,13 +29,31 @@ class LevelManager extends Sprite {
 	}
 
 	public function loadLevel(levelPath:String):Void {
+		if (prepare(levelPath) != null) {
+			startPrepared();
+		}
+	}
+
+	/** Parse and store level data WITHOUT starting the waves. Lets the stage
+	 *  flow read metadata (e.g. dialogue) and play intro conversations before
+	 *  any enemy spawns. Returns null on load failure. */
+	public function prepare(levelPath:String):LevelData {
 		try {
 			var levelJson:String = Assets.getText(levelPath);
 			currentLevel = Json.parse(levelJson);
 			trace("Loaded level: " + currentLevel.name);
-			startLevel();
+			return currentLevel;
 		} catch (e:Dynamic) {
 			trace("Error loading level: " + e);
+			currentLevel = null;
+			return null;
+		}
+	}
+
+	/** Start the waves of a previously prepare()d level. */
+	public function startPrepared():Void {
+		if (currentLevel != null) {
+			startLevel();
 		}
 	}
 

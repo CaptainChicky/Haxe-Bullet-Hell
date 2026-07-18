@@ -1,5 +1,19 @@
 {
   "name": "Level 1 - Introduction",
+  "dialogue": {
+    "intro": [
+      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
+       "text": "The border's gone quiet... too quiet. Something is stirring past the treeline."},
+      {"speaker": "???", "portrait": "assets/Enemy.png", "side": "right",
+       "text": "Turn back, little bird. The sky belongs to the Swarm tonight."},
+      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
+       "text": "Funny, I was about to say the same thing to you."}
+    ],
+    "outro": [
+      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
+       "text": "Scouts, nothing more. Whoever sent them is still out there."}
+    ]
+  },
   "waves": [
     {
       "startTime": 0,

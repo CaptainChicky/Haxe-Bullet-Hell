@@ -6,7 +6,6 @@ import enemy.MovementScript;
 import shot.GhostOrigin;
 import shot.ShotCommand.IShotCommand;
 import shot.ScriptRunner;
-import openfl.events.Event;
 
 /**
  * Shooting pattern driven by a compiled shot script.
@@ -16,6 +15,7 @@ class ScriptedShootingPattern extends EnemyShootingPattern {
 	private var runner:ScriptRunner;
 	private var emitter:EnemyBulletEmitter;
 	private var ghostMovement:MovementScript = null;
+	private var ghostActive:Bool = false;
 
 	public function new(enemy:Enemy, commands:Array<IShotCommand>, collisionManager:CollisionManager, ?bulletSprite:String) {
 		super(enemy);
@@ -23,9 +23,10 @@ class ScriptedShootingPattern extends EnemyShootingPattern {
 		this.runner = new ScriptRunner(emitter, commands);
 	}
 
-	// Override to use script update for pattern execution
-	override private function everyFrame(event:Event):Void {
-		if (runner != null) {
+	// Runs the shot script while shooting, and keeps a ghost origin ticking
+	// after the owner's death (both driven by EnemyManager's single loop).
+	override public function update():Void {
+		if (isShooting && runner != null) {
 			runner.update();
 
 			// Firedancer-style self-movement: a pattern that sets the script
@@ -37,6 +38,10 @@ class ScriptedShootingPattern extends EnemyShootingPattern {
 				var rad = proto.direction * Math.PI / 180;
 				getEnemy().setVelocity(Math.cos(rad) * proto.speed, Math.sin(rad) * proto.speed);
 			}
+		}
+
+		if (ghostActive) {
+			updateGhost();
 		}
 	}
 
@@ -67,14 +72,14 @@ class ScriptedShootingPattern extends EnemyShootingPattern {
 			ghostMovement.disableLoop();
 			ghostMovement.retarget(ghost);
 		}
-		addEventListener(Event.ENTER_FRAME, ghostFrame);
+		ghostActive = true;
 	}
 
-	private function ghostFrame(event:Event):Void {
+	private function updateGhost():Void {
 		var ghost = emitter.getGhost();
 		if (ghost == null) {
 			// Refcount reached zero (or force-vanish emptied it): torn down.
-			removeEventListener(Event.ENTER_FRAME, ghostFrame);
+			ghostActive = false;
 			ghostMovement = null;
 			return;
 		}

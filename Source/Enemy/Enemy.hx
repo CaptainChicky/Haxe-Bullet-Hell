@@ -1,7 +1,6 @@
 package enemy;
 
 import openfl.Lib;
-import openfl.events.Event;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
@@ -52,9 +51,6 @@ class Enemy extends Sprite implements IMovable {
 		// Add the Bitmap to the sprite
 		addChild(bitmap);
 		collisionRadius = Math.max(bitmapData.width, bitmapData.height) / 2;
-
-		// Subscribe to the ENTER_FRAME event to call the everyFrame function on every frame update
-		addEventListener(Event.ENTER_FRAME, everyFrame);
 	}
 
 	public function setShootingPattern(pattern:EnemyShootingPattern):Void {
@@ -114,7 +110,6 @@ class Enemy extends Sprite implements IMovable {
 			shootingPattern.stopShooting();
 		}
 
-		removeEventListener(Event.ENTER_FRAME, everyFrame);
 		if (parent != null) {
 			parent.removeChild(this);
 		}
@@ -127,7 +122,11 @@ class Enemy extends Sprite implements IMovable {
 		}
 	}
 
-	private function everyFrame(event:Event):Void {
+	/** Advance one frame. Driven centrally by EnemyManager (same reasoning as
+	 *  bullets: self-removing ENTER_FRAME listeners skip neighbors mid-dispatch). */
+	public function update():Void {
+		if (!isAlive()) return;
+
 		// Update movement script if it exists
 		if (movementScript != null) {
 			movementScript.update();

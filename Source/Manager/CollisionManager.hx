@@ -30,6 +30,28 @@ class CollisionManager extends Sprite {
 		this.enemyBullets = new Array<BulletEnemy>();
 
 		addEventListener(Event.ENTER_FRAME, update);
+
+		// Bullets are updated centrally from ONE stable listener instead of one
+		// ENTER_FRAME listener per bullet. OpenFL iterates the live broadcast
+		// array while dispatching, so a bullet removing its own listener
+		// mid-dispatch made the next listener skip a frame — visible as a
+		// permanently lagging bullet inside an otherwise uniform ring.
+		// EXIT_FRAME runs after every ENTER_FRAME handler: enemies have moved
+		// and patterns have fired before bullets integrate, preserving the old
+		// frame order (including a same-frame first update for new bullets).
+		addEventListener(Event.EXIT_FRAME, updateBullets);
+	}
+
+	private function updateBullets(event:Event):Void {
+		// Plain index loops on purpose: a bullet's sub-script can spawn new
+		// bullets during update, which append to these arrays and receive
+		// their first update in this same pass (matching legacy timing).
+		for (bullet in playerBullets) {
+			bullet.update();
+		}
+		for (bullet in enemyBullets) {
+			bullet.update();
+		}
 	}
 
 	public function registerPlayerBullet(bullet:BulletPlayer):Void {
@@ -42,6 +64,10 @@ class CollisionManager extends Sprite {
 
 	public function getPlayer():Player {
 		return player;
+	}
+
+	public function getEnemyManager():EnemyManager {
+		return enemyManager;
 	}
 
 	private function update(event:Event):Void {

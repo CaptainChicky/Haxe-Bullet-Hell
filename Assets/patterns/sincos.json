@@ -10,6 +10,7 @@
   },
   "script": [
     {"control": "Set", "prop": "speed", "value": 0},
+    {"control": "Set", "prop": "maxOrphanFrames", "value": 600},
     {"control": "Set", "prop": "x", "value": "$radiusX"},
     {
       "control": "Sub",

@@ -5,6 +5,19 @@ package manager;
 typedef LevelData = {
 	var name:String;
 	var waves:Array<WaveData>;
+	@:optional var dialogue:DialogueData; // Conversations played around the stage
+}
+
+typedef DialogueData = {
+	@:optional var intro:Array<DialogueEntryData>; // Before the first wave spawns
+	@:optional var outro:Array<DialogueEntryData>; // After the stage is cleared
+}
+
+typedef DialogueEntryData = {
+	var speaker:String; // Display name shown above the text box
+	var text:String; // Body text (typewritten)
+	@:optional var portrait:String; // Asset path, e.g. "assets/Player.png"
+	@:optional var side:String; // "left" (default) or "right" portrait placement
 }
 
 typedef WaveData = {

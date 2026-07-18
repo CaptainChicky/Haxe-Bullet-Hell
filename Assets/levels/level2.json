@@ -1,5 +1,19 @@
 {
   "name": "Level 2 – Rolling Advance (Mixed Behaviors)",
+  "dialogue": {
+    "intro": [
+      {"speaker": "Swarm Vanguard", "portrait": "assets/Enemy(second).png", "side": "right",
+       "text": "You clipped our scouts. Impressive. Now meet the formations they were scouting FOR."},
+      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
+       "text": "Formations just means more of you fall in order."}
+    ],
+    "outro": [
+      {"speaker": "Swarm Vanguard", "portrait": "assets/Enemy(second).png", "side": "right",
+       "text": "Enough. The Firedancer will finish this personally."},
+      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
+       "text": "Firedancer? ...Fine. I'll bring the wind."}
+    ]
+  },
   "waves": [
     {
       "startTime": 0,

@@ -6,7 +6,6 @@ import shot.ShotPrototype;
 import shot.ScriptRunner;
 import shot.ShotEmitter.IShotEmitter;
 import openfl.Lib;
-import openfl.events.Event;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
@@ -101,8 +100,6 @@ class BulletEnemy extends Sprite {
 		collisionRadius = Math.max(bmd.width, bmd.height) / 2;
 
 		spawnTime = Lib.getTimer();
-
-		addEventListener(Event.ENTER_FRAME, everyFrame);
 	}
 
 	/** Attach a script this bullet runs on its own (called by the emitter). */
@@ -140,10 +137,12 @@ class BulletEnemy extends Sprite {
 		velocityY = Math.sin(rad) * speed;
 	}
 
-	private function everyFrame(event:Event):Void {
+	/** Advance one frame. Driven centrally by CollisionManager (bullets must
+	 *  never own ENTER_FRAME listeners: self-removal during the broadcast
+	 *  dispatch skips the next listener's update — the "lagging bullet" bug). */
+	public function update():Void {
 		// Check if bullet was removed (e.g., by collision)
 		if (parent == null) {
-			removeEventListener(Event.ENTER_FRAME, everyFrame);
 			releaseBind();
 			return;
 		}
@@ -157,7 +156,6 @@ class BulletEnemy extends Sprite {
 
 			// The script may have despawned this bullet (Vanish command).
 			if (parent == null) {
-				removeEventListener(Event.ENTER_FRAME, everyFrame);
 				releaseBind();
 				return;
 			}
@@ -290,7 +288,6 @@ class BulletEnemy extends Sprite {
 	}
 
 	private function despawn():Void {
-		removeEventListener(Event.ENTER_FRAME, everyFrame);
 		releaseBind();
 		if (script != null) {
 			script.stop();

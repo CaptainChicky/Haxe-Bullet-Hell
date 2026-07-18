@@ -20,6 +20,23 @@ class EnemyManager extends Sprite {
 		movementScripts = new Array<MovementScript>();
 	}
 
+	/**
+	 * Advance all enemies, then all patterns, by one frame. Called from
+	 * Main.everyFrame — enemies and patterns own no ENTER_FRAME listeners
+	 * (self-removal during OpenFL's broadcast dispatch skips the next
+	 * listener's update for a frame; see CollisionManager for the full story).
+	 * All enemies move before any pattern fires, so a pattern always fires
+	 * from its enemy's post-move position — same as the old listener order.
+	 */
+	public function update():Void {
+		for (enemy in enemies) {
+			enemy.update();
+		}
+		for (pattern in enemyPatterns) {
+			pattern.update();
+		}
+	}
+
 	public function spawnEnemy(x:Float, y:Float, patternType:String, patternConfig:Dynamic, health:Int = 1, velocityX:Float = 0, velocityY:Float = 0, movementScriptData:Dynamic = null, ?spriteName:String):Enemy {
 		var enemy:Enemy = new Enemy(health, spriteName);
 		enemy.x = x;

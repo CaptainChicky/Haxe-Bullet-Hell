@@ -1,5 +1,21 @@
 {
   "name": "Level 3 \u2013 The Firedancer's Gauntlet",
+  "dialogue": {
+    "intro": [
+      {"speaker": "Firedancer", "portrait": "assets/Enemy.png", "side": "right",
+       "text": "So you're the storm that scattered my swarm. Every dance ends, Aviator."},
+      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
+       "text": "Then let's make the last one worth watching."},
+      {"speaker": "Firedancer", "portrait": "assets/Enemy.png", "side": "right",
+       "text": "Burn brightly, little bird. The gauntlet is open!"}
+    ],
+    "outro": [
+      {"speaker": "Firedancer", "portrait": "assets/Enemy.png", "side": "right",
+       "text": "Beautiful... like falling embers. The sky is yours, for now."},
+      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
+       "text": "For now is enough. Time to fly home."}
+    ]
+  },
   "waves": [
     {
       "startTime": 0,

@@ -1148,7 +1148,12 @@ class TestShot {
 			var b = materialize(gEm, gEm.spawns[0]);
 			for (f in 0...10) b.everyFrame();
 			gEm.alive = false;
-			var ghost = gEm.beginGhost(gEm.originX, gEm.originY, -6, 0); // carrier was drifting left
+			// Mirror ScriptedShootingPattern.onOwnerDied: the pattern's
+			// maxOrphanFrames var (sincos sets 600 for the long drift-out)
+			// overrides the 1s default cap.
+			var maxFrames = Std.int(runner.getPrototype().getProp("maxOrphanFrames"));
+			if (maxFrames <= 0) maxFrames = GhostOrigin.DEFAULT_MAX_ORPHAN_FRAMES;
+			var ghost = gEm.beginGhost(gEm.originX, gEm.originY, -6, 0, maxFrames); // carrier was drifting left
 			for (f in 0...100) {
 				ghost.tick();
 				b.everyFrame();

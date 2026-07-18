@@ -1,7 +1,8 @@
 package bullet;
 
+import enemy.Enemy;
+import manager.EnemyManager;
 import openfl.Lib;
-import openfl.events.Event;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
@@ -18,6 +19,12 @@ class BulletPlayer extends Sprite {
 
 	/** Collision radius, cached at construction (see BulletEnemy.collisionRadius). */
 	public var collisionRadius(default, null):Float = 0;
+
+	// Homing (0 = straight flight). Set via enableHoming().
+	private var homingTurnRate:Float = 0; // max steer, degrees per frame
+	private var homingDirection:Float = 0; // current heading, degrees
+	private var homingSpeed:Float = 0; // px per frame
+	private var enemySource:EnemyManager = null;
 
 	private var spawnTime:Int = Lib.getTimer(); // To store the time of bullet spawn
 
@@ -42,16 +49,57 @@ class BulletPlayer extends Sprite {
 		// Add the Bitmap to the sprite
 		addChild(bitmap);
 		collisionRadius = Math.max(bitmapData.width, bitmapData.height) / 2;
-
-		// Register the "everyFrame" function to be called on every frame update
-		addEventListener(Event.ENTER_FRAME, everyFrame);
 	}
 
-	private function everyFrame(event:Event):Void {
+	/** Make this bullet steer toward the nearest living enemy each frame.
+	 *  Heading/speed are derived from the current velocity. */
+	public function enableHoming(turnRate:Float, enemySource:EnemyManager):Void {
+		this.homingTurnRate = turnRate;
+		this.enemySource = enemySource;
+		homingSpeed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+		homingDirection = Math.atan2(velocityY, velocityX) * 180 / Math.PI;
+	}
+
+	private function steerTowardNearestEnemy():Void {
+		var nearest:Enemy = null;
+		var nearestDistSq:Float = 1e18;
+		for (enemy in enemySource.getEnemies()) {
+			if (!enemy.isAlive()) continue;
+			var dx = enemy.x - x;
+			var dy = enemy.y - y;
+			var distSq = dx * dx + dy * dy;
+			if (distSq < nearestDistSq) {
+				nearestDistSq = distSq;
+				nearest = enemy;
+			}
+		}
+		if (nearest == null) return; // nothing to chase: hold heading
+
+		var desired = Math.atan2(nearest.y - y, nearest.x - x) * 180 / Math.PI;
+		var delta = desired - homingDirection;
+		// Wrap to [-180, 180] so we always turn the short way around
+		while (delta > 180) delta -= 360;
+		while (delta < -180) delta += 360;
+		if (delta > homingTurnRate) delta = homingTurnRate;
+		if (delta < -homingTurnRate) delta = -homingTurnRate;
+		homingDirection += delta;
+
+		var rad = homingDirection * Math.PI / 180;
+		velocityX = Math.cos(rad) * homingSpeed;
+		velocityY = Math.sin(rad) * homingSpeed;
+	}
+
+	/** Advance one frame. Driven centrally by CollisionManager (bullets must
+	 *  never own ENTER_FRAME listeners: self-removal during the broadcast
+	 *  dispatch skips the next listener's update — the "lagging bullet" bug). */
+	public function update():Void {
 		// Check if bullet was removed (e.g., by collision)
 		if (parent == null) {
-			removeEventListener(Event.ENTER_FRAME, everyFrame);
 			return;
+		}
+
+		if (homingTurnRate != 0 && enemySource != null) {
+			steerTowardNearestEnemy();
 		}
 
 		// Update the bullet's position based on its velocity
@@ -65,7 +113,6 @@ class BulletPlayer extends Sprite {
 		// Check if the bullet is out of the stage boundaries
 		if (x < -100 || x > stageWidth + 100 || y < -100 || y > stageHeight + 100) {
 			// Remove the bullet from the stage
-			removeEventListener(Event.ENTER_FRAME, everyFrame);
 			if (parent != null) {
 				parent.removeChild(this);
 			}

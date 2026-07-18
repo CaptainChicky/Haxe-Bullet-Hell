@@ -3,8 +3,10 @@ package;
 import manager.*;
 import enemy.*;
 import player.PlayerShootingPattern;
+import player.PlayerShootingPattern.PlayerShotType;
 import player.Player;
 import ui.HUD;
+import ui.DialogueManager;
 import openfl.ui.Keyboard;
 import openfl.events.KeyboardEvent;
 import openfl.text.Font;
@@ -54,6 +56,7 @@ class Main extends Sprite {
 	private var bombs:Int = START_BOMBS;
 	private var hud:HUD;
 	private var bombFlash:Sprite;
+	private var dialogueManager:DialogueManager;
 
 	// Ordered list of stages making up one full run
 	private static final STAGES:Array<String> = [
@@ -64,6 +67,9 @@ class Main extends Sprite {
 
 	// God mode key sequence tracking
 	private var keySequence:String = "";
+
+	// Selected player shot type (1/2/3 on the title screen)
+	private var shotType:PlayerShotType = Spread;
 
 	// Embedded UI font (bundled TTF: system fonts like Verdana don't exist on
 	// native targets, so every TextField must use this).
@@ -114,6 +120,12 @@ class Main extends Sprite {
 		stageManager.onStageMessage = showMessage;
 		stageManager.onMessageClear = hideMessage;
 		stageManager.onAllStagesCleared = onAllStagesCleared;
+		stageManager.onPlayDialogue = function(entries, onDone) {
+			// Ceasefire while people talk: no stray bullets, no held-down shot.
+			collisionManager.clearEnemyBullets();
+			playerShootingPattern.stopShooting();
+			dialogueManager.start(entries, onDone);
+		};
 
 		// Set player death callback
 		player.setOnDeathCallback(onPlayerDeath);
@@ -141,7 +153,7 @@ class Main extends Sprite {
 		messageField.selectable = false;
 		messageField.multiline = true;
 		messageField.wordWrap = true;
-		messageField.text = "Press SPACE to start\nUse ARROW KEYS to move, Z to shoot, X to bomb";
+		messageField.text = titleText();
 
 		// HUD (score / lives / bombs, top-right)
 		hud = new HUD(stageWidth, uiFont.fontName);
@@ -149,6 +161,10 @@ class Main extends Sprite {
 		hud.setLives(lives);
 		hud.setBombs(bombs);
 		addChild(hud);
+
+		// Dialogue overlay (hidden until a stage plays a conversation)
+		dialogueManager = new DialogueManager(stageWidth, stageHeight, uiFont.fontName);
+		addChild(dialogueManager);
 
 		// Bomb screen flash overlay (invisible until a bomb goes off)
 		bombFlash = new Sprite();
@@ -172,6 +188,8 @@ class Main extends Sprite {
 		stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 
 		playerShootingPattern = new PlayerShootingPattern(player, collisionManager);
+		playerShootingPattern.setShotType(shotType);
+		hud.setShotType(shotTypeName(shotType));
 
 		this.addEventListener(Event.ENTER_FRAME, everyFrame);
 	}
@@ -200,9 +218,38 @@ class Main extends Sprite {
 			// Clear everything when restarting
 			collisionManager.clearAllBullets();
 			enemyManager.clearAllEnemies();
+			dialogueManager.cancel();
 
 			// Start the run from stage 1
 			stageManager.startRun();
+		}
+	}
+
+	private function shotTypeName(type:PlayerShotType):String {
+		return switch (type) {
+			case Spread: "Spread";
+			case Pierce: "Pierce";
+			case Homing: "Homing";
+		}
+	}
+
+	private function titleText():String {
+		return "Press SPACE to start"
+			+ "\nARROW KEYS move · Z shoot · X bomb · SHIFT focus"
+			+ "\nShot type [1/2/3]: " + shotTypeName(shotType);
+	}
+
+	/** Select a shot type (title / game-over screen only). */
+	private function selectShotType(type:PlayerShotType):Void {
+		shotType = type;
+		if (playerShootingPattern != null) {
+			playerShootingPattern.setShotType(type);
+		}
+		hud.setShotType(shotTypeName(type));
+		// Refresh the hint line if the title message is on screen
+		if (currentGameState == Paused && StringTools.startsWith(messageField.text, "Press SPACE")) {
+			messageField.text = titleText();
+			messageField.setTextFormat(messageFormat);
 		}
 	}
 
@@ -263,6 +310,24 @@ class Main extends Sprite {
 			}
 		}
 
+		// A running conversation consumes the action keys (Z / X / SPACE advance)
+		if (currentGameState == Playing && dialogueManager.isActive()) {
+			if (event.keyCode == Keyboard.SPACE || event.keyCode == 90 || event.keyCode == 88) {
+				dialogueManager.advance();
+				return;
+			}
+		}
+
+		// Shot type select on the title / game-over screen
+		if (currentGameState == Paused) {
+			switch (event.keyCode) {
+				case 49: selectShotType(Spread); // "1"
+				case 50: selectShotType(Pierce); // "2"
+				case 51: selectShotType(Homing); // "3"
+				default:
+			}
+		}
+
 		if (currentGameState == Paused && event.keyCode == Keyboard.SPACE) {
 			setGameState(Playing);
 		} else if (event.keyCode == Keyboard.UP) {
@@ -279,6 +344,8 @@ class Main extends Sprite {
 			}
 		} else if (event.keyCode == 88) { // "x" key
 			useBomb();
+		} else if (event.keyCode == Keyboard.SHIFT) {
+			player.setFocused(true);
 		}
 	}
 
@@ -293,6 +360,8 @@ class Main extends Sprite {
 			player.setMoveRight(false);
 		} else if (event.keyCode == 90) { // "z" key
 			playerShootingPattern.stopShooting();
+		} else if (event.keyCode == Keyboard.SHIFT) {
+			player.setFocused(false);
 		}
 	}
 
@@ -315,6 +384,7 @@ class Main extends Sprite {
 		trace("GAME OVER!");
 		currentGameState = Paused;
 		stageManager.stop();
+		dialogueManager.cancel();
 		showMessage("GAME OVER\nFinal Score: " + score + "\n\nPress SPACE to restart");
 
 		// Stop all enemy shooting but keep them visible
@@ -335,11 +405,19 @@ class Main extends Sprite {
 	private function everyFrame(event:Event):Void {
 		if (currentGameState == Playing) {
 			// Player handles its own movement and boundaries
-			player.updateMovement();
+			// (frozen while a conversation is on screen)
+			if (!dialogueManager.isActive()) {
+				player.updateMovement();
+			}
 
 			// Stage progression (pauses automatically outside Playing)
 			stageManager.update();
 		}
+
+		// Enemies + patterns advance even outside Playing (bullets stay in
+		// flight on the game-over screen), exactly as their per-object
+		// ENTER_FRAME listeners did before updates were centralized.
+		enemyManager.update();
 
 		// Fade out the bomb flash
 		if (bombFlash != null && bombFlash.alpha > 0) {

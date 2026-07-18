@@ -2,15 +2,14 @@ package enemy;
 
 import bullet.BulletEnemy;
 import manager.CollisionManager;
-import openfl.events.Event;
-import openfl.display.Sprite;
 
 /**
  * Abstract base class for enemy shooting patterns.
- * Provides core functionality for managing collision detection and event listeners.
- * Subclasses (like ScriptedShootingPattern) override everyFrame() to implement pattern logic.
+ * Updated centrally by EnemyManager once per frame (patterns own no
+ * ENTER_FRAME listeners; see the lagging-bullet note in CollisionManager).
+ * Subclasses (like ScriptedShootingPattern) override update() to implement pattern logic.
  */
-abstract class EnemyShootingPattern extends Sprite {
+abstract class EnemyShootingPattern {
 	private var enemy:Enemy;
 	private var isShooting:Bool = false;
 
@@ -33,23 +32,22 @@ abstract class EnemyShootingPattern extends Sprite {
 	}
 
 	public function new(enemy:Enemy) {
-		super();
 		this.enemy = enemy;
 	}
 
-	// Subclasses override this to implement their update logic
-	private function everyFrame(event:Event):Void {
+	// Subclasses override this to implement their per-frame logic.
+	// Called every frame by EnemyManager regardless of shooting state
+	// (subclasses gate on isShooting and may keep ticking a ghost origin).
+	public function update():Void {
 		// Override in subclass
 	}
 
 	public function startShooting():Void {
 		isShooting = true;
-		addEventListener(Event.ENTER_FRAME, everyFrame);
 	}
 
 	public function stopShooting():Void {
 		isShooting = false;
-		removeEventListener(Event.ENTER_FRAME, everyFrame);
 	}
 
 	/** Called by Enemy.die() after the enemy is fully dead. Subclasses may

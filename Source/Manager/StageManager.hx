@@ -1,20 +1,24 @@
 package manager;
 
+import manager.LevelData.DialogueEntryData;
+
 enum StageState {
 	Idle; // not running (title / game over / all clear)
 	Intro; // stage started, intro message still on screen
+	IntroDialogue; // pre-stage conversation playing (waves not started yet)
 	Running; // stage in progress
+	OutroDialogue; // post-stage conversation playing (field is empty)
 	ClearDelay; // stage beaten, showing "Stage Clear" before the next one
 }
 
 /**
  * Sequences an ordered list of level files into a full run.
  *
- * Drives LevelManager: starts each stage, watches for completion (level done
- * spawning AND no enemies left), shows transition messages via callbacks, and
- * advances to the next stage. Main calls update() once per frame while the
- * game is in the Playing state, so progression pauses automatically on game
- * over / pause.
+ * Drives LevelManager: prepares each stage, plays intro dialogue, starts the
+ * waves, watches for completion (level done spawning AND no enemies left),
+ * plays outro dialogue, shows transition messages via callbacks, and advances
+ * to the next stage. Main calls update() once per frame while the game is in
+ * the Playing state, so progression pauses automatically on game over / pause.
  */
 class StageManager {
 	private static inline final INTRO_FRAMES:Int = 90;
@@ -27,6 +31,7 @@ class StageManager {
 
 	private var state:StageState = Idle;
 	private var delayCounter:Int = 0;
+	private var currentLevel:LevelData = null;
 
 	/** Show a centered overlay message. */
 	public var onStageMessage:String->Void = null;
@@ -36,6 +41,10 @@ class StageManager {
 
 	/** The last stage was beaten. */
 	public var onAllStagesCleared:Void->Void = null;
+
+	/** Play a conversation; invoke the callback when it finishes.
+	 *  Wired by Main to the DialogueManager overlay. */
+	public var onPlayDialogue:(entries:Array<DialogueEntryData>, onDone:Void->Void) -> Void = null;
 
 	public function new(levelManager:LevelManager, enemyManager:EnemyManager, stages:Array<String>) {
 		this.levelManager = levelManager;
@@ -59,9 +68,32 @@ class StageManager {
 
 	private function startStage():Void {
 		if (onStageMessage != null) onStageMessage("Stage " + (index + 1));
-		levelManager.loadLevel(stages[index]);
+		currentLevel = levelManager.prepare(stages[index]);
 		state = Intro;
 		delayCounter = INTRO_FRAMES;
+	}
+
+	/** Dialogue entries for the current stage, or null. */
+	private function dialogueFor(intro:Bool):Array<DialogueEntryData> {
+		if (currentLevel == null || currentLevel.dialogue == null) return null;
+		var entries = intro ? currentLevel.dialogue.intro : currentLevel.dialogue.outro;
+		return (entries != null && entries.length > 0) ? entries : null;
+	}
+
+	private function beginWaves():Void {
+		state = Running;
+		levelManager.startPrepared();
+	}
+
+	private function stageCleared():Void {
+		if (index < stages.length - 1) {
+			state = ClearDelay;
+			delayCounter = CLEAR_DELAY_FRAMES;
+			if (onStageMessage != null) onStageMessage("Stage " + (index + 1) + " Clear!");
+		} else {
+			state = Idle;
+			if (onAllStagesCleared != null) onAllStagesCleared();
+		}
 	}
 
 	public function update():Void {
@@ -72,22 +104,33 @@ class StageManager {
 				delayCounter--;
 				if (delayCounter <= 0) {
 					if (onMessageClear != null) onMessageClear();
-					state = Running;
+					var intro = dialogueFor(true);
+					if (intro != null && onPlayDialogue != null) {
+						state = IntroDialogue;
+						onPlayDialogue(intro, beginWaves);
+					} else {
+						beginWaves();
+					}
 				}
+
+			case IntroDialogue:
+				// Waiting for the dialogue completion callback (beginWaves).
 
 			case Running:
 				// Stage is beaten when the level has nothing left to spawn and
 				// every enemy is gone (killed or flew off-screen).
 				if (!levelManager.isActive() && enemyManager.getEnemyCount() == 0) {
-					if (index < stages.length - 1) {
-						state = ClearDelay;
-						delayCounter = CLEAR_DELAY_FRAMES;
-						if (onStageMessage != null) onStageMessage("Stage " + (index + 1) + " Clear!");
+					var outro = dialogueFor(false);
+					if (outro != null && onPlayDialogue != null) {
+						state = OutroDialogue;
+						onPlayDialogue(outro, stageCleared);
 					} else {
-						state = Idle;
-						if (onAllStagesCleared != null) onAllStagesCleared();
+						stageCleared();
 					}
 				}
+
+			case OutroDialogue:
+				// Waiting for the dialogue completion callback (stageCleared).
 
 			case ClearDelay:
 				delayCounter--;
