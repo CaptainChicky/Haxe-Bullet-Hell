@@ -20,6 +20,8 @@
 
 **Tier 3 — Polish (variable effort)**
 
+**Determine compatability** - determine if you want to keep old compatability patterns. if you decide to get rid of them, rewrite the previous levels using outdated notation into the new notation.
+
 **Items/power system** — Enemies drop items on death (power, points, bombs, lives). Items float down, auto-collect above a Y threshold (Touhou's "collection line"). Power level affects player shot strength. Medium.
 
 **Stage backgrounds** — Scrolling background layers. OpenFL's Tilesheet or just scrolling Bitmaps. Small-medium for basic parallax scrolling.
