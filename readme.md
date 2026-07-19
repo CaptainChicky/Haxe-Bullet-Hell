@@ -6,7 +6,7 @@ I probably will not finish this anytime soon. If anyone wants to help, feel free
 # How to run
 Compile into html5 using `openfl build html5 -release -clean` or `openfl test html5`.
 
-For the native Windows build, use `openfl build windows -release` — the exe lands in `Export/windows/bin/BulletHell.exe` (run it from that folder; it needs `lime.ndll` and `assets/` next to it). It runs as a borderless window at desktop resolution (looks like fullscreen, but plays nice with alt-tab and screenshot tools like Win+Shift+S) at 60 fps with vsync. Note: `<window fps="60" />` in project.xml matters — native targets default to 30 fps and look laggy without it. Text uses the bundled Noto Sans font in `Assets/fonts/`, since system fonts like Verdana don't exist on native targets.
+For the native Windows build, use `openfl build windows -release` — the exe lands in `Export/windows/bin/BulletHell.exe` (run it from that folder; it needs `lime.ndll` and `assets/` next to it). It runs fullscreen at 60 fps with vsync (exclusive fullscreen for now, so it minimizes on focus loss — the game auto-pauses when that happens). Note: `<window fps="60" />` in project.xml matters — native targets default to 30 fps and look laggy without it. Text uses the bundled Noto Sans font in `Assets/fonts/`, since system fonts like Verdana don't exist on native targets.
 
 ## Controls
 - ARROW KEYS — move

@@ -15,12 +15,13 @@
 	     is frame-based and tuned for 60. -->
 	<window fps="60" hardware="true" antialiasing="0" />
 
-	<!-- Windows: borderless window at desktop resolution (width/height 0 =
-	     match the screen) instead of exclusive fullscreen. Looks identical,
-	     but survives focus loss — Win+Shift+S / alt-tab no longer minimize
-	     the game, and screen capture overlays can draw on top of it.
-	     vsync keeps frame pacing clean at 60Hz. -->
-	<window if="windows" width="0" height="0" borderless="true" resizable="false" vsync="true" />
+	<!-- Windows: fullscreen-only for now (no fixed resolution: borderless
+	     desktop fullscreen). vsync keeps frame pacing clean at 60Hz.
+	     Known tradeoff: exclusive fullscreen minimizes on focus loss, so
+	     Win+Shift+S capture doesn't work. A borderless-window attempt
+	     (2026-07-18) failed: width/height 0 creates a 0-sized window, and a
+	     runtime resize to desktop bounds didn't take either. Revisit later. -->
+	<window if="windows" fullscreen="true" vsync="true" />
 
 	<!-- Strip trace() calls from release builds; per-hit traces are a real
 	     per-frame cost on native. -->
