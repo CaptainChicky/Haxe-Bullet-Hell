@@ -7,6 +7,7 @@ import player.PlayerShootingPattern.PlayerShotType;
 import player.Player;
 import ui.HUD;
 import ui.DialogueManager;
+import ui.BossHealthBar;
 import openfl.ui.Keyboard;
 import openfl.events.KeyboardEvent;
 import openfl.text.Font;
@@ -30,10 +31,28 @@ class Main extends Sprite {
 	private var stageWidth:Int;
 	private var stageHeight:Int;
 
+	// Center message panel (title screen, stage announcements, game over)
+	private static inline final MESSAGE_PANEL_W:Int = 560;
+	private static inline final MESSAGE_PANEL_H:Int = 190;
+
 	private var player:Player;
 	private var currentGameState:GameState;
+
+	// In-run pause (ESC). Deliberately NOT a GameState: Paused there means the
+	// title / game-over screen, where bullets keep flying. Every per-frame
+	// listener in the game (CollisionManager, LevelManager, Player,
+	// DialogueManager, PlayerShootingPattern) checks this flag, so the whole
+	// simulation freezes in place. Static so those handlers can read it
+	// without plumbing. Pause menu options can hang off this later.
+	public static var gamePaused:Bool = false;
+
+	// Message that was on screen when pause hit (e.g. a "Stage N" banner),
+	// restored on resume. null = panel was hidden.
+	private var pausedPrevMessage:String = null;
+	private var messagePanel:Sprite;
 	private var messageField:TextField;
 	private var messageFormat:TextFormat;
+	private var headlineFormat:TextFormat;
 
 	private var playerShootingPattern:PlayerShootingPattern;
 
@@ -55,6 +74,7 @@ class Main extends Sprite {
 	private var lives:Int = START_LIVES;
 	private var bombs:Int = START_BOMBS;
 	private var hud:HUD;
+	private var bossBar:BossHealthBar;
 	private var bombFlash:Sprite;
 	private var dialogueManager:DialogueManager;
 
@@ -62,7 +82,8 @@ class Main extends Sprite {
 	private static final STAGES:Array<String> = [
 		"assets/levels/level1.json",
 		"assets/levels/level2.json",
-		"assets/levels/level3.json"
+		"assets/levels/level3.json",
+		"assets/levels/level4.json"
 	];
 
 	// God mode key sequence tracking
@@ -140,20 +161,36 @@ class Main extends Sprite {
 
 		uiFont = Assets.getFont("assets/fonts/NotoSans-Regular.ttf");
 
-		messageFormat = new TextFormat(uiFont.fontName, 18, 0xbbbbbb, true);
+		messageFormat = new TextFormat(uiFont.fontName, 18, 0xd8d8e0, true);
 		messageFormat.align = TextFormatAlign.CENTER;
+		headlineFormat = new TextFormat(uiFont.fontName, 26, 0xffd766, true);
+		headlineFormat.align = TextFormatAlign.CENTER;
+
+		// Backing panel so messages read over the white field and any bullets
+		// (same visual language as the HUD and dialogue box)
+		messagePanel = new Sprite();
+		messagePanel.graphics.beginFill(0x0d0d16, 0.85);
+		messagePanel.graphics.drawRoundRect(0, 0, MESSAGE_PANEL_W, MESSAGE_PANEL_H, 18, 18);
+		messagePanel.graphics.endFill();
+		messagePanel.graphics.lineStyle(1, 0x8899cc, 0.5);
+		messagePanel.graphics.drawRoundRect(0, 0, MESSAGE_PANEL_W, MESSAGE_PANEL_H, 18, 18);
+		messagePanel.x = (stageWidth - MESSAGE_PANEL_W) / 2;
+		messagePanel.y = (stageHeight - MESSAGE_PANEL_H) / 2;
+		messagePanel.mouseEnabled = false;
+		addChild(messagePanel);
+
 		messageField = new TextField();
-		addChild(messageField);
+		messagePanel.addChild(messageField);
 		messageField.embedFonts = true;
-		messageField.width = 500;
-		messageField.height = 160;
-		messageField.y = stageHeight / 2 - messageField.height / 2;
-		messageField.x = stageWidth / 2 - messageField.width / 2;
+		messageField.width = MESSAGE_PANEL_W - 40;
+		messageField.height = MESSAGE_PANEL_H - 40;
+		messageField.x = 20;
+		messageField.y = 20;
 		messageField.defaultTextFormat = messageFormat;
 		messageField.selectable = false;
 		messageField.multiline = true;
 		messageField.wordWrap = true;
-		messageField.text = titleText();
+		showMessage(titleText());
 
 		// HUD (score / lives / bombs, top-right)
 		hud = new HUD(stageWidth, uiFont.fontName);
@@ -161,6 +198,10 @@ class Main extends Sprite {
 		hud.setLives(lives);
 		hud.setBombs(bombs);
 		addChild(hud);
+
+		// Boss status strip (hidden until a boss fight starts)
+		bossBar = new BossHealthBar(stageWidth, uiFont.fontName);
+		addChild(bossBar);
 
 		// Dialogue overlay (hidden until a stage plays a conversation)
 		dialogueManager = new DialogueManager(stageWidth, stageHeight, uiFont.fontName);
@@ -187,6 +228,14 @@ class Main extends Sprite {
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 
+		// Losing window focus (alt-tab, Win+Shift+S snip overlay) auto-pauses
+		// mid-run so the player doesn't die off-screen.
+		stage.addEventListener(Event.DEACTIVATE, function(_) {
+			if (currentGameState == Playing && !gamePaused) {
+				togglePause();
+			}
+		});
+
 		playerShootingPattern = new PlayerShootingPattern(player, collisionManager);
 		playerShootingPattern.setShotType(shotType);
 		hud.setShotType(shotTypeName(shotType));
@@ -196,11 +245,13 @@ class Main extends Sprite {
 
 	private function setGameState(state:GameState):Void {
 		currentGameState = state;
+		gamePaused = false;
+		pausedPrevMessage = null;
 
 		if (state == Paused) {
-			messageField.alpha = 1;
+			messagePanel.alpha = 1;
 		} else {
-			messageField.alpha = 0;
+			messagePanel.alpha = 0;
 
 			// Respawn player if they were dead
 			if (!player.isAlive()) {
@@ -225,6 +276,29 @@ class Main extends Sprite {
 		}
 	}
 
+	/** ESC during a run: freeze the whole simulation and show the pause
+	 *  panel. ESC again resumes, restoring whatever message (stage banner,
+	 *  ...) was on screen when pause hit. */
+	private function togglePause():Void {
+		if (currentGameState != Playing) {
+			return;
+		}
+
+		if (!gamePaused) {
+			gamePaused = true;
+			pausedPrevMessage = (messagePanel.alpha > 0) ? messageField.text : null;
+			showMessage("PAUSED\nESC to resume");
+		} else {
+			gamePaused = false;
+			if (pausedPrevMessage != null) {
+				showMessage(pausedPrevMessage);
+				pausedPrevMessage = null;
+			} else {
+				messagePanel.alpha = 0;
+			}
+		}
+	}
+
 	private function shotTypeName(type:PlayerShotType):String {
 		return switch (type) {
 			case Spread: "Spread";
@@ -235,7 +309,7 @@ class Main extends Sprite {
 
 	private function titleText():String {
 		return "Press SPACE to start"
-			+ "\nARROW KEYS move · Z shoot · X bomb · SHIFT focus"
+			+ "\nARROW KEYS move · Z shoot · X bomb · SHIFT focus · ESC pause"
 			+ "\nShot type [1/2/3]: " + shotTypeName(shotType);
 	}
 
@@ -248,20 +322,28 @@ class Main extends Sprite {
 		hud.setShotType(shotTypeName(type));
 		// Refresh the hint line if the title message is on screen
 		if (currentGameState == Paused && StringTools.startsWith(messageField.text, "Press SPACE")) {
-			messageField.text = titleText();
-			messageField.setTextFormat(messageFormat);
+			showMessage(titleText());
 		}
 	}
 
 	private function showMessage(text:String):Void {
 		messageField.text = text;
 		messageField.setTextFormat(messageFormat);
-		messageField.alpha = 1;
+
+		// First line is the headline: bigger and gold
+		var newline = text.indexOf("\n");
+		messageField.setTextFormat(headlineFormat, 0, newline > 0 ? newline : text.length);
+
+		// Vertically center the block inside the panel
+		var offset = (MESSAGE_PANEL_H - messageField.textHeight) / 2 - 4;
+		messageField.y = offset > 12 ? offset : 12;
+
+		messagePanel.alpha = 1;
 	}
 
 	private function hideMessage():Void {
 		if (currentGameState == Playing) {
-			messageField.alpha = 0;
+			messagePanel.alpha = 0;
 		}
 	}
 
@@ -293,6 +375,17 @@ class Main extends Sprite {
 	}
 
 	private function keyDown(event:KeyboardEvent):Void {
+		if (event.keyCode == Keyboard.ESCAPE) {
+			togglePause();
+			return;
+		}
+
+		// While paused only ESC does anything; keyUp still runs, so held
+		// movement/focus keys release cleanly even if let go mid-pause.
+		if (gamePaused) {
+			return;
+		}
+
 		// Track number keys for god mode sequence
 		if (event.keyCode >= 48 && event.keyCode <= 57) { // Number keys 0-9
 			var digit:String = String.fromCharCode(event.keyCode);
@@ -403,6 +496,10 @@ class Main extends Sprite {
 	}
 
 	private function everyFrame(event:Event):Void {
+		if (gamePaused) {
+			return;
+		}
+
 		if (currentGameState == Playing) {
 			// Player handles its own movement and boundaries
 			// (frozen while a conversation is on screen)
@@ -418,6 +515,9 @@ class Main extends Sprite {
 		// flight on the game-over screen), exactly as their per-object
 		// ENTER_FRAME listeners did before updates were centralized.
 		enemyManager.update();
+
+		// Boss bar follows whichever boss (if any) is alive
+		bossBar.track(enemyManager.getActiveBoss());
 
 		// Fade out the bomb flash
 		if (bombFlash != null && bombFlash.alpha > 0) {

@@ -119,6 +119,8 @@ class LevelManager extends Sprite {
 	}
 
 	private function update(event:Event):Void {
+		if (Main.gamePaused) return;
+
 		if (!isLevelActive && pendingSpawns.length == 0) {
 			return;
 		}
@@ -146,6 +148,13 @@ class LevelManager extends Sprite {
 	}
 
 	private function spawnEnemy(spawnData:EnemySpawnData):Void {
+		if (spawnData.boss != null) {
+			trace("Spawning boss at (" + spawnData.x + ", " + spawnData.y + ") with "
+				+ spawnData.boss.phases.length + " phase(s)");
+			enemyManager.spawnBoss(spawnData);
+			return;
+		}
+
 		var health:Int = (spawnData.health != null) ? spawnData.health : 1;
 		var vx:Float = (spawnData.velocityX != null) ? spawnData.velocityX : 0;
 		var vy:Float = (spawnData.velocityY != null) ? spawnData.velocityY : 0;

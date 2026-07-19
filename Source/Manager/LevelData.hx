@@ -35,7 +35,22 @@ typedef EnemySpawnData = {
 	@:optional var velocityX:Float; // X velocity (pixels per frame, defaults to 0)
 	@:optional var velocityY:Float; // Y velocity (pixels per frame, defaults to 0)
 	@:optional var movementScript:MovementScriptData; // Scripted movement pattern
-	@:optional var sprite:String; // "enemy2" uses Enemy(second).png; null/absent = default Enemy.png
+	@:optional var sprite:String; // Skin name from assets/sprites.json ("enemy2", ...) or a direct .png path; null/absent = default art
+	@:optional var boss:BossData; // Present = spawn a multi-phase boss instead of a regular enemy
+}
+
+typedef BossData = {
+	@:optional var name:String; // Shown on the boss health bar
+	var phases:Array<BossPhaseData>; // Fought in order; clearing the last one kills the boss
+}
+
+typedef BossPhaseData = {
+	@:optional var name:String; // Spell card name shown on the boss bar
+	var health:Int; // Damage needed to clear this phase
+	@:optional var pattern:String; // Pattern template name (Assets/patterns/<name>.json)
+	@:optional var patternConfig:Dynamic; // Parameters for the pattern / inline script
+	@:optional var script:Array<Dynamic>; // Inline shot script actions (instead of pattern)
+	@:optional var movementScript:MovementScriptData; // Replaces the boss's movement for this phase
 }
 
 typedef MovementScriptData = {

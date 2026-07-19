@@ -4,7 +4,7 @@ import openfl.Lib;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
-import openfl.Assets;
+import manager.SpriteLibrary;
 import enemy.MovementScript;
 import shot.GhostOrigin.IMovable;
 
@@ -37,9 +37,10 @@ class Enemy extends Sprite implements IMovable {
 		this.maxHealth = health;
 		this.currentHealth = health;
 
-		// Load the image from the assets folder
-		var assetPath:String = (spriteName == "enemy2") ? "assets/Enemy(second).png" : "assets/Enemy.png";
-		var bitmapData:BitmapData = Assets.getBitmapData(assetPath);
+		// Skin lookup: spriteName selects from the sprite manifest
+		// (assets/sprites.json), or is a direct .png path drop-in.
+		var resolved = SpriteLibrary.enemySprite(spriteName);
+		var bitmapData:BitmapData = resolved.bitmapData;
 
 		// Create a Bitmap using the loaded image
 		var bitmap:Bitmap = new Bitmap(bitmapData);
@@ -51,6 +52,18 @@ class Enemy extends Sprite implements IMovable {
 		// Add the Bitmap to the sprite
 		addChild(bitmap);
 		collisionRadius = Math.max(bitmapData.width, bitmapData.height) / 2;
+		if (resolved.scale != 1) {
+			setVisualScale(resolved.scale);
+		}
+	}
+
+	/** Uniformly scale the sprite AND its cached collision radius (skin scale,
+	 *  boss enlargement). Multiplies, so both can stack. Lives here because
+	 *  collisionRadius is only writable from this class. */
+	private function setVisualScale(factor:Float):Void {
+		scaleX *= factor;
+		scaleY *= factor;
+		collisionRadius *= factor;
 	}
 
 	public function setShootingPattern(pattern:EnemyShootingPattern):Void {

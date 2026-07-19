@@ -4,17 +4,19 @@
 
 **Tier 2 — Content and feel (each is 1-2 sessions)**
 
-**debug** - Some patterns have lagging bullets. For instance, the radial shot pattern sometimes has a lagging bullet in the ring. There either is a race condition or something similar tha tmight be causing this issue. 
+**debug** [DONE] - Some patterns have lagging bullets. Root cause found: not a race condition but OpenFL's broadcast-event dispatch — a bullet removing its own ENTER_FRAME listener mid-dispatch made the *next* listener skip a frame. Fixed by removing all per-bullet/per-enemy listeners and updating everything centrally (bullets from CollisionManager on EXIT_FRAME, enemies + patterns from EnemyManager), preserving the legacy frame order.
 
-**Dialogue system** — JSON-driven: array of `{speaker, portrait, text}` entries. A `DialogueManager` overlays character portrait + text box, advances on input, pauses gameplay. Integrate with stage progression: stage manager triggers dialogue before/after levels. Medium — the UI layout and text rendering is the bulk.
+**Dialogue system** [DONE] — JSON-driven `dialogue: {intro: [...], outro: [...]}` block per level, entries `{speaker, text, portrait, side}`. `DialogueManager` overlay (portrait + typewriter text box, Z/X/SPACE advances), integrated with StageManager: intro plays before waves spawn, outro after the field is cleared.
 
-**Multiple player shot types** — Currently `PlayerShootingPattern` is one pattern. Add 2-3 types (e.g. wide spread, focused narrow, homing), selectable at game start or via item pickup. Each type is a different firing pattern in the same framework. You'd also want focused/unfocused modes (hold Shift = focused = slower movement + tighter shot). Medium.
+**Multiple player shot types** [DONE] — Spread / Pierce / Homing, selectable with 1/2/3 on the title screen. Hold SHIFT for focus mode: slower movement + tighter volleys (homing turns harder when focused).
 
-**Boss fights** — An enemy with multiple phases: health thresholds trigger pattern changes and dialogue. The pattern system already supports this (switch to a new script at each threshold). You'd need: boss health bar UI, phase transition logic in Enemy or a BossEnemy subclass, non-spell/spell card naming display. Medium-large.
+**Boss fights** [DONE] — `BossEnemy` + `boss: {name, phases: [...]}` spawn block: each phase has health, a pattern (template or inline script), optional movement, and a spell card name. Phase clears wipe the field, swap patterns, grant brief invulnerability. Boss health bar UI with spell card display and remaining-phase dots. Stage 4 (level4, authored in the DSL) is the boss stage.
 
-**Before imeplemeting this, please take note of the "Things ot keep in mind" section** - don't try to bruteforce write thousands of lines of json from now on. a smarter method is needed.
+**Multiple enemy sprites/types** [DONE] — Data-driven `SpriteLibrary`: `sprite` on a spawn names a skin in `assets/sprites.json` (enemy art + bullet art, optional spritesheet `rect` cell and `scale` — collision radius follows). A `.png` path works as a direct drop-in with no manifest entry. `default`/`enemy2` are built in, so old content is untouched.
 
-**Multiple enemy sprites/types** — You just added the sprite system. Expanding to more types means more art assets and maybe size/collision-radius differences. The code side is small — the art side depends on you. For now there are two variants of enemy sprites and only one player sprite, but perhaps it would be good to have a framework where a dropin or a spritesheet can be used. 
+**sin/cos** [DONE] - offset-bound bullets orbit a ghost anchor after the owner dies so they don't freeze mid-screen; the orphan cap then force-vanishes them 60 frames (1s) after death. sincos.json previously overrode `maxOrphanFrames` to 600, which made level3's orbit chains linger for 10s after the kill — the override is removed, the 60-frame default applies, and the headless tests assert the vanish at exactly the cap. Patterns that genuinely want a long scripted drift-out can still set the `maxOrphanFrames` var.
+
+**DSL + validator** [DONE, see "Things to keep in mind"] — `tools/` holds a zero-dependency Node toolchain: `tools/bh` (S = shot-script builders mirroring CommandRegistry, M = movement helpers `enterFrom`/`easeTo`/`weave`/..., plus `level`/`wave`/`spawn`/`boss`/`phase`/`pattern`), `tools/compile.js` (compiles `tools/src/**` to the existing JSON formats), and a static validator (unknown controls/fields, expression + `$param` checking, infinite no-Wait loops, unreachable code after blocking Concurrents, dialogue/sprite/boss shapes). `node tools/compile.js --check` also validates all hand-written JSON in Assets/. See `tools/README.md`.
 
 ---
 

@@ -9,9 +9,18 @@ import openfl.display.Sprite;
 import openfl.events.Event;
 
 class EnemyManager extends Sprite {
+	/** Field-clear pause between boss phases before the next pattern opens. */
+	private static inline final BOSS_TRANSITION_FRAMES:Int = 60;
+
 	private var enemies:Array<Enemy>;
 	private var enemyPatterns:Array<EnemyShootingPattern>;
 	private var movementScripts:Array<MovementScript>;
+
+	// Boss fight state (one boss at a time)
+	private var activeBoss:BossEnemy = null;
+	private var bossPattern:EnemyShootingPattern = null;
+	private var bossSpriteName:String = null;
+	private var bossTransitionFrames:Int = 0;
 
 	public function new() {
 		super();
@@ -34,6 +43,15 @@ class EnemyManager extends Sprite {
 		}
 		for (pattern in enemyPatterns) {
 			pattern.update();
+		}
+
+		// Boss phase transition: short breather after the field clear, then
+		// the next phase's pattern opens fire.
+		if (bossTransitionFrames > 0) {
+			bossTransitionFrames--;
+			if (bossTransitionFrames == 0 && activeBoss != null && activeBoss.isAlive()) {
+				startBossPhase(activeBoss, activeBoss.getPhaseIndex());
+			}
 		}
 	}
 
@@ -59,15 +77,106 @@ class EnemyManager extends Sprite {
 
 		// Create and attach movement script if provided
 		if (movementScriptData != null) {
-			var movementScript:MovementScript = createMovementScript(enemy, movementScriptData);
-			if (movementScript != null) {
-				movementScripts.push(movementScript);
-				enemy.setMovementScript(movementScript);
-				movementScript.start();
-			}
+			attachMovement(enemy, movementScriptData);
 		}
 
 		return enemy;
+	}
+
+	/** Attach (or replace) an enemy's movement script. */
+	private function attachMovement(enemy:Enemy, scriptData:Dynamic):Void {
+		var old = enemy.getMovementScript();
+		if (old != null) {
+			old.stop();
+			movementScripts.remove(old);
+		}
+		var script:MovementScript = createMovementScript(enemy, scriptData);
+		if (script != null) {
+			movementScripts.push(script);
+			enemy.setMovementScript(script);
+			script.start();
+		}
+	}
+
+	/**
+	 * Spawn a multi-phase boss from a full EnemySpawnData carrying a `boss`
+	 * block. The top-level movementScript is the entrance; each phase may
+	 * replace it. Phase clears are driven by BossEnemy.onPhaseDepleted.
+	 */
+	public function spawnBoss(spawnData:Dynamic):BossEnemy {
+		var boss = new BossEnemy(spawnData.boss, spawnData.sprite);
+		boss.x = spawnData.x;
+		boss.y = spawnData.y;
+		boss.setVelocity(
+			spawnData.velocityX != null ? spawnData.velocityX : 0,
+			spawnData.velocityY != null ? spawnData.velocityY : 0
+		);
+		addChild(boss);
+		enemies.push(boss);
+
+		activeBoss = boss;
+		bossSpriteName = spawnData.sprite;
+		bossTransitionFrames = 0;
+
+		if (spawnData.movementScript != null) {
+			attachMovement(boss, spawnData.movementScript);
+		}
+
+		boss.onPhaseDepleted = function() {
+			onBossPhaseDepleted(boss);
+		};
+		startBossPhase(boss, 0);
+		return boss;
+	}
+
+	private function startBossPhase(boss:BossEnemy, index:Int):Void {
+		var phase = boss.getPhase(index);
+
+		var cfg:Dynamic = (phase.patternConfig != null) ? phase.patternConfig : {};
+		if (phase.script != null) {
+			cfg.patternScript = {actions: phase.script};
+		}
+		var patternName:String = (phase.pattern != null) ? phase.pattern : "inline";
+
+		var pattern = createPattern(boss, patternName, cfg, bossSpriteName);
+		if (pattern != null) {
+			enemyPatterns.push(pattern);
+			boss.setShootingPattern(pattern);
+			pattern.startShooting();
+			bossPattern = pattern;
+		}
+
+		if (phase.movementScript != null) {
+			attachMovement(boss, phase.movementScript);
+		}
+	}
+
+	private function onBossPhaseDepleted(boss:BossEnemy):Void {
+		// Silence the guns and wipe the field before anything else happens
+		if (bossPattern != null) {
+			bossPattern.stopShooting();
+			enemyPatterns.remove(bossPattern);
+			bossPattern = null;
+		}
+		var collisionManager = EnemyShootingPattern.getCollisionManager();
+		if (collisionManager != null) {
+			collisionManager.clearEnemyBullets();
+		}
+
+		if (boss.getPhaseIndex() >= boss.getPhaseCount() - 1) {
+			// Last phase cleared: the boss is done
+			activeBoss = null;
+			boss.defeat();
+			return;
+		}
+
+		boss.startNextPhase(); // grants transition invincibility
+		bossTransitionFrames = BOSS_TRANSITION_FRAMES;
+	}
+
+	/** The live boss, or null when no boss fight is running. */
+	public function getActiveBoss():BossEnemy {
+		return (activeBoss != null && activeBoss.isAlive()) ? activeBoss : null;
 	}
 
 	private function createPattern(enemy:Enemy, patternType:String, config:Dynamic, ?spriteName:String):EnemyShootingPattern {
@@ -154,6 +263,12 @@ class EnemyManager extends Sprite {
 			script.stop();
 		}
 		movementScripts = new Array<MovementScript>();
+
+		// Any boss fight in progress is over
+		activeBoss = null;
+		bossPattern = null;
+		bossSpriteName = null;
+		bossTransitionFrames = 0;
 	}
 
 	public function getEnemyCount():Int {

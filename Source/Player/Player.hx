@@ -225,6 +225,8 @@ class Player extends Sprite {
 	}
 
 	private function everyFrame(event:Event):Void {
+		if (Main.gamePaused) return;
+
 		// Update the player's rotation based on the elapsed time since the last frame
 		// will rotate based on spawn time
 		var currentTime:Int = Lib.getTimer();

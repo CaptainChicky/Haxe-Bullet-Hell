@@ -1,0 +1,13 @@
+{
+  "_readme": "Sprite skin manifest (see Source/Manager/SpriteLibrary.hx). A spawn's 'sprite' field names a skin here; each skin maps to enemy art and the bullet art its patterns fire. A part can be a plain asset path string, or an object {source, rect: [x,y,w,h] spritesheet cell, scale}. Skins 'default' and 'enemy2' are built into the engine; entries here override or extend them. A sprite value ending in .png bypasses the manifest entirely (direct drop-in with default bullets).",
+  "skins": {
+    "default": {
+      "enemy": "assets/Enemy.png",
+      "bullet": "assets/BulletEnemy.png"
+    },
+    "enemy2": {
+      "enemy": "assets/Enemy(second).png",
+      "bullet": "assets/BulletEnemy(second).png"
+    }
+  }
+}

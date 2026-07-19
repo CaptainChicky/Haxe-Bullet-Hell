@@ -195,6 +195,31 @@ function spawn(o) {
 	return e;
 }
 
+/**
+ * boss("Name", phase(...), phase(...)) -> value for spawn({boss: ...}).
+ * Phases are fought in order; clearing the last one kills the boss.
+ */
+function boss(name, ...phases) {
+	return { name, phases: flat(phases) };
+}
+
+/**
+ * phase({name, health, pattern, config, script, move})
+ * name    spell card title shown on the boss bar
+ * health  damage needed to clear the phase
+ * pattern + config, or script: [S...] for an inline shot script
+ * move    M.script(...) replacing the boss's movement for this phase
+ */
+function phase(o) {
+	const p = { health: o.health };
+	if (o.name) p.name = o.name;
+	if (o.pattern) p.pattern = o.pattern;
+	if (o.config) p.patternConfig = { ...o.config };
+	if (o.script) p.script = flat([o.script]);
+	if (o.move) p.movementScript = o.move;
+	return p;
+}
+
 /** wave(startTimeSeconds, [spawn, ...]) */
 function wave(startTime, enemies) {
 	return { startTime, enemies: flat([enemies]) };
@@ -231,4 +256,4 @@ function pattern(name, description, parameters, script) {
 	};
 }
 
-module.exports = { S, M, spawn, wave, say, level, pattern, flat };
+module.exports = { S, M, spawn, wave, say, level, pattern, boss, phase, flat };

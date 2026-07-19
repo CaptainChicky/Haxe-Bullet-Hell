@@ -43,6 +43,8 @@ class CollisionManager extends Sprite {
 	}
 
 	private function updateBullets(event:Event):Void {
+		if (Main.gamePaused) return;
+
 		// Plain index loops on purpose: a bullet's sub-script can spawn new
 		// bullets during update, which append to these arrays and receive
 		// their first update in this same pass (matching legacy timing).
@@ -71,6 +73,8 @@ class CollisionManager extends Sprite {
 	}
 
 	private function update(event:Event):Void {
+		if (Main.gamePaused) return;
+
 		// Check player bullets vs enemies
 		checkPlayerBulletsVsEnemies();
 

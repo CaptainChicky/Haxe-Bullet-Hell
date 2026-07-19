@@ -125,6 +125,8 @@ class PlayerShootingPattern extends Sprite {
 	}
 
 	private function everyFrame(event:Event):Void {
+		if (Main.gamePaused) return;
+
 		if (isShooting) {
 			spawnPlayerBullet();
 		}

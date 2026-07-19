@@ -15,9 +15,12 @@
 	     is frame-based and tuned for 60. -->
 	<window fps="60" hardware="true" antialiasing="0" />
 
-	<!-- Windows: fullscreen-only for now (no fixed resolution: borderless
-	     desktop fullscreen). vsync keeps frame pacing clean at 60Hz. -->
-	<window if="windows" fullscreen="true" vsync="true" />
+	<!-- Windows: borderless window at desktop resolution (width/height 0 =
+	     match the screen) instead of exclusive fullscreen. Looks identical,
+	     but survives focus loss — Win+Shift+S / alt-tab no longer minimize
+	     the game, and screen capture overlays can draw on top of it.
+	     vsync keeps frame pacing clean at 60Hz. -->
+	<window if="windows" width="0" height="0" borderless="true" resizable="false" vsync="true" />
 
 	<!-- Strip trace() calls from release builds; per-hit traces are a real
 	     per-frame cost on native. -->

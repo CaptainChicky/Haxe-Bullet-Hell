@@ -218,7 +218,9 @@ function checkScript(ctx, p, actions, paramSet) {
 		// recurse
 		if (a.control === "Loop" || a.control === "Rep" || a.control === "Sub" || a.control === "Scope") {
 			checkScript(ctx, `${ap}.actions`, a.actions, paramSet);
-			if (Array.isArray(a.actions) && a.actions.length === 0) {
+			// Empty Sub is meaningful: it clears an inherited sub-script
+			// (FlowCommands sets subCommands = null for an empty body).
+			if (Array.isArray(a.actions) && a.actions.length === 0 && a.control !== "Sub") {
 				ctx.error(ap, `"${a.control}" has an empty actions array`);
 			}
 		}
@@ -349,9 +351,36 @@ function checkDialogue(ctx, p, dialogue, assetRoot) {
 const SPAWN_FIELDS = ["spawnTime", "x", "y", "pattern", "patternConfig", "health",
 	"velocityX", "velocityY", "movementScript", "sprite", "boss"];
 
-function checkSpawn(ctx, p, e) {
+/** Skin names accepted by SpriteLibrary: built-ins plus the sprite manifest. */
+let skinCache = null;
+function knownSkins(assetRoot) {
+	if (skinCache) return skinCache;
+	skinCache = new Set(["default", "enemy2"]);
+	if (assetRoot) {
+		try {
+			const doc = JSON.parse(fs.readFileSync(path.join(assetRoot, "sprites.json"), "utf8"));
+			for (const name of Object.keys(doc.skins || {})) skinCache.add(name);
+		} catch { /* no manifest is fine — built-ins still work */ }
+	}
+	return skinCache;
+}
+
+function checkSpawn(ctx, p, e, assetRoot) {
 	for (const key of Object.keys(e)) {
 		if (!SPAWN_FIELDS.includes(key)) ctx.warn(p, `spawn does not use field "${key}" (typo?)`);
+	}
+	if (e.sprite !== undefined) {
+		if (typeof e.sprite !== "string") {
+			ctx.error(`${p}.sprite`, "sprite must be a skin name or .png path string");
+		} else if (e.sprite.endsWith(".png")) {
+			// direct drop-in: runtime path "assets/Foo.png" lives at "<repo>/Assets/Foo.png"
+			const rel = e.sprite.replace(/^assets\//, "");
+			if (assetRoot && !fs.existsSync(path.join(assetRoot, rel))) {
+				ctx.warn(`${p}.sprite`, `sprite asset not found: ${e.sprite}`);
+			}
+		} else if (!knownSkins(assetRoot).has(e.sprite)) {
+			ctx.warn(`${p}.sprite`, `unknown sprite skin "${e.sprite}" (not built in, not in sprites.json) — falls back to default art`);
+		}
 	}
 	if (typeof e.spawnTime !== "number") ctx.error(p, "spawn needs numeric spawnTime (seconds)");
 	if (typeof e.x !== "number" || typeof e.y !== "number") ctx.error(p, "spawn needs numeric x and y");
@@ -446,7 +475,7 @@ function validateLevel(doc, file, assetRoot) {
 			ctx.error(wp, "wave needs a non-empty enemies array");
 			return;
 		}
-		w.enemies.forEach((e, j) => checkSpawn(ctx, `${wp}.enemies[${j}]`, e));
+		w.enemies.forEach((e, j) => checkSpawn(ctx, `${wp}.enemies[${j}]`, e, assetRoot));
 	});
 	return ctx.issues;
 }
@@ -459,7 +488,7 @@ function validatePattern(doc, file) {
 		return ctx.issues;
 	}
 	for (const key of Object.keys(doc)) {
-		if (!["name", "description", "parameters", "script"].includes(key)) {
+		if (!["name", "description", "parameters", "script", "note"].includes(key)) {
 			ctx.warn("$", `pattern does not use field "${key}"`);
 		}
 	}

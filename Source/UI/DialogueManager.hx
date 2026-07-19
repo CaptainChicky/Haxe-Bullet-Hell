@@ -199,6 +199,7 @@ class DialogueManager extends Sprite {
 	}
 
 	private function everyFrame(event:Event):Void {
+		if (Main.gamePaused) return;
 		if (entries == null) return;
 
 		// Typewriter reveal

@@ -9,7 +9,7 @@ import openfl.Lib;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
-import openfl.Assets;
+import manager.SpriteLibrary;
 
 /**
  * An enemy bullet, constructed from a cloned ShotPrototype.
@@ -22,10 +22,6 @@ import openfl.Assets;
  */
 class BulletEnemy extends Sprite {
 	public static inline final ROTATION_SPEED:Float = 90.0; // Sprite spin, degrees per second (visual only)
-
-	/** Cached textures - one per bullet variant. */
-	private static var cachedBitmapData:BitmapData = null;
-	private static var cachedBitmapData2:BitmapData = null;
 
 	// Kept public for compatibility with any external velocity reads.
 	public var velocityX:Float = 0;
@@ -83,21 +79,19 @@ class BulletEnemy extends Sprite {
 		bulletSprite = bulletSpriteVariant;
 		updateVelocity();
 
-		var bmd:BitmapData;
-		if (bulletSpriteVariant == "enemy2") {
-			if (cachedBitmapData2 == null)
-				cachedBitmapData2 = Assets.getBitmapData("assets/BulletEnemy(second).png");
-			bmd = cachedBitmapData2;
-		} else {
-			if (cachedBitmapData == null)
-				cachedBitmapData = Assets.getBitmapData("assets/BulletEnemy.png");
-			bmd = cachedBitmapData;
-		}
+		// Skin lookup (SpriteLibrary caches the BitmapData per skin)
+		var resolved = SpriteLibrary.bulletSprite(bulletSpriteVariant);
+		var bmd:BitmapData = resolved.bitmapData;
 		var bitmap:Bitmap = new Bitmap(bmd);
 		bitmap.x = -bitmap.width / 2;
 		bitmap.y = -bitmap.height / 2;
 		addChild(bitmap);
 		collisionRadius = Math.max(bmd.width, bmd.height) / 2;
+		if (resolved.scale != 1) {
+			scaleX = resolved.scale;
+			scaleY = resolved.scale;
+			collisionRadius *= resolved.scale;
+		}
 
 		spawnTime = Lib.getTimer();
 	}

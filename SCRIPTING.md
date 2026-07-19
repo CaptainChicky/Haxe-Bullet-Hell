@@ -141,7 +141,7 @@ Rules and behaviors:
 - **Parent death → orphan-release** (`position`/`full`): the bullet keeps its current position and flight state and continues as a normal independent bullet. Tradeoff: cascade-vanish (children die with the parent) is the tidier mental model and prevents stranded formations, but it lets the player erase whole patterns by sniping one parent bullet; orphan-release was chosen as the default. Cascade could be added later as a third mode without breaking anything.
 - **Parent death → ghost parent** (`offset`): orphan-release would strand an offset-bound bullet forever — its state is speed 0 and all of its motion comes from the sub-script mutating the offset, so "released with current state" means frozen mid-screen with an infinite `Loop` still firing. Instead, when an enemy dies with offset-bound bullets still attached, a lightweight **ghost origin** survives as a pure coordinate source: the bullets stay bound, keep deriving `ghost + offset` every frame, and their patterns run to completion. The enemy is otherwise fully dead the instant it dies — not drawn, not collidable, excluded from targeting and wave-clear/scoring; only the origin outlives it.
   - The ghost **keeps moving**: it inherits the enemy's velocity at death and the enemy's `movementScript` is retargeted to it (with `loop` forced off, so a looping path plays once and leaves). Orbit chains and pods therefore drift off-screen with the ghost and despawn on their own via the normal cull, which uses each bullet's *derived* world position.
-  - Safety cap: each ghost lives at most `maxOrphanFrames` (default 600 = 10s @ 60fps; override by setting a `maxOrphanFrames` script variable on the pattern's root prototype). If the origin never leaves the screen — stationary or looping-in-place — bullets still bound at the cap are force-resolved by Vanish, so no bullet is ever immortal.
+  - Safety cap: each ghost lives at most `maxOrphanFrames` (default 60 = 1s @ 60fps; override by setting a `maxOrphanFrames` script variable on the pattern's root prototype, e.g. for a long scripted drift-out). Once the cap hits, bullets still bound are force-resolved by Vanish — orphaned formations disappear ~1s after their owner dies, and no bullet is ever immortal.
   - Lifecycle: bound bullets refcount their parent anchor; the ghost is dropped the moment the last one despawns (or at the cap).
 - `bindMode` is part of the prototype and travels through `clone()` (so `Concurrent` branches inherit it), **except** into a bullet's sub-script starting prototype, which is reset to `none` — a bound bullet's children don't implicitly bind to it; a chain opts in with another `Bind` inside the sub-script.
 - The runtime link to the parent (`bindSource`) is attached at fire time and is never copied by `clone()`.
@@ -211,3 +211,13 @@ haxe -cp Source -cp Tests -main TestShot --interp
 ```
 
 (Source folders are lowercase to match package names, so this works on case-sensitive filesystems.)
+
+## Level-side formats & the authoring DSL
+
+The shot-script language above is unchanged, but levels grew some blocks (all optional, all parsed in `Source/Manager/LevelData.hx`):
+
+- **`dialogue: {intro: [...], outro: [...]}`** — conversations of `{speaker, text, portrait?, side?}` played before the waves / after the field clears (`Source/UI/DialogueManager.hx`).
+- **`boss: {name?, phases: [...]}`** on a spawn — multi-phase boss. Each phase: `{name?, health, pattern? | script?, patternConfig?, movementScript?}`. Phase clears wipe the bullet field, swap the pattern (and movement), and grant brief invulnerability; the last phase kills the boss (`Source/Enemy/BossEnemy.hx`, orchestration in `EnemyManager`).
+- **`sprite`** on a spawn — a skin name from `assets/sprites.json` (enemy + bullet art, optional spritesheet `rect` cell, `scale`) or a direct `.png` path drop-in (`Source/Manager/SpriteLibrary.hx`).
+
+Instead of hand-writing level JSON, prefer the **authoring DSL**: JavaScript sources in `tools/src/` compiled by `node tools/compile.js` into the exact JSON formats above, with high-level movement helpers (`enterFrom`, `easeTo`, `weave`) and a static validator that also checks all hand-written JSON via `--check`. Full reference: `tools/README.md`.

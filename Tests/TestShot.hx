@@ -1131,7 +1131,8 @@ class TestShot {
 		}
 
 		// sincos e2e: the Cartesian (x/y expression) offset chains follow the
-		// ghost too, and the moving origin carries them past the cull bound.
+		// ghost after the owner dies, then the default orphan cap (60 frames)
+		// force-vanishes them even if the origin never leaves the screen.
 		{
 			var text = sys.io.File.getContent("Assets/patterns/sincos.json");
 			var template:Dynamic = Json.parse(text);
@@ -1148,20 +1149,26 @@ class TestShot {
 			var b = materialize(gEm, gEm.spawns[0]);
 			for (f in 0...10) b.everyFrame();
 			gEm.alive = false;
-			// Mirror ScriptedShootingPattern.onOwnerDied: the pattern's
-			// maxOrphanFrames var (sincos sets 600 for the long drift-out)
-			// overrides the 1s default cap.
+			// Mirror ScriptedShootingPattern.onOwnerDied: no override in the
+			// pattern, so the 1s default cap applies.
 			var maxFrames = Std.int(runner.getPrototype().getProp("maxOrphanFrames"));
 			if (maxFrames <= 0) maxFrames = GhostOrigin.DEFAULT_MAX_ORPHAN_FRAMES;
-			var ghost = gEm.beginGhost(gEm.originX, gEm.originY, -6, 0, maxFrames); // carrier was drifting left
-			for (f in 0...100) {
+			check(maxFrames == GhostOrigin.DEFAULT_MAX_ORPHAN_FRAMES, "sincos ghost: pattern uses the default orphan cap");
+			var ghost = gEm.beginGhost(gEm.originX, gEm.originY, -2, 0, maxFrames); // carrier was drifting left
+			// One frame short of the cap: still alive, still tracing the
+			// ellipse around the drifting ghost.
+			for (f in 0...maxFrames - 1) {
 				ghost.tick();
 				b.everyFrame();
 			}
 			var proto = b.script.getPrototype();
 			check(b.alive && Math.abs(b.x - (ghost.x + proto.x)) < 1e-9 && Math.abs(b.y - (ghost.y + proto.y)) < 1e-9,
 				"sincos ghost: bullet still traces its ellipse around the moving ghost");
-			check(b.x <= -100, "sincos ghost: derived position crossed the off-screen cull bound (despawns on its own)");
+			// Cap frame: the ghost expires and the bullet force-vanishes on
+			// its next update, on-screen or not.
+			ghost.tick();
+			b.everyFrame();
+			check(!b.alive, "sincos ghost: orphan cap vanishes the bullet 60 frames after the owner dies");
 		}
 
 		Sys.println(failures == 0 ? "\nALL TESTS PASSED" : '\n$failures TEST(S) FAILED');

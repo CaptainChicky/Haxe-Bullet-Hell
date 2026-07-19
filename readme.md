@@ -6,13 +6,16 @@ I probably will not finish this anytime soon. If anyone wants to help, feel free
 # How to run
 Compile into html5 using `openfl build html5 -release -clean` or `openfl test html5`.
 
-For the native Windows build, use `openfl build windows -release` — the exe lands in `Export/windows/bin/BulletHell.exe` (run it from that folder; it needs `lime.ndll` and `assets/` next to it). It runs fullscreen at 60 fps with vsync. Note: `<window fps="60" />` in project.xml matters — native targets default to 30 fps and look laggy without it. Text uses the bundled Noto Sans font in `Assets/fonts/`, since system fonts like Verdana don't exist on native targets.
+For the native Windows build, use `openfl build windows -release` — the exe lands in `Export/windows/bin/BulletHell.exe` (run it from that folder; it needs `lime.ndll` and `assets/` next to it). It runs as a borderless window at desktop resolution (looks like fullscreen, but plays nice with alt-tab and screenshot tools like Win+Shift+S) at 60 fps with vsync. Note: `<window fps="60" />` in project.xml matters — native targets default to 30 fps and look laggy without it. Text uses the bundled Noto Sans font in `Assets/fonts/`, since system fonts like Verdana don't exist on native targets.
 
 ## Controls
 - ARROW KEYS — move
-- Z — shoot
+- Z — shoot (also advances dialogue)
 - X — bomb (clears all enemy bullets, brief invincibility, 3 per life)
-- SPACE — start / restart
+- SHIFT (hold) — focus mode: slower movement, tighter shot
+- 1 / 2 / 3 — select shot type on the title screen (Spread / Pierce / Homing)
+- SPACE — start / restart / advance dialogue
+- ESC — pause / resume mid-run (the game also auto-pauses when the window loses focus, e.g. alt-tab or Win+Shift+S)
 
 # Architecture (UPDATED!)
 The codebase has been completely refactored to be data-driven and scalable!
@@ -29,7 +32,14 @@ The codebase has been completely refactored to be data-driven and scalable!
 - **Lives**: 3 per run. Death respawns you with ~3s of invincibility (blinking) and clears the bullet field; game over at 0.
 - **Bombs**: 3 per life, X key. Clears every enemy bullet, screen flash, ~2s invincibility.
 - **Scoring**: enemy kill = 100 × max health, graze = 10 (each enemy bullet can graze once). HUD top-right shows score/lives/bombs; FPS counter top-left.
-- **Stages**: StageManager sequences level1 → level2 → level3 with "Stage N" intros and "Stage Clear" transitions; beating stage 3 shows final score.
+- **Stages**: StageManager sequences level1 → level2 → level3 → level4 with "Stage N" intros and "Stage Clear" transitions; beating the run shows final score.
+
+## Content & feel (Tier 2)
+- **Dialogue**: levels can carry `dialogue: {intro, outro}` conversations (`{speaker, text, portrait, side}` entries). Portrait + typewriter text box overlay; intro plays before the waves, outro after the field is cleared.
+- **Shot types**: Spread / Pierce / Homing (1/2/3 on the title screen) + SHIFT focus mode.
+- **Boss fights**: multi-phase bosses with spell card names, a boss health bar (phase dots + per-phase colors), field wipes and pattern/movement swaps between phases. Stage 4 is the boss stage.
+- **Sprite skins**: `assets/sprites.json` maps skin names to enemy + bullet art (optional spritesheet `rect` and `scale`); a spawn's `sprite` field picks the skin, or a direct `.png` path works as a drop-in.
+- **Level DSL**: levels/patterns can be authored in JavaScript under `tools/src/` and compiled to the existing JSON with `node tools/compile.js`; `--check` statically validates all hand-written JSON too (unknown controls, bad `$params`, infinite no-Wait loops, ...). See `tools/README.md`. Hand-written JSON keeps working unchanged.
 
 man this shit is hard idk how ZUN does this lmao alone
 
