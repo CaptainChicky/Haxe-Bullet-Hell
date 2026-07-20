@@ -19,6 +19,12 @@ class BulletPlayer extends Sprite {
 	/** Damage dealt on hit; scales with the player's power level. */
 	public var damage:Int = 1;
 
+	/** Pierce shot: the bullet passes through enemies, damaging each once. */
+	public var piercing:Bool = false;
+
+	// Enemies this piercing bullet has already damaged (small, linear scan is fine)
+	private var piercedEnemies:Array<Enemy> = null;
+
 	/** Collision radius, cached at construction (see BulletEnemy.collisionRadius). */
 	public var collisionRadius(default, null):Float = 0;
 
@@ -52,6 +58,17 @@ class BulletPlayer extends Sprite {
 		// Add the Bitmap to the sprite
 		addChild(bitmap);
 		collisionRadius = Math.max(bitmapData.width, bitmapData.height) / 2;
+	}
+
+	/** Has this piercing bullet already damaged the given enemy? */
+	public function hasPierced(enemy:Enemy):Bool {
+		return piercedEnemies != null && piercedEnemies.indexOf(enemy) >= 0;
+	}
+
+	/** Record an enemy as damaged so a piercing bullet hits it only once. */
+	public function markPierced(enemy:Enemy):Void {
+		if (piercedEnemies == null) piercedEnemies = [];
+		piercedEnemies.push(enemy);
 	}
 
 	/** Make this bullet steer toward the nearest living enemy each frame.

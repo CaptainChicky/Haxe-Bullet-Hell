@@ -84,8 +84,16 @@ class HUD extends Sprite {
 		bombsField.text = "Bombs  " + repeatMarks(value, 8);
 	}
 
-	public function setPower(value:Int, max:Int):Void {
-		powerField.text = (value >= max) ? "Power  MAX" : "Power  " + value + " / " + max;
+	public function setPower(value:Float, max:Float):Void {
+		powerField.text = (value >= max) ? "Power  MAX" : "Power  " + formatPower(value) + " / " + formatPower(max);
+	}
+
+	/** Power is in 0.25 steps: always show two decimals ("1.25", "4.00"). */
+	private static function formatPower(value:Float):String {
+		var hundredths = Math.round(value * 100);
+		var whole = Std.int(hundredths / 100);
+		var frac = hundredths - whole * 100;
+		return whole + "." + (frac < 10 ? "0" : "") + frac;
 	}
 
 	public function setShotType(name:String):Void {

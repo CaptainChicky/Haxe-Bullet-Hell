@@ -103,6 +103,19 @@ class CollisionManager extends Sprite {
 				var dx:Float = bullet.x - enemy.x;
 				var dy:Float = bullet.y - enemy.y;
 				if (dx * dx + dy * dy < hitDistance * hitDistance) {
+					if (bullet.piercing) {
+						// Piercing bullets fly on through, damaging each enemy
+						// at most once for their whole flight.
+						if (!bullet.hasPierced(enemy)) {
+							bullet.markPierced(enemy);
+							enemy.takeDamage(bullet.damage);
+							if (!enemy.isAlive() && onEnemyKilled != null) {
+								onEnemyKilled(enemy);
+							}
+						}
+						continue; // keep checking further enemies
+					}
+
 					enemy.takeDamage(bullet.damage);
 					if (!enemy.isAlive() && onEnemyKilled != null) {
 						onEnemyKilled(enemy);

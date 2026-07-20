@@ -85,12 +85,17 @@ class Main extends Sprite {
 	private static inline final POINT_ITEM_SCORE:Int = 500;
 	private static inline final MAX_LIVES:Int = 8;
 	private static inline final MAX_BOMBS:Int = 8;
-	private static inline final DEATH_POWER_LOSS:Int = 2;
+
+	// Power economy (Touhou-style): each power item is worth +0.25 toward the
+	// 4.00 cap; dying costs a full 1.00, spilled back as recoverable items.
+	private static inline final POWER_PER_ITEM:Float = 0.25;
+	private static inline final DEATH_POWER_LOSS:Float = 1.0;
+	private static inline final DEATH_POWER_SPILL_ITEMS:Int = 4;
 
 	private var score:Int = 0;
 	private var lives:Int = START_LIVES;
 	private var bombs:Int = START_BOMBS;
-	private var power:Int = 0;
+	private var power:Float = 0;
 	private var hud:HUD;
 	private var bossBar:BossHealthBar;
 	private var bombFlash:Sprite;
@@ -276,6 +281,7 @@ class Main extends Sprite {
 
 		playerShootingPattern = new PlayerShootingPattern(player, collisionManager);
 		playerShootingPattern.setShotType(shotType);
+		applySpeedProfile(shotType);
 		hud.setShotType(shotTypeName(shotType));
 
 		this.addEventListener(Event.ENTER_FRAME, everyFrame);
@@ -349,9 +355,29 @@ class Main extends Sprite {
 	}
 
 	private function pauseText():String {
-		return "PAUSED\nESC to resume"
+		return "PAUSED\nESC to resume · Q quit to main menu"
 			+ "\nM music: " + (AudioManager.musicMuted ? "Off" : "On")
 			+ " · [ ] volume: " + Math.round(AudioManager.musicVolume * 100) + "%";
+	}
+
+	/** Q on the pause panel: abandon the run and return to the title screen. */
+	private function quitToTitle():Void {
+		gamePaused = false;
+		pausedPrevMessage = null;
+		AudioManager.setMusicDucked(false);
+		AudioManager.stopMusic();
+
+		stageManager.stop();
+		levelManager.stopLevel();
+		dialogueManager.cancel();
+		playerShootingPattern.stopShooting();
+
+		collisionManager.clearAllBullets();
+		enemyManager.clearAllEnemies();
+		itemManager.clear();
+
+		currentGameState = Paused;
+		showMessage(titleText());
 	}
 
 	/** Music controls (work on any screen, paused included). Returns true if
@@ -398,12 +424,24 @@ class Main extends Sprite {
 			+ " · [ ] volume: " + Math.round(AudioManager.musicVolume * 100) + "%";
 	}
 
+	/** Movement speeds per shot type (unfocused / focused): homing trades
+	 *  speed for auto-aim, spread is the baseline, pierce is fastest to
+	 *  compensate for having to line its narrow shot up manually. */
+	private function applySpeedProfile(type:PlayerShotType):Void {
+		switch (type) {
+			case Homing: player.setSpeedProfile(4.2, 1.8);
+			case Spread: player.setSpeedProfile(5.2, 2.2);
+			case Pierce: player.setSpeedProfile(6.5, 2.8);
+		}
+	}
+
 	/** Select a shot type (title / game-over screen only). */
 	private function selectShotType(type:PlayerShotType):Void {
 		shotType = type;
 		if (playerShootingPattern != null) {
 			playerShootingPattern.setShotType(type);
 		}
+		applySpeedProfile(type);
 		hud.setShotType(shotTypeName(type));
 		refreshTitleMessage();
 	}
@@ -442,7 +480,7 @@ class Main extends Sprite {
 	}
 
 	/** Clamp + apply a new power level to shot strength and the HUD. */
-	private function setPower(value:Int):Void {
+	private function setPower(value:Float):Void {
 		power = value < 0 ? 0 : (value > PlayerShootingPattern.MAX_POWER ? PlayerShootingPattern.MAX_POWER : value);
 		playerShootingPattern.setPower(power);
 		hud.setPower(power, PlayerShootingPattern.MAX_POWER);
@@ -452,7 +490,7 @@ class Main extends Sprite {
 		AudioManager.sfxItemPickup();
 		switch (type) {
 			case PowerItem:
-				setPower(power + 1);
+				setPower(power + POWER_PER_ITEM);
 			case PointItem:
 				addScore(POINT_ITEM_SCORE);
 			case BombItem:
@@ -504,9 +542,13 @@ class Main extends Sprite {
 			return;
 		}
 
-		// While paused only ESC and music keys do anything; keyUp still runs,
-		// so held movement/focus keys release cleanly even if let go mid-pause.
+		// While paused only ESC, Q (quit to title) and music keys do anything;
+		// keyUp still runs, so held movement/focus keys release cleanly even if
+		// let go mid-pause.
 		if (gamePaused) {
+			if (event.keyCode == 81) { // "q"
+				quitToTitle();
+			}
 			return;
 		}
 
@@ -597,7 +639,7 @@ class Main extends Sprite {
 			// Respawn mid-run: clear the bullet field so the return is fair,
 			// refill bombs (per-life stock), and grant invincibility frames.
 			// Some power spills out as recoverable items where the player died.
-			itemManager.spillPower(player.x, player.y, DEATH_POWER_LOSS);
+			itemManager.spillPower(player.x, player.y, DEATH_POWER_SPILL_ITEMS);
 			setPower(power - DEATH_POWER_LOSS);
 			collisionManager.clearEnemyBullets();
 			bombs = GameSettings.startingBombs();

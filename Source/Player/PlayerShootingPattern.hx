@@ -8,9 +8,9 @@ import openfl.Lib;
 
 /** Selectable player shot types (1/2/3 on the title screen). */
 enum PlayerShotType {
-	Spread; // wide 5-way cover (the original pattern)
-	Pierce; // narrow, fast, concentrated forward damage
-	Homing; // straight core + flankers that chase enemies
+	Spread; // wide multi-stream cover; medium speed, medium damage
+	Pierce; // few piercing streams, highest focused damage; fastest movement
+	Homing; // seeker volleys that never miss; lowest DPS, slowest movement
 }
 
 /** One bullet of a volley. turnRate != 0 makes it homing. */
@@ -22,10 +22,19 @@ private typedef VolleyShot = {
 }
 
 /**
- * Fires the player's volley every frame while Z is held.
- * The volley layout depends on the selected shot type and on focus mode
- * (hold Shift: slower movement, tighter pattern) — same framework, three
- * layouts, each with a focused variant.
+ * Fires the player's volley on a per-type cadence while Z is held.
+ *
+ * Balance model (Touhou-style): collecting power items grows the NUMBER of
+ * bullet streams (and shortens homing's cooldown), not just raw damage.
+ * Power is 0.00..4.00 in 0.25 steps; the integer part is the "tier" (0..4)
+ * that picks the volley layout. Rough single-target DPS targets at 60fps:
+ *
+ *   tier          0     1     2     3     4
+ *   Spread       10    20    30    40    50   (coverage; only some streams hit)
+ *   Pierce       15   22.5   30    45    60   (narrow, but bullets pierce)
+ *   Homing        8    12    16    24    32   (never misses)
+ *
+ * Focus mode (hold Shift) tightens each layout, it does not change DPS.
  */
 class PlayerShootingPattern extends Sprite {
 	private var player:Player; // Reference to the player that uses this shooting pattern
@@ -33,10 +42,14 @@ class PlayerShootingPattern extends Sprite {
 	private var collisionManager:CollisionManager;
 	private var shotType:PlayerShotType = Spread;
 
-	// Power level 0..MAX (from collected items): every 4 power = +1 damage
-	// per bullet, so max power triples the volley's punch.
-	public static inline final MAX_POWER:Int = 8;
-	private var power:Int = 0;
+	// Power level 0.00..MAX (each power item = +0.25). Std.int(power) is the
+	// volley tier.
+	public static inline final MAX_POWER:Float = 4.0;
+
+	private var power:Float = 0;
+
+	// Frames until the next volley may fire
+	private var cooldown:Int = 0;
 
 	public function new(player:Player, collisionManager:CollisionManager) {
 		super();
@@ -49,7 +62,7 @@ class PlayerShootingPattern extends Sprite {
 	}
 
 	/** Set the current power level (clamped to 0..MAX_POWER). */
-	public function setPower(value:Int):Void {
+	public function setPower(value:Float):Void {
 		power = value < 0 ? 0 : (value > MAX_POWER ? MAX_POWER : value);
 	}
 
@@ -57,57 +70,123 @@ class PlayerShootingPattern extends Sprite {
 		return shotType;
 	}
 
-	/** Bullet layout for the current type + focus state. */
+	/** Volley tier 0..4 — the integer part of power picks the layout. */
+	private function tier():Int {
+		var t = Std.int(power);
+		return t > 4 ? 4 : t;
+	}
+
+	/** Frames between volleys for the current type (homing speeds up with power). */
+	private function fireInterval():Int {
+		return switch (shotType) {
+			case Spread: 6;
+			case Pierce: 8;
+			case Homing: [30, 24, 22, 18, 15][tier()];
+		}
+	}
+
+	/** Damage per bullet for the current type and tier. */
+	private function bulletDamage():Int {
+		return switch (shotType) {
+			case Spread: 1;
+			case Pierce: [2, 3, 2, 3, 4][tier()];
+			case Homing: 2;
+		}
+	}
+
+	/** Bullet layout for the current type + tier + focus state. */
 	private function volley(focused:Bool):Array<VolleyShot> {
 		return switch (shotType) {
 			case Spread:
-				focused
-					// Focused: everything flies straight ahead, tightly packed
-					? [
-						{offsetX: -14, velX: 0, velY: -20},
-						{offsetX: -7, velX: 0, velY: -20},
-						{offsetX: 0, velX: 0, velY: -20},
-						{offsetX: 7, velX: 0, velY: -20},
-						{offsetX: 14, velX: 0, velY: -20}
-					]
-					// Unfocused: 3 center (tight, parallel) + 2 angled flankers
-					: [
-						{offsetX: -30, velX: -1, velY: -10},
-						{offsetX: -7, velX: 0, velY: -20},
-						{offsetX: 0, velX: 0, velY: -20},
-						{offsetX: 7, velX: 0, velY: -20},
-						{offsetX: 30, velX: 1, velY: -10}
-					];
+				// Streams grow 1 -> 5 with power. Unfocused: outer streams fan
+				// out for coverage. Focused: same count, all tight and parallel.
+				switch (tier()) {
+					case 0:
+						[{offsetX: 0, velX: 0, velY: -20}];
+					case 1:
+						focused
+							? [{offsetX: -5, velX: 0, velY: -20}, {offsetX: 5, velX: 0, velY: -20}]
+							: [{offsetX: -8, velX: 0, velY: -20}, {offsetX: 8, velX: 0, velY: -20}];
+					case 2:
+						focused
+							? [
+								{offsetX: -8, velX: 0, velY: -20},
+								{offsetX: 0, velX: 0, velY: -20},
+								{offsetX: 8, velX: 0, velY: -20}
+							]
+							: [
+								{offsetX: -12, velX: -0.7, velY: -19},
+								{offsetX: 0, velX: 0, velY: -20},
+								{offsetX: 12, velX: 0.7, velY: -19}
+							];
+					case 3:
+						focused
+							? [
+								{offsetX: -12, velX: 0, velY: -20},
+								{offsetX: -4, velX: 0, velY: -20},
+								{offsetX: 4, velX: 0, velY: -20},
+								{offsetX: 12, velX: 0, velY: -20}
+							]
+							: [
+								{offsetX: -24, velX: -1.6, velY: -14},
+								{offsetX: -8, velX: 0, velY: -20},
+								{offsetX: 8, velX: 0, velY: -20},
+								{offsetX: 24, velX: 1.6, velY: -14}
+							];
+					default:
+						focused
+							? [
+								{offsetX: -14, velX: 0, velY: -20},
+								{offsetX: -7, velX: 0, velY: -20},
+								{offsetX: 0, velX: 0, velY: -20},
+								{offsetX: 7, velX: 0, velY: -20},
+								{offsetX: 14, velX: 0, velY: -20}
+							]
+							: [
+								{offsetX: -30, velX: -2, velY: -12},
+								{offsetX: -14, velX: -0.7, velY: -19},
+								{offsetX: 0, velX: 0, velY: -20},
+								{offsetX: 14, velX: 0.7, velY: -19},
+								{offsetX: 30, velX: 2, velY: -12}
+							];
+				}
 
 			case Pierce:
-				focused
-					? [
-						{offsetX: -4, velX: 0, velY: -30},
-						{offsetX: 0, velX: 0, velY: -30},
-						{offsetX: 4, velX: 0, velY: -30}
-					]
-					: [
-						{offsetX: -9, velX: 0, velY: -26},
-						{offsetX: 0, velX: 0, velY: -26},
-						{offsetX: 9, velX: 0, velY: -26}
+				// One rail-like stream growing to two; bullets fly fast and
+				// pierce through enemies (damage rises with tier instead of
+				// stream count on odd tiers).
+				var spacing = focused ? 4.0 : 9.0;
+				if (tier() < 2) {
+					[{offsetX: 0, velX: 0, velY: -34}];
+				} else {
+					[
+						{offsetX: -spacing, velX: 0, velY: -34},
+						{offsetX: spacing, velX: 0, velY: -34}
 					];
+				}
 
 			case Homing:
-				focused
-					// Focused: tight core, flankers launch forward and steer hard
+				// Pure seeker volleys on a slow cadence: 2 seekers at tier 0
+				// (~2 volleys/sec), growing to 4 while the cooldown shortens.
+				var turn = focused ? 8.0 : 5.0;
+				var shots:Array<VolleyShot> = focused
 					? [
-						{offsetX: -6, velX: 0, velY: -20},
-						{offsetX: 6, velX: 0, velY: -20},
-						{offsetX: -18, velX: 0, velY: -14, turnRate: 8},
-						{offsetX: 18, velX: 0, velY: -14, turnRate: 8}
+						{offsetX: -10, velX: 0, velY: -16, turnRate: turn},
+						{offsetX: 10, velX: 0, velY: -16, turnRate: turn}
 					]
-					// Unfocused: flankers launch outward and curve back in
 					: [
-						{offsetX: -6, velX: 0, velY: -20},
-						{offsetX: 6, velX: 0, velY: -20},
-						{offsetX: -26, velX: -4, velY: -13, turnRate: 5},
-						{offsetX: 26, velX: 4, velY: -13, turnRate: 5}
+						{offsetX: -14, velX: -2, velY: -15, turnRate: turn},
+						{offsetX: 14, velX: 2, velY: -15, turnRate: turn}
 					];
+				if (tier() >= 2) {
+					shots.push({offsetX: 0, velX: 0, velY: -18, turnRate: turn});
+				}
+				if (tier() >= 3) {
+					shots.push(focused
+						? {offsetX: 0, velX: 0, velY: -13, turnRate: turn}
+						: {offsetX: 0, velX: 0, velY: -13, turnRate: 4});
+				}
+				shots;
 		}
 	}
 
@@ -115,7 +194,8 @@ class PlayerShootingPattern extends Sprite {
 		manager.AudioManager.sfxFire();
 		var shots = volley(player.isFocused());
 
-		var damage = 1 + Std.int(power / 4);
+		var damage = bulletDamage();
+		var piercing = (shotType == Pierce);
 
 		for (config in shots) {
 			var bullet:BulletPlayer = new BulletPlayer();
@@ -124,6 +204,7 @@ class PlayerShootingPattern extends Sprite {
 			bullet.velocityX = config.velX;
 			bullet.velocityY = config.velY;
 			bullet.damage = damage;
+			bullet.piercing = piercing;
 
 			if (config.turnRate != null && config.turnRate != 0) {
 				bullet.enableHoming(config.turnRate, collisionManager.getEnemyManager());
@@ -141,8 +222,11 @@ class PlayerShootingPattern extends Sprite {
 	private function everyFrame(event:Event):Void {
 		if (Main.gamePaused) return;
 
-		if (isShooting) {
+		if (cooldown > 0) cooldown--;
+
+		if (isShooting && cooldown <= 0) {
 			spawnPlayerBullet();
+			cooldown = fireInterval();
 		}
 	}
 

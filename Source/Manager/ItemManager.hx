@@ -50,11 +50,13 @@ class ItemManager extends Sprite {
 		items.push(item);
 	}
 
-	/** Drops for a defeated enemy. Tougher enemies drop more; bosses shower. */
+	/** Drops for a defeated enemy. Tougher enemies drop more; bosses shower.
+	 *  Deliberately stingy: each power item is only +0.25 power, and reaching
+	 *  the 4.00 cap should take roughly three stages of collecting. */
 	public function dropForEnemy(enemy:Enemy):Void {
 		if (Std.isOfType(enemy, BossEnemy)) {
 			// Boss defeat: a shower of goodies plus a guaranteed bomb
-			for (i in 0...8) spawnItem(PowerItem, enemy.x + jitter(60), enemy.y + jitter(30));
+			for (i in 0...4) spawnItem(PowerItem, enemy.x + jitter(60), enemy.y + jitter(30));
 			for (i in 0...8) spawnItem(PointItem, enemy.x + jitter(60), enemy.y + jitter(30));
 			spawnItem(BombItem, enemy.x, enemy.y);
 			return;
@@ -67,12 +69,19 @@ class ItemManager extends Sprite {
 			spawnItem(BombItem, enemy.x, enemy.y);
 		}
 
-		// 1 drop for fodder, up to 3 for tanky enemies; ~60/40 power/point
-		var count = 1 + Std.int(enemy.getMaxHealth() / 8);
-		if (count > 3) count = 3;
-		for (i in 0...count) {
-			var type = (Math.random() < 0.6) ? PowerItem : PointItem;
-			spawnItem(type, enemy.x + jitter(24), enemy.y + jitter(12));
+		var hp = enemy.getMaxHealth();
+		if (hp < 15) {
+			// Fodder: 60% chance of one drop, point-biased
+			if (Math.random() < 0.6) {
+				spawnItem((Math.random() < 0.4) ? PowerItem : PointItem, enemy.x + jitter(24), enemy.y + jitter(12));
+			}
+		} else if (hp < 40) {
+			// Mid-tier: always one drop, 50/50
+			spawnItem((Math.random() < 0.5) ? PowerItem : PointItem, enemy.x + jitter(24), enemy.y + jitter(12));
+		} else {
+			// Tanky / midboss-class: a power item plus a coin-flip second drop
+			spawnItem(PowerItem, enemy.x + jitter(24), enemy.y + jitter(12));
+			spawnItem((Math.random() < 0.5) ? PowerItem : PointItem, enemy.x + jitter(24), enemy.y + jitter(12));
 		}
 	}
 

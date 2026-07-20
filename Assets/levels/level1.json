@@ -4,29 +4,29 @@
     "intro": [
       {
         "speaker": "Aviator",
+        "text": "The border's gone quiet... too quiet. Something is stirring past the treeline.",
         "portrait": "assets/Player.png",
-        "side": "left",
-        "text": "The border's gone quiet... too quiet. Something is stirring past the treeline."
+        "side": "left"
       },
       {
         "speaker": "???",
+        "text": "Turn back, little bird. The sky belongs to the Swarm tonight.",
         "portrait": "assets/Enemy.png",
-        "side": "right",
-        "text": "Turn back, little bird. The sky belongs to the Swarm tonight."
+        "side": "right"
       },
       {
         "speaker": "Aviator",
+        "text": "Funny, I was about to say the same thing to you.",
         "portrait": "assets/Player.png",
-        "side": "left",
-        "text": "Funny, I was about to say the same thing to you."
+        "side": "left"
       }
     ],
     "outro": [
       {
         "speaker": "Aviator",
+        "text": "Scouts, nothing more. Whoever sent them is still out there.",
         "portrait": "assets/Player.png",
-        "side": "left",
-        "text": "Scouts, nothing more. Whoever sent them is still out there."
+        "side": "left"
       }
     ]
   },
@@ -37,45 +37,111 @@
         {
           "spawnTime": 0,
           "x": -50,
-          "y": 100,
+          "y": 170,
           "pattern": "nwhip",
-          "health": 3,
           "patternConfig": {
             "numberOfWhips": 3,
-            "numberOfBullets": 5,
-            "baseBulletSpeed": 5,
-            "speedChange": 0.5
+            "numberOfBullets": 4,
+            "baseBulletSpeed": 3,
+            "speedChange": 0.4,
+            "patternDelay": 80
           },
+          "health": 8,
           "movementScript": {
             "loop": false,
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 2,
+                "vx": 2.5,
                 "vy": 0
               },
               {
                 "type": "Wait",
-                "frames": 225
-              },
-              {
-                "type": "Stop"
-              },
-              {
-                "type": "Wait",
-                "frames": 60
+                "frames": 100
               },
               {
                 "type": "SetVelocity",
-                "vx": 0,
-                "vy": 1
+                "vx": 2.48,
+                "vy": 0
               },
               {
                 "type": "Wait",
-                "frames": 120
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.29,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.94,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.49,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.01,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.56,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.21,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.02,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
               },
               {
                 "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 300
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1,
+                "vy": -2
               }
             ]
           }
@@ -83,133 +149,108 @@
         {
           "spawnTime": 1,
           "x": 1850,
-          "y": 100,
+          "y": 170,
           "pattern": "spiral",
-          "health": 2,
           "patternConfig": {
-            "bulletSpeed": 6,
-            "rotationChange": 15
+            "bulletSpeed": 3.5,
+            "rotationChange": 14
           },
+          "health": 8,
           "movementScript": {
             "loop": false,
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": -2,
+                "vx": -2.5,
                 "vy": 0
-              },
-              {
-                "type": "Wait",
-                "frames": 225
-              },
-              {
-                "type": "Stop"
-              },
-              {
-                "type": "Wait",
-                "frames": 60
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 0,
-                "vy": 1
-              },
-              {
-                "type": "Wait",
-                "frames": 120
-              },
-              {
-                "type": "Stop"
-              }
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "startTime": 8,
-      "enemies": [
-        {
-          "spawnTime": 0,
-          "x": 300,
-          "y": -50,
-          "pattern": "spiral",
-          "health": 2,
-          "patternConfig": {
-            "bulletSpeed": 4,
-            "rotationChange": 8
-          },
-          "movementScript": {
-            "loop": false,
-            "actions": [
-              {
-                "type": "SetVelocity",
-                "vx": 0,
-                "vy": 2
-              },
-              {
-                "type": "Wait",
-                "frames": 75
-              },
-              {
-                "type": "Stop"
-              }
-            ]
-          }
-        },
-        {
-          "spawnTime": 0,
-          "x": 1720,
-          "y": -50,
-          "pattern": "spiral",
-          "health": 2,
-          "patternConfig": {
-            "bulletSpeed": 10,
-            "rotationChange": -25
-          },
-          "movementScript": {
-            "loop": false,
-            "actions": [
-              {
-                "type": "SetVelocity",
-                "vx": 0,
-                "vy": 2
-              },
-              {
-                "type": "Wait",
-                "frames": 75
-              },
-              {
-                "type": "Stop"
-              }
-            ]
-          }
-        },
-        {
-          "spawnTime": 1.5,
-          "x": 1000,
-          "y": -50,
-          "pattern": "radial",
-          "health": 3,
-          "patternConfig": {
-            "bulletCount": 12,
-            "bulletSpeed": 4.5,
-            "rotationSpeed": 8
-          },
-          "movementScript": {
-            "loop": false,
-            "actions": [
-              {
-                "type": "SetVelocity",
-                "vx": 0,
-                "vy": 1.5
               },
               {
                 "type": "Wait",
                 "frames": 100
               },
               {
+                "type": "SetVelocity",
+                "vx": -2.48,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.29,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.94,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.49,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.01,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.56,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.21,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.02,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
                 "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 300
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1,
+                "vy": -2
               }
             ]
           }
@@ -217,22 +258,203 @@
       ]
     },
     {
-      "startTime": 16,
+      "startTime": 10,
       "enemies": [
         {
           "spawnTime": 0,
-          "x": 400,
+          "x": 450,
           "y": -50,
-          "pattern": "nwhip",
-          "health": 5,
+          "pattern": "spiral",
           "patternConfig": {
-            "numberOfWhips": 7,
-            "numberOfBullets": 10,
-            "baseBulletSpeed": 3,
-            "speedChange": 1.2
+            "bulletSpeed": 3,
+            "rotationChange": 9
           },
+          "health": 8,
           "movementScript": {
-            "loop": true,
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 80
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 330
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -2.5
+              }
+            ]
+          }
+        },
+        {
+          "spawnTime": 0,
+          "x": 1350,
+          "y": -50,
+          "pattern": "spiral",
+          "patternConfig": {
+            "bulletSpeed": 3,
+            "rotationChange": -9
+          },
+          "health": 8,
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 80
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 330
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -2.5
+              }
+            ]
+          }
+        },
+        {
+          "spawnTime": 1.5,
+          "x": 900,
+          "y": -50,
+          "pattern": "radial",
+          "patternConfig": {
+            "bulletCount": 10,
+            "bulletSpeed": 3,
+            "rotationSpeed": 6
+          },
+          "health": 14,
+          "movementScript": {
+            "loop": false,
             "actions": [
               {
                 "type": "SetVelocity",
@@ -241,48 +463,741 @@
               },
               {
                 "type": "Wait",
-                "frames": 75
+                "frames": 90
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.97
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.71
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.26
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.74
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.29
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.03
+              },
+              {
+                "type": "Wait",
+                "frames": 5
               },
               {
                 "type": "Stop"
               },
               {
                 "type": "Wait",
-                "frames": 30
+                "frames": 330
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -2.5
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 22,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 900,
+          "y": -60,
+          "pattern": "nwhip",
+          "patternConfig": {
+            "numberOfWhips": 5,
+            "numberOfBullets": 6,
+            "baseBulletSpeed": 3,
+            "speedChange": 0.6,
+            "patternDelay": 60
+          },
+          "health": 18,
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 90
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.53,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.03,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.45,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.76,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.95,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
               },
               {
                 "type": "SetVelocity",
                 "vx": 2,
-                "vy": 0
+                "vy": 0.2
               },
               {
                 "type": "Wait",
-                "frames": 60
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.9,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.67,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.32,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.87,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.36,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.18,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.7,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.18,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.56,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.84,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.98,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.98,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.84,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.56,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.18,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.7,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.18,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.36,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.87,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.32,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.67,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.9,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.95,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.76,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.45,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.03,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.53,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.53,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.03,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.45,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.76,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.95,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
               },
               {
                 "type": "SetVelocity",
                 "vx": -2,
-                "vy": 0
+                "vy": 0.2
               },
               {
                 "type": "Wait",
-                "frames": 120
+                "frames": 6
               },
               {
                 "type": "SetVelocity",
-                "vx": 2,
-                "vy": 0
+                "vx": -1.9,
+                "vy": 0.2
               },
               {
                 "type": "Wait",
-                "frames": 60
+                "frames": 6
               },
               {
-                "type": "Stop"
+                "type": "SetVelocity",
+                "vx": -1.67,
+                "vy": 0.2
               },
               {
                 "type": "Wait",
-                "frames": 30
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.32,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.87,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.36,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.18,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.7,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.18,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.56,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.84,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.98,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.98,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.84,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.56,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.18,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.7,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.18,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.36,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.87,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.32,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.67,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.9,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.95,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.76,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.45,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.03,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.53,
+                "vy": 0.2
+              },
+              {
+                "type": "Wait",
+                "frames": 6
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -2.5
               }
             ]
           }
@@ -290,70 +1205,39 @@
         {
           "spawnTime": 2,
           "x": -50,
-          "y": 200,
+          "y": 300,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
-            "bulletSpeed": 5,
-            "rotationChange": 10
+            "bulletSpeed": 3.5,
+            "rotationChange": 11
           },
-          "movementScript": {
-            "loop": false,
-            "actions": [
-              {
-                "type": "SetVelocity",
-                "vx": 2,
-                "vy": 0
-              },
-              {
-                "type": "Wait",
-                "frames": 150
-              },
-              {
-                "type": "Stop"
-              }
-            ]
-          }
+          "health": 8,
+          "velocityX": 3,
+          "velocityY": 0
         },
         {
           "spawnTime": 2,
           "x": 1850,
-          "y": 200,
+          "y": 300,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
-            "bulletSpeed": 5,
-            "rotationChange": -10
+            "bulletSpeed": 3.5,
+            "rotationChange": -11
           },
-          "movementScript": {
-            "loop": false,
-            "actions": [
-              {
-                "type": "SetVelocity",
-                "vx": -2,
-                "vy": 0
-              },
-              {
-                "type": "Wait",
-                "frames": 150
-              },
-              {
-                "type": "Stop"
-              }
-            ]
-          }
+          "health": 8,
+          "velocityX": -3,
+          "velocityY": 0
         }
       ]
     },
     {
-      "startTime": 24,
+      "startTime": 34,
       "enemies": [
         {
           "spawnTime": 0,
-          "x": 400,
-          "y": 100,
+          "x": 900,
+          "y": -80,
           "pattern": "sunexplosion",
-          "health": 50,
           "patternConfig": {
             "patternScript": {
               "actions": [
@@ -716,126 +1600,118 @@
                 }
               ]
             }
+          },
+          "health": 200,
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 3
+              },
+              {
+                "type": "Wait",
+                "frames": 110
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 2600
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -2.5
+              }
+            ]
           }
         }
       ]
     },
     {
-      "startTime": 50,
+      "startTime": 58,
       "enemies": [
         {
           "spawnTime": 0,
-          "x": -50,
-          "y": 100,
-          "pattern": "nwhip",
-          "health": 3,
-          "patternConfig": {
-            "startDelay": 405,
-            "numberOfWhips": 1,
-            "numberOfBullets": 24,
-            "bulletDelay": 5,
-            "baseBulletSpeed": 2,
-            "speedChange": 0.2,
-            "angleChange": 0,
-            "patternDelay": 120
-          },
-          "movementScript": {
-            "loop": false,
-            "actions": [
-              {
-                "type": "SetVelocity",
-                "vx": 2,
-                "vy": 0
-              },
-              {
-                "type": "Wait",
-                "frames": 225
-              },
-              {
-                "type": "Stop"
-              },
-              {
-                "type": "Wait",
-                "frames": 60
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 0,
-                "vy": 1
-              },
-              {
-                "type": "Wait",
-                "frames": 120
-              },
-              {
-                "type": "Stop"
-              },
-              {
-                "type": "Wait",
-                "frames": 600
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 0,
-                "vy": -1
-              }
-            ]
-          }
-        },
-        {
-          "spawnTime": 0,
-          "x": 200,
-          "y": 100,
-          "pattern": "spiral",
-          "health": 3,
-          "patternConfig": {
-            "startDelay": 180,
-            "bulletSpeed": 5,
-            "rotationChange": 12,
-            "fireDelay": 1
-          },
-          "movementScript": {
-            "loop": false,
-            "actions": [
-              {
-                "type": "SetVelocity",
-                "vx": 3.5,
-                "vy": 0
-              },
-              {
-                "type": "Wait",
-                "frames": 180
-              },
-              {
-                "type": "Stop"
-              },
-              {
-                "type": "Wait",
-                "frames": 660
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 0,
-                "vy": -1
-              }
-            ]
-          }
-        },
-        {
-          "spawnTime": 0,
-          "x": 1600,
-          "y": 200,
+          "x": 1450,
+          "y": -60,
           "pattern": "orbit",
-          "health": 5,
           "patternConfig": {
             "orbitDistance": 150,
-            "bulletSpeed": 6,
-            "rotationSpeed": 4,
-            "fireDelay": 2
+            "bulletSpeed": 4,
+            "rotationSpeed": 3,
+            "fireDelay": 4
           },
+          "health": 26,
           "movementScript": {
             "loop": false,
             "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 100
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
               {
                 "type": "Stop"
               },
@@ -846,17 +1722,128 @@
               {
                 "type": "SetVelocity",
                 "vx": 0,
-                "vy": -1
+                "vy": -2.5
               }
             ]
           }
         },
         {
-          "spawnTime": 20,
-          "x": 800,
-          "y": 300,
+          "spawnTime": 1,
+          "x": -50,
+          "y": 320,
+          "pattern": "spiral",
+          "patternConfig": {
+            "bulletSpeed": 3.5,
+            "rotationChange": 12
+          },
+          "health": 8,
+          "velocityX": 3,
+          "velocityY": 0
+        },
+        {
+          "spawnTime": 2,
+          "x": 400,
+          "y": -60,
+          "pattern": "nwhip",
+          "patternConfig": {
+            "numberOfWhips": 3,
+            "numberOfBullets": 5,
+            "baseBulletSpeed": 3,
+            "speedChange": 0.5,
+            "patternDelay": 70
+          },
+          "health": 12,
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 80
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 540
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -2.5
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 72,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 700,
+          "y": -60,
           "pattern": "nway-radial-line",
-          "health": 3,
           "patternConfig": {
             "patternScript": {
               "actions": [
@@ -927,9 +1914,167 @@
               ]
             }
           },
+          "health": 22,
           "movementScript": {
             "loop": false,
             "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 100
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 780
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -2.5
+              }
+            ]
+          }
+        },
+        {
+          "spawnTime": 1.5,
+          "x": 1300,
+          "y": -60,
+          "pattern": "sniper",
+          "patternConfig": {
+            "bulletSpeed": 12,
+            "burstCount": 3,
+            "burstDelay": 4,
+            "orbitDistance": 150,
+            "patternDelay": 70
+          },
+          "health": 16,
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 90
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
               {
                 "type": "Stop"
               },
@@ -940,79 +2085,115 @@
               {
                 "type": "SetVelocity",
                 "vx": 0,
-                "vy": -1
+                "vy": -2.5
               }
             ]
           }
         },
         {
-          "spawnTime": 20,
-          "x": 1600,
-          "y": 150,
+          "spawnTime": 3,
+          "x": 300,
+          "y": -60,
           "pattern": "random",
-          "health": 5,
           "patternConfig": {
             "minSpeed": 1,
-            "maxSpeed": 4,
+            "maxSpeed": 3.5,
             "baseAngle": 90,
-            "angleSpread": 45,
-            "fireDelay": 2
+            "angleSpread": 40,
+            "fireDelay": 5
           },
+          "health": 12,
           "movementScript": {
             "loop": false,
             "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 90
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
               {
                 "type": "Stop"
               },
               {
                 "type": "Wait",
-                "frames": 720
+                "frames": 660
               },
               {
                 "type": "SetVelocity",
                 "vx": 0,
-                "vy": -1
+                "vy": -2.5
               }
             ]
           }
-        },
+        }
+      ]
+    },
+    {
+      "startTime": 86,
+      "enemies": [
         {
-          "spawnTime": 20,
-          "x": 1200,
-          "y": 500,
-          "pattern": "sniper",
-          "health": 10,
-          "patternConfig": {
-            "bulletSpeed": 14,
-            "burstCount": 8,
-            "burstDelay": 1,
-            "orbitDistance": 150,
-            "patternDelay": 10
-          },
-          "movementScript": {
-            "loop": false,
-            "actions": [
-              {
-                "type": "Stop"
-              },
-              {
-                "type": "Wait",
-                "frames": 720
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 0,
-                "vy": -1
-              }
-            ]
-          }
-        },
-        {
-          "spawnTime": 40,
-          "x": 800,
-          "y": 300,
+          "spawnTime": 0,
+          "x": 900,
+          "y": -60,
           "pattern": "parallel-spirals",
-          "health": 5,
           "patternConfig": {
             "patternScript": {
               "actions": [
@@ -1102,9 +2283,73 @@
               ]
             }
           },
+          "health": 26,
           "movementScript": {
             "loop": false,
             "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 110
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
               {
                 "type": "Stop"
               },
@@ -1115,49 +2360,21 @@
               {
                 "type": "SetVelocity",
                 "vx": 0,
-                "vy": -1
+                "vy": -2.5
               }
             ]
           }
-        },
+        }
+      ]
+    },
+    {
+      "startTime": 98,
+      "enemies": [
         {
-          "spawnTime": 40,
-          "x": 1400,
-          "y": 500,
-          "pattern": "nwhip",
-          "health": 5,
-          "patternConfig": {
-            "numberOfWhips": 5,
-            "numberOfBullets": 8,
-            "baseBulletSpeed": 4,
-            "speedChange": 1,
-            "angleChange": 1.5,
-            "patternDelay": 30
-          },
-          "movementScript": {
-            "loop": false,
-            "actions": [
-              {
-                "type": "Stop"
-              },
-              {
-                "type": "Wait",
-                "frames": 720
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 0,
-                "vy": -1
-              }
-            ]
-          }
-        },
-        {
-          "spawnTime": 60,
-          "x": 1200,
-          "y": 200,
+          "spawnTime": 0,
+          "x": 1250,
+          "y": -60,
           "pattern": "laundry",
-          "health": 5,
           "patternConfig": {
             "patternScript": {
               "actions": [
@@ -1242,37 +2459,100 @@
               ]
             }
           },
+          "health": 26,
           "movementScript": {
             "loop": false,
             "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 100
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
               {
                 "type": "Stop"
               },
               {
                 "type": "Wait",
-                "frames": 720
+                "frames": 780
               },
               {
                 "type": "SetVelocity",
                 "vx": 0,
-                "vy": -1
+                "vy": -2.5
               }
             ]
           }
         },
         {
-          "spawnTime": 60,
-          "x": 400,
-          "y": 500,
+          "spawnTime": 2,
+          "x": 500,
+          "y": -60,
           "pattern": "random-bomb",
-          "health": 12,
           "patternConfig": {
             "patternScript": {
               "actions": [
                 {
                   "control": "Set",
                   "prop": "speed",
-                  "value": 7
+                  "value": 6
                 },
                 {
                   "control": "SetOffset",
@@ -1297,27 +2577,91 @@
                     },
                     {
                       "control": "Wait",
-                      "frames": 12
+                      "frames": 18
                     }
                   ]
                 }
               ]
             }
           },
+          "health": 30,
           "movementScript": {
             "loop": false,
             "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 110
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
               {
                 "type": "Stop"
               },
               {
                 "type": "Wait",
-                "frames": 1200
+                "frames": 780
               },
               {
                 "type": "SetVelocity",
                 "vx": 0,
-                "vy": -1
+                "vy": -2.5
               }
             ]
           }

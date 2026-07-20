@@ -18,10 +18,15 @@ class Player extends Sprite {
 	private var moveLeft:Bool = false;
 	private var moveRight:Bool = false;
 
-	private static inline final NORMAL_SPEED:Int = 5;
-	private static inline final FOCUSED_SPEED:Int = 2;
+	// Movement speeds depend on the selected shot type (set via
+	// setSpeedProfile): homing trades speed for auto-aim, pierce gets the
+	// fastest ship to compensate for having to line shots up manually.
+	private static inline final DEFAULT_NORMAL_SPEED:Float = 5.0;
+	private static inline final DEFAULT_FOCUSED_SPEED:Float = 2.2;
 
-	private var moveSpeed:Int = NORMAL_SPEED;
+	private var normalSpeed:Float = DEFAULT_NORMAL_SPEED;
+	private var focusedSpeed:Float = DEFAULT_FOCUSED_SPEED;
+	private var moveSpeed:Float = DEFAULT_NORMAL_SPEED;
 
 	// Focus mode (hold Shift): slower, precise movement + tighter shot
 	private var focused:Bool = false;
@@ -90,10 +95,17 @@ class Player extends Sprite {
 		this.onDeathCallback = callback;
 	}
 
+	/** Movement speeds for the selected shot type (unfocused / focused). */
+	public function setSpeedProfile(normal:Float, focusedSpd:Float):Void {
+		normalSpeed = normal;
+		focusedSpeed = focusedSpd;
+		moveSpeed = focused ? focusedSpeed : normalSpeed;
+	}
+
 	/** Hold Shift: focused = slow precise movement (+ tighter shot pattern). */
 	public function setFocused(value:Bool):Void {
 		focused = value;
-		moveSpeed = focused ? FOCUSED_SPEED : NORMAL_SPEED;
+		moveSpeed = focused ? focusedSpeed : normalSpeed;
 	}
 
 	public function isFocused():Bool {
