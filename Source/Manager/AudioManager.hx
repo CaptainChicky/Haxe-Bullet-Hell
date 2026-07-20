@@ -4,11 +4,19 @@ import openfl.media.Sound;
 import openfl.media.SoundChannel;
 import openfl.media.SoundTransform;
 import openfl.utils.ByteArray;
+import openfl.utils.Endian;
 
 /**
  * All game audio, synthesized at startup — there are no audio assets yet, so
  * every cue is a generated sine wave (the roadmap's placeholder until real
  * music/SFX land). Static: any system can fire a cue without plumbing.
+ *
+ * Every cue is packaged as an in-memory 16-bit stereo WAV and loaded through
+ * loadCompressedDataFromByteArray. Do NOT switch back to
+ * loadPCMFromByteArray: raw float PCM buffers are silently unplayable on
+ * BOTH shipping targets (lime 8.0.2's OpenAL backend only maps 8/16-bit
+ * buffers to an AL format, and the HTML5 howler backend refuses to play a
+ * buffer that has no Howl source) — that was the "sound is broken" bug.
  *
  *  - Music: a short looping note sequence per stage (distinct base pitch).
  *  - SFX: one-shot blips for firing / player death / bomb / item pickup.
@@ -69,14 +77,32 @@ class AudioManager {
 	}
 
 	/** Synthesize a note sequence into a playable Sound. Each note gets a
-	 *  short attack/release envelope so transitions don't click. */
+	 *  short attack/release envelope so transitions don't click, plus a soft
+	 *  second harmonic so the tone reads less like a test signal. */
 	private static function makeSequence(notes:Array<{freq:Float, seconds:Float}>, gain:Float):Sound {
 		var totalSamples = 0;
 		for (note in notes) {
 			totalSamples += Std.int(note.seconds * SAMPLE_RATE);
 		}
 
+		// WAV container: 44-byte RIFF header + 16-bit little-endian stereo PCM
+		var dataBytes = totalSamples * 4; // 2 channels x 2 bytes
 		var bytes = new ByteArray();
+		bytes.endian = Endian.LITTLE_ENDIAN;
+		bytes.writeUTFBytes("RIFF");
+		bytes.writeInt(36 + dataBytes);
+		bytes.writeUTFBytes("WAVE");
+		bytes.writeUTFBytes("fmt ");
+		bytes.writeInt(16); // fmt chunk size
+		bytes.writeShort(1); // PCM
+		bytes.writeShort(2); // stereo
+		bytes.writeInt(SAMPLE_RATE);
+		bytes.writeInt(SAMPLE_RATE * 4); // byte rate
+		bytes.writeShort(4); // block align
+		bytes.writeShort(16); // bits per sample
+		bytes.writeUTFBytes("data");
+		bytes.writeInt(dataBytes);
+
 		for (note in notes) {
 			var samples = Std.int(note.seconds * SAMPLE_RATE);
 			var attack = Std.int(samples * 0.08);
@@ -85,15 +111,20 @@ class AudioManager {
 				var envelope = 1.0;
 				if (i < attack) envelope = i / attack;
 				else if (i > samples - release) envelope = (samples - i) / release;
-				var sample = Math.sin(2 * Math.PI * note.freq * i / SAMPLE_RATE) * gain * envelope;
-				bytes.writeFloat(sample); // left
-				bytes.writeFloat(sample); // right
+				var phase = 2 * Math.PI * note.freq * i / SAMPLE_RATE;
+				var wave = Math.sin(phase) + 0.28 * Math.sin(phase * 2);
+				var sample = wave * gain * envelope * 0.75;
+				if (sample > 1) sample = 1;
+				if (sample < -1) sample = -1;
+				var pcm = Std.int(sample * 32767);
+				bytes.writeShort(pcm); // left
+				bytes.writeShort(pcm); // right
 			}
 		}
 		bytes.position = 0;
 
 		var sound = new Sound();
-		sound.loadPCMFromByteArray(bytes, totalSamples, "float", true, SAMPLE_RATE);
+		sound.loadCompressedDataFromByteArray(bytes, bytes.length);
 		return sound;
 	}
 

@@ -22,6 +22,10 @@ class BossEnemy extends Enemy {
 	private var phaseHealth:Int;
 	private var invulnFrames:Int = 0;
 
+	// Frames spent fighting the current phase (only counts while vulnerable,
+	// so transition mercy time doesn't eat into a phase's timeout).
+	private var phaseFrames:Int = 0;
+
 	// Difficulty-scaled copies of the authored phase healths (the shared
 	// BossData must never be mutated).
 	private var phaseHealths:Array<Int>;
@@ -64,6 +68,7 @@ class BossEnemy extends Enemy {
 		phaseIndex++;
 		phaseHealth = phaseHealths[phaseIndex];
 		invulnFrames = TRANSITION_INVULN_FRAMES;
+		phaseFrames = 0;
 	}
 
 	/** Final phase cleared: run the normal enemy death path. */
@@ -80,8 +85,30 @@ class BossEnemy extends Enemy {
 			if (invulnFrames == 0) {
 				alpha = 1.0;
 			}
+		} else if (isAlive() && phaseHealth > 0) {
+			// Touhou-style phase timeout: if the player can't (or won't) burn
+			// the phase down in time, it auto-clears — no drops, no spill.
+			phaseFrames++;
+			var timeout = data.phases[phaseIndex].timeoutFrames;
+			if (timeout != null && timeout > 0 && phaseFrames >= timeout) {
+				var remaining = phaseHealth;
+				phaseHealth = 0;
+				currentHealth -= remaining;
+				if (onPhaseDepleted != null) {
+					onPhaseDepleted();
+				}
+			}
 		}
 		super.update();
+	}
+
+	/** Frames left before the current phase times out, or -1 if it has no
+	 *  timeout (the boss bar shows a countdown only when this is >= 0). */
+	public function getPhaseTimeoutRemaining():Int {
+		var timeout = data.phases[phaseIndex].timeoutFrames;
+		if (timeout == null || timeout <= 0) return -1;
+		var left = timeout - phaseFrames;
+		return left < 0 ? 0 : left;
 	}
 
 	public function getBossName():String {

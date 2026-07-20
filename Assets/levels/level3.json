@@ -4,35 +4,35 @@
     "intro": [
       {
         "speaker": "Firedancer",
+        "text": "So you're the storm that scattered my swarm. Every dance ends, Aviator.",
         "portrait": "assets/Enemy.png",
-        "side": "right",
-        "text": "So you're the storm that scattered my swarm. Every dance ends, Aviator."
+        "side": "right"
       },
       {
         "speaker": "Aviator",
+        "text": "Then let's make the last one worth watching.",
         "portrait": "assets/Player.png",
-        "side": "left",
-        "text": "Then let's make the last one worth watching."
+        "side": "left"
       },
       {
         "speaker": "Firedancer",
+        "text": "Burn brightly, little bird. The gauntlet is open!",
         "portrait": "assets/Enemy.png",
-        "side": "right",
-        "text": "Burn brightly, little bird. The gauntlet is open!"
+        "side": "right"
       }
     ],
     "outro": [
       {
         "speaker": "Firedancer",
+        "text": "Beautiful... like falling embers. The sky is yours, for now.",
         "portrait": "assets/Enemy.png",
-        "side": "right",
-        "text": "Beautiful... like falling embers. The sky is yours, for now."
+        "side": "right"
       },
       {
         "speaker": "Aviator",
+        "text": "For now is enough. Time to fly home.",
         "portrait": "assets/Player.png",
-        "side": "left",
-        "text": "For now is enough. Time to fly home."
+        "side": "left"
       }
     ]
   },
@@ -45,12 +45,12 @@
           "x": -50,
           "y": 90,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.2,
             "rotationChange": 14,
             "fireDelay": 3
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -134,12 +134,12 @@
           "x": -50,
           "y": 120,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.2,
             "rotationChange": 14,
             "fireDelay": 3
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -223,12 +223,12 @@
           "x": -50,
           "y": 150,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.2,
             "rotationChange": 14,
             "fireDelay": 3
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -312,12 +312,12 @@
           "x": -50,
           "y": 180,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.2,
             "rotationChange": 14,
             "fireDelay": 3
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -401,12 +401,12 @@
           "x": 1850,
           "y": 90,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.2,
             "rotationChange": -14,
             "fireDelay": 3
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -490,12 +490,12 @@
           "x": 1850,
           "y": 120,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.2,
             "rotationChange": -14,
             "fireDelay": 3
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -579,12 +579,12 @@
           "x": 1850,
           "y": 150,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.2,
             "rotationChange": -14,
             "fireDelay": 3
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -668,12 +668,12 @@
           "x": 1850,
           "y": 180,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.2,
             "rotationChange": -14,
             "fireDelay": 3
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -762,12 +762,12 @@
           "x": 500,
           "y": -50,
           "pattern": "radial",
-          "health": 4,
           "patternConfig": {
             "bulletCount": 12,
             "bulletSpeed": 3,
             "rotationSpeed": 9
           },
+          "health": 4,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -959,12 +959,12 @@
           "x": 900,
           "y": -50,
           "pattern": "radial",
-          "health": 4,
           "patternConfig": {
             "bulletCount": 12,
             "bulletSpeed": 3,
             "rotationSpeed": 9
           },
+          "health": 4,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -1156,12 +1156,12 @@
           "x": 1300,
           "y": -50,
           "pattern": "radial",
-          "health": 4,
           "patternConfig": {
             "bulletCount": 12,
             "bulletSpeed": 3,
             "rotationSpeed": 9
           },
+          "health": 4,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -1358,7 +1358,6 @@
           "x": -50,
           "y": 130,
           "pattern": "nwhip",
-          "health": 6,
           "patternConfig": {
             "numberOfWhips": 5,
             "numberOfBullets": 8,
@@ -1367,6 +1366,7 @@
             "angleChange": 4,
             "patternDelay": 32
           },
+          "health": 6,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -1594,7 +1594,6 @@
           "x": 1850,
           "y": 130,
           "pattern": "nwhip",
-          "health": 6,
           "patternConfig": {
             "numberOfWhips": 5,
             "numberOfBullets": 8,
@@ -1603,6 +1602,7 @@
             "angleChange": -4,
             "patternDelay": 32
           },
+          "health": 6,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -1830,7 +1830,6 @@
           "x": 900,
           "y": -50,
           "pattern": "shotspeed",
-          "health": 5,
           "patternConfig": {
             "direction": 90,
             "baseSpeed": 2.5,
@@ -1839,6 +1838,7 @@
             "fireDelay": 1,
             "volleyDelay": 38
           },
+          "health": 5,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -2035,7 +2035,6 @@
           "x": -50,
           "y": 90,
           "pattern": "random",
-          "health": 34,
           "patternConfig": {
             "minSpeed": 2.5,
             "maxSpeed": 6,
@@ -2043,6 +2042,7 @@
             "angleSpread": 62,
             "fireDelay": 3
           },
+          "health": 34,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -2342,12 +2342,12 @@
           "x": 1850,
           "y": 260,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.5,
             "rotationChange": -16,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -2431,12 +2431,12 @@
           "x": -50,
           "y": 300,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.5,
             "rotationChange": 16,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -2525,7 +2525,6 @@
           "x": -50,
           "y": 150,
           "pattern": "controlflow",
-          "health": 12,
           "patternConfig": {
             "shotSpeed": 4.5,
             "direction": 90,
@@ -2533,6 +2532,7 @@
             "burstCount": 6,
             "burstDelay": 7
           },
+          "health": 12,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -2832,7 +2832,6 @@
           "x": 1850,
           "y": 210,
           "pattern": "sniper",
-          "health": 16,
           "patternConfig": {
             "bulletSpeed": 12,
             "burstCount": 4,
@@ -2840,6 +2839,7 @@
             "orbitDistance": 110,
             "patternDelay": 38
           },
+          "health": 16,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -3211,7 +3211,6 @@
           "x": 500,
           "y": -50,
           "pattern": "parallel",
-          "health": 8,
           "patternConfig": {
             "shotSpeed": 3.2,
             "direction": 90,
@@ -3219,6 +3218,7 @@
             "spinDelay": 4,
             "spinStep": 30
           },
+          "health": 8,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -3410,7 +3410,6 @@
           "x": 1300,
           "y": -50,
           "pattern": "parallel",
-          "health": 8,
           "patternConfig": {
             "shotSpeed": 3.2,
             "direction": 90,
@@ -3418,6 +3417,7 @@
             "spinDelay": 4,
             "spinStep": -30
           },
+          "health": 8,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -3614,7 +3614,6 @@
           "x": -50,
           "y": 160,
           "pattern": "nwayline",
-          "health": 18,
           "patternConfig": {
             "direction": 90,
             "shotSpeed": 4,
@@ -3625,6 +3624,7 @@
             "lineSpeedBoost": 6,
             "phaseDelay": 46
           },
+          "health": 18,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -3924,13 +3924,13 @@
           "x": 1850,
           "y": 200,
           "pattern": "orbit",
-          "health": 20,
           "patternConfig": {
             "orbitDistance": 130,
             "bulletSpeed": 5,
             "rotationSpeed": 6,
             "fireDelay": 2
           },
+          "health": 20,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -4230,7 +4230,6 @@
           "x": 900,
           "y": -50,
           "pattern": "laundry",
-          "health": 6,
           "patternConfig": {
             "bulletSpeed": 8,
             "bigCount": 8,
@@ -4240,6 +4239,7 @@
             "smallStep": 5,
             "smallDelay": 3
           },
+          "health": 6,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -4308,8 +4308,8 @@
           "x": 300,
           "y": -50,
           "pattern": "vanish",
-          "health": 6,
           "patternConfig": {},
+          "health": 6,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -4501,8 +4501,8 @@
           "x": 1500,
           "y": -50,
           "pattern": "vanish",
-          "health": 6,
           "patternConfig": {},
+          "health": 6,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -4694,8 +4694,8 @@
           "x": -50,
           "y": 220,
           "pattern": "staticgeo",
-          "health": 22,
           "patternConfig": {},
+          "health": 22,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -4779,12 +4779,12 @@
           "x": 900,
           "y": -50,
           "pattern": "vardemo",
-          "health": 10,
           "patternConfig": {
             "speed": 4.5,
             "angleStep": 18,
             "fireDelay": 3
           },
+          "health": 10,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -5053,7 +5053,6 @@
           "x": -50,
           "y": 170,
           "pattern": "shifter",
-          "health": 24,
           "patternConfig": {
             "bulletSpeed": 5,
             "startDirection": 60,
@@ -5062,6 +5061,7 @@
             "spokeStep": 24,
             "fireDelay": 6
           },
+          "health": 24,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -5433,7 +5433,6 @@
           "x": 1850,
           "y": 170,
           "pattern": "shifter",
-          "health": 24,
           "patternConfig": {
             "bulletSpeed": 5,
             "startDirection": 120,
@@ -5442,6 +5441,7 @@
             "spokeStep": -24,
             "fireDelay": 6
           },
+          "health": 24,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -5813,7 +5813,6 @@
           "x": 900,
           "y": -50,
           "pattern": "shotspeed",
-          "health": 7,
           "patternConfig": {
             "direction": 90,
             "baseSpeed": 3,
@@ -5822,6 +5821,7 @@
             "fireDelay": 1,
             "volleyDelay": 33
           },
+          "health": 7,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -6018,12 +6018,12 @@
           "x": -50,
           "y": 140,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": 15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -6107,12 +6107,12 @@
           "x": 1850,
           "y": 180,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": -15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -6196,12 +6196,12 @@
           "x": -50,
           "y": 220,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": 15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -6290,7 +6290,6 @@
           "x": 900,
           "y": 190,
           "pattern": "gaster-frog",
-          "health": 300,
           "patternConfig": {
             "patternScript": {
               "actions": [
@@ -6517,6 +6516,7 @@
               ]
             }
           },
+          "health": 300,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -6540,12 +6540,12 @@
           "x": -50,
           "y": 120,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": 15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -6629,12 +6629,12 @@
           "x": 1850,
           "y": 120,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": -15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -6723,12 +6723,12 @@
           "x": -50,
           "y": 160,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": 15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -6812,12 +6812,12 @@
           "x": 1850,
           "y": 200,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": -15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -6906,8 +6906,8 @@
           "x": -50,
           "y": 180,
           "pattern": "seeds",
-          "health": 30,
           "patternConfig": {},
+          "health": 30,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -7207,7 +7207,6 @@
           "x": 1850,
           "y": 200,
           "pattern": "pods",
-          "health": 26,
           "patternConfig": {
             "orbitRadius": 120,
             "orbitStep": -3,
@@ -7215,6 +7214,7 @@
             "streamSpeed": 4,
             "streamDelay": 1
           },
+          "health": 26,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -7519,7 +7519,6 @@
           "x": 900,
           "y": -50,
           "pattern": "bindpos",
-          "health": 26,
           "patternConfig": {
             "startDistance": 25,
             "spokeCount": 12,
@@ -7528,6 +7527,7 @@
             "volleyDelay": 22,
             "bindRotation": 0
           },
+          "health": 26,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -7634,12 +7634,12 @@
           "x": 300,
           "y": -50,
           "pattern": "spiral",
-          "health": 2,
           "patternConfig": {
             "bulletSpeed": 4,
             "rotationChange": 18,
             "fireDelay": 4
           },
+          "health": 2,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -7759,12 +7759,12 @@
           "x": 1400,
           "y": -50,
           "pattern": "spiral",
-          "health": 2,
           "patternConfig": {
             "bulletSpeed": 4,
             "rotationChange": -18,
             "fireDelay": 4
           },
+          "health": 2,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -7889,7 +7889,6 @@
           "x": 900,
           "y": 200,
           "pattern": "satellite",
-          "health": 260,
           "patternConfig": {
             "podCount": 3,
             "orbitRadius": 110,
@@ -7909,6 +7908,7 @@
             "pulseLife": 150,
             "pulseDelay": 78
           },
+          "health": 260,
           "movementScript": {
             "loop": true,
             "actions": [
@@ -7972,12 +7972,12 @@
           "x": -50,
           "y": 480,
           "pattern": "spiral",
-          "health": 4,
           "patternConfig": {
             "bulletSpeed": 3.6,
             "rotationChange": 15,
             "fireDelay": 5
           },
+          "health": 4,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -8061,12 +8061,12 @@
           "x": 1850,
           "y": 480,
           "pattern": "spiral",
-          "health": 4,
           "patternConfig": {
             "bulletSpeed": 3.6,
             "rotationChange": -15,
             "fireDelay": 5
           },
+          "health": 4,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -8155,7 +8155,6 @@
           "x": 500,
           "y": -50,
           "pattern": "sincos",
-          "health": 20,
           "patternConfig": {
             "radiusX": 190,
             "radiusY": 60,
@@ -8163,6 +8162,7 @@
             "fireDelay": 5,
             "bearingStep": 5
           },
+          "health": 20,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -8336,7 +8336,6 @@
           "x": 1300,
           "y": -50,
           "pattern": "transform",
-          "health": 20,
           "patternConfig": {
             "radius": 150,
             "scaleX": 1,
@@ -8346,6 +8345,7 @@
             "bearingStep": 4,
             "rotationStep": 2
           },
+          "health": 20,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -8519,7 +8519,6 @@
           "x": 900,
           "y": -50,
           "pattern": "clover",
-          "health": 24,
           "patternConfig": {
             "radius": 200,
             "scaleX": 1,
@@ -8529,6 +8528,7 @@
             "bearingStep": 5,
             "rotationStep": 2.5
           },
+          "health": 24,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -8616,13 +8616,13 @@
           "x": -50,
           "y": 240,
           "pattern": "sniper",
-          "health": 16,
           "patternConfig": {
             "bulletSpeed": 12,
             "burstCount": 3,
             "burstDelay": 2,
             "patternDelay": 46
           },
+          "health": 16,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -8994,13 +8994,13 @@
           "x": 1850,
           "y": 240,
           "pattern": "sniper",
-          "health": 16,
           "patternConfig": {
             "bulletSpeed": 12,
             "burstCount": 3,
             "burstDelay": 2,
             "patternDelay": 46
           },
+          "health": 16,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -9377,12 +9377,12 @@
           "x": -50,
           "y": 150,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": 15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -9466,12 +9466,12 @@
           "x": 1850,
           "y": 180,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": -15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -9555,12 +9555,12 @@
           "x": -50,
           "y": 240,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": 15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -9649,7 +9649,6 @@
           "x": 600,
           "y": -50,
           "pattern": "flower",
-          "health": 82,
           "patternConfig": {
             "petalCount": 6,
             "petalSpread": 30,
@@ -9666,6 +9665,7 @@
             "ringDelay": 150,
             "ringRotation": 25
           },
+          "health": 82,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -9776,7 +9776,6 @@
           "x": 1250,
           "y": -50,
           "pattern": "flowerdup",
-          "health": 92,
           "patternConfig": {
             "copies": 32,
             "ways": 9,
@@ -9792,6 +9791,7 @@
             "endSpeed": 2,
             "volleyDelay": 220
           },
+          "health": 92,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -9902,7 +9902,6 @@
           "x": 300,
           "y": -50,
           "pattern": "nwhip",
-          "health": 5,
           "patternConfig": {
             "numberOfWhips": 4,
             "numberOfBullets": 6,
@@ -9910,6 +9909,7 @@
             "speedChange": 1,
             "patternDelay": 28
           },
+          "health": 5,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -10029,7 +10029,6 @@
           "x": 1550,
           "y": -50,
           "pattern": "nwhip",
-          "health": 5,
           "patternConfig": {
             "numberOfWhips": 4,
             "numberOfBullets": 6,
@@ -10037,6 +10036,7 @@
             "speedChange": 1,
             "patternDelay": 28
           },
+          "health": 5,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -10156,7 +10156,6 @@
           "x": 900,
           "y": -50,
           "pattern": "nwhip",
-          "health": 5,
           "patternConfig": {
             "numberOfWhips": 4,
             "numberOfBullets": 6,
@@ -10164,6 +10163,7 @@
             "speedChange": 1.5,
             "patternDelay": 28
           },
+          "health": 5,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -10288,12 +10288,12 @@
           "x": -50,
           "y": 150,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": 15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -10377,12 +10377,12 @@
           "x": 1850,
           "y": 190,
           "pattern": "spiral",
-          "health": 3,
           "patternConfig": {
             "bulletSpeed": 3.4,
             "rotationChange": -15,
             "fireDelay": 4
           },
+          "health": 3,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -10471,7 +10471,6 @@
           "x": 900,
           "y": 200,
           "pattern": "weaver",
-          "health": 360,
           "patternConfig": {
             "patternScript": {
               "actions": [
@@ -10533,8 +10532,8 @@
                             "actions": [
                               {
                                 "control": "Line",
-                                "prop": "speed",
                                 "count": 7,
+                                "prop": "speed",
                                 "from": 3,
                                 "to": 10.2
                               },
@@ -10833,6 +10832,7 @@
               ]
             }
           },
+          "health": 360,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -10856,8 +10856,8 @@
           "x": -50,
           "y": 500,
           "pattern": "vanish",
-          "health": 8,
           "patternConfig": {},
+          "health": 8,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -10941,8 +10941,8 @@
           "x": 1850,
           "y": 500,
           "pattern": "vanish",
-          "health": 8,
           "patternConfig": {},
+          "health": 8,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -11026,8 +11026,8 @@
           "x": -50,
           "y": 540,
           "pattern": "vanish",
-          "health": 8,
           "patternConfig": {},
+          "health": 8,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -11116,7 +11116,6 @@
           "x": 900,
           "y": 210,
           "pattern": "sol-firedancer",
-          "health": 950,
           "patternConfig": {
             "patternScript": {
               "actions": [
@@ -11449,7 +11448,7 @@
                               {
                                 "control": "Set",
                                 "prop": "speed",
-                                "value": 8
+                                "value": 7
                               },
                               {
                                 "control": "Radial",
@@ -11468,7 +11467,7 @@
                               {
                                 "control": "Set",
                                 "prop": "speed",
-                                "value": 12
+                                "value": 10
                               },
                               {
                                 "control": "Radial",
@@ -11487,7 +11486,7 @@
                               {
                                 "control": "Set",
                                 "prop": "speed",
-                                "value": 16
+                                "value": 13
                               },
                               {
                                 "control": "Radial",
@@ -11888,6 +11887,7 @@
               ]
             }
           },
+          "health": 950,
           "movementScript": {
             "loop": false,
             "actions": [

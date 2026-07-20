@@ -417,12 +417,15 @@ function checkBoss(ctx, p, boss) {
 	boss.phases.forEach((ph, i) => {
 		const pp = `${p}.phases[${i}]`;
 		for (const key of Object.keys(ph)) {
-			if (!["name", "health", "pattern", "patternConfig", "script", "movementScript"].includes(key)) {
+			if (!["name", "health", "timeoutFrames", "pattern", "patternConfig", "script", "movementScript"].includes(key)) {
 				ctx.warn(pp, `boss phase does not use field "${key}"`);
 			}
 		}
 		if (!Number.isInteger(ph.health) || ph.health <= 0) {
 			ctx.error(pp, "boss phase needs a positive integer health");
+		}
+		if (ph.timeoutFrames !== undefined && (!Number.isInteger(ph.timeoutFrames) || ph.timeoutFrames <= 0)) {
+			ctx.error(pp, "timeoutFrames must be a positive integer (frames)");
 		}
 		const hasPattern = typeof ph.pattern === "string";
 		const hasScript = Array.isArray(ph.script);

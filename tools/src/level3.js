@@ -215,14 +215,15 @@ const solFiredancerScript = [
 	S.wait(20),
 
 	// III — retreat-and-return under four volleys of layered shockwaves
-	// (each volley: rings at speed 4/8/12/16, dense to sparse)
+	// (each volley: rings at speed 4/7/10/13, dense to sparse — capped so the
+	// fastest layer stays inside the game's Touhou-Hard ceiling)
 	S.concurrentShared(
 		[dash(270, 2.5, 26), S.wait(20), dash(90, 2, 26)],
 		[S.rep(4,
 			burst(4, S.radial(90, 0)), S.wait(8),
-			burst(8, S.radial(72, 0)), S.wait(8),
-			burst(12, S.radial(45, 0)), S.wait(8),
-			burst(16, S.radial(30, 0)), S.wait(38),
+			burst(7, S.radial(72, 0)), S.wait(8),
+			burst(10, S.radial(45, 0)), S.wait(8),
+			burst(13, S.radial(30, 0)), S.wait(38),
 		)],
 	),
 	S.wait(20),

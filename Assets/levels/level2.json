@@ -590,7 +590,7 @@
                 {
                   "control": "Radial",
                   "count": 80,
-                  "speed": 5
+                  "speed": 4
                 },
                 {
                   "control": "Wait",
@@ -599,7 +599,7 @@
                 {
                   "control": "Radial",
                   "count": 40,
-                  "speed": 10
+                  "speed": 7
                 },
                 {
                   "control": "Wait",
@@ -608,7 +608,7 @@
                 {
                   "control": "Radial",
                   "count": 20,
-                  "speed": 15
+                  "speed": 10
                 },
                 {
                   "control": "Wait",
@@ -617,7 +617,7 @@
                 {
                   "control": "Radial",
                   "count": 10,
-                  "speed": 20
+                  "speed": 12.5
                 },
                 {
                   "control": "Wait",
@@ -626,7 +626,7 @@
                 {
                   "control": "Radial",
                   "count": 5,
-                  "speed": 25
+                  "speed": 15
                 },
                 {
                   "control": "Wait",
@@ -639,7 +639,7 @@
                 {
                   "control": "Radial",
                   "count": 120,
-                  "speed": 5
+                  "speed": 4
                 },
                 {
                   "control": "Wait",
@@ -648,7 +648,7 @@
                 {
                   "control": "Radial",
                   "count": 90,
-                  "speed": 10
+                  "speed": 7
                 },
                 {
                   "control": "Wait",
@@ -657,7 +657,7 @@
                 {
                   "control": "Radial",
                   "count": 72,
-                  "speed": 15
+                  "speed": 10
                 },
                 {
                   "control": "Wait",
@@ -666,7 +666,7 @@
                 {
                   "control": "Radial",
                   "count": 45,
-                  "speed": 20
+                  "speed": 12.5
                 },
                 {
                   "control": "Wait",
@@ -675,7 +675,7 @@
                 {
                   "control": "Radial",
                   "count": 30,
-                  "speed": 25
+                  "speed": 15
                 },
                 {
                   "control": "Wait",
@@ -688,7 +688,7 @@
                 {
                   "control": "Radial",
                   "count": 40,
-                  "speed": 5
+                  "speed": 4
                 },
                 {
                   "control": "Wait",
@@ -697,7 +697,7 @@
                 {
                   "control": "Radial",
                   "count": 20,
-                  "speed": 10
+                  "speed": 7
                 },
                 {
                   "control": "Wait",
@@ -706,7 +706,7 @@
                 {
                   "control": "Radial",
                   "count": 10,
-                  "speed": 15
+                  "speed": 10
                 },
                 {
                   "control": "Wait",
@@ -715,7 +715,7 @@
                 {
                   "control": "Radial",
                   "count": 5,
-                  "speed": 20
+                  "speed": 12.5
                 },
                 {
                   "control": "Wait",
@@ -724,7 +724,7 @@
                 {
                   "control": "Radial",
                   "count": 2,
-                  "speed": 25
+                  "speed": 15
                 },
                 {
                   "control": "Wait",
@@ -1819,7 +1819,7 @@
                           {
                             "control": "Set",
                             "prop": "speed",
-                            "value": 14
+                            "value": 12
                           },
                           {
                             "control": "Rep",

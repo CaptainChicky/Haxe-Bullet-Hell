@@ -79,6 +79,11 @@ class Main extends Sprite {
 	private static inline final START_BOMBS:Int = 3;
 	private static inline final RESPAWN_INVINCIBLE_FRAMES:Int = 180;
 	private static inline final BOMB_INVINCIBLE_FRAMES:Int = 120;
+
+	// Bomb blast damage to every enemy on screen (Touhou-style: bombs are a
+	// panic button AND meaningful burst damage — roughly 1.5s of max DPS
+	// applied to the whole field at once).
+	private static inline final BOMB_DAMAGE:Int = 40;
 	private static inline final SCORE_PER_HEALTH:Int = 100;
 	private static inline final SCORE_PER_GRAZE:Int = 10;
 
@@ -214,8 +219,12 @@ class Main extends Sprite {
 		messagePanel.graphics.beginFill(0x0d0d16, 0.85);
 		messagePanel.graphics.drawRoundRect(0, 0, MESSAGE_PANEL_W, MESSAGE_PANEL_H, 18, 18);
 		messagePanel.graphics.endFill();
-		messagePanel.graphics.lineStyle(1, 0x8899cc, 0.5);
+		messagePanel.graphics.lineStyle(1, 0x3a4260, 0.9);
 		messagePanel.graphics.drawRoundRect(0, 0, MESSAGE_PANEL_W, MESSAGE_PANEL_H, 18, 18);
+		messagePanel.graphics.lineStyle();
+		messagePanel.graphics.beginFill(0xffd766, 0.85);
+		messagePanel.graphics.drawRoundRect(16, 0, MESSAGE_PANEL_W - 32, 3, 2, 2);
+		messagePanel.graphics.endFill();
 		messagePanel.x = (stageWidth - MESSAGE_PANEL_W) / 2;
 		messagePanel.y = (stageHeight - MESSAGE_PANEL_H) / 2;
 		messagePanel.mouseEnabled = false;
@@ -517,8 +526,10 @@ class Main extends Sprite {
 		hud.setBombs(bombs);
 		AudioManager.sfxBomb();
 
-		// Wipe every enemy bullet and give the player breathing room
+		// Wipe every enemy bullet, damage everything on screen, and give the
+		// player breathing room
 		collisionManager.clearEnemyBullets();
+		collisionManager.damageAllEnemies(BOMB_DAMAGE);
 		player.setInvincible(BOMB_INVINCIBLE_FRAMES);
 
 		// Screen flash, faded out in everyFrame
@@ -706,6 +717,9 @@ class Main extends Sprite {
 
 		// Boss bar follows whichever boss (if any) is alive
 		bossBar.track(enemyManager.getActiveBoss());
+
+		// HUD steps aside when the player fights underneath it
+		hud.trackPlayer(player.x, player.y);
 
 		// Fade out the bomb flash
 		if (bombFlash != null && bombFlash.alpha > 0) {

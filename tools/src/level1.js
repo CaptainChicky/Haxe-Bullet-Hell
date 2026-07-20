@@ -40,7 +40,10 @@ function dropIn(speed, enterFrames, holdFrames, exitVy = -2.5) {
 // Signature midboss script kept intact from the original hand-written level:
 // three widening fans, three volleys of collapsing radial rings, then a
 // looping fire-line + slow-ring barrage until it leaves or dies.
-const RING_SET = [[120, 5], [90, 10], [72, 15], [45, 20], [30, 25]];
+// Ring speed ladder capped at 14 (was 25): a speed-25 bullet crosses the
+// whole field in ~0.7s, which is Lunatic reaction time — stage 1 should sit
+// around Touhou Easy/Normal, the fast top ring is still a clear overtake.
+const RING_SET = [[110, 4], [84, 6.5], [64, 9], [44, 11.5], [30, 14]];
 
 const sunExplosionScript = [
 	S.set("direction", 90), S.set("speed", 4),
@@ -200,7 +203,7 @@ module.exports = level("level1", "Level 1 - Introduction", {
 					S.loop(
 						S.nway(10, 90, 0), S.wait(60),
 						S.radial(36, 0), S.wait(60),
-						S.set("speed", 14),
+						S.set("speed", 12),
 						S.rep(10, S.fire(0, 0), S.add("speed", -1)),
 						S.set("speed", 5), S.wait(60),
 					),
@@ -247,7 +250,7 @@ module.exports = level("level1", "Level 1 - Introduction", {
 				at: [1250, -60], time: 0,
 				pattern: "laundry", health: 26,
 				script: [
-					S.set("direction", 90), S.set("speed", 12),
+					S.set("direction", 90), S.set("speed", 9),
 					S.concurrent(
 						[S.loop(S.radial(10, 0), S.add("direction", 8), S.wait(4))],
 						[S.loop(S.radial(4, 0), S.add("direction", 4), S.wait(2))],

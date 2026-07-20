@@ -196,6 +196,21 @@ class CollisionManager extends Sprite {
 		enemyBullets = new Array<BulletEnemy>();
 	}
 
+	/** Bomb blast damage: hit every live enemy at once. Deaths route through
+	 *  the same onEnemyKilled hook as bullet kills, so score and item drops
+	 *  behave exactly as if the player shot them down. Boss transition
+	 *  invulnerability still applies (BossEnemy.takeDamage ignores it). */
+	public function damageAllEnemies(damage:Int):Void {
+		for (enemy in enemyManager.getEnemies()) {
+			if (!enemy.isAlive()) continue;
+			enemy.takeDamage(damage);
+			if (!enemy.isAlive() && onEnemyKilled != null) {
+				onEnemyKilled(enemy);
+			}
+		}
+		enemyManager.cleanupDeadEnemies();
+	}
+
 	/** Despawn every live enemy bullet (bomb effect). Uses destroy() so bound
 	 *  bullets and sub-scripts tear down properly. */
 	public function clearEnemyBullets():Void {

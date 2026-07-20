@@ -46,9 +46,11 @@ const sunExplosion2Script = [
 	S.set("direction", 90), S.set("speed", 4), S.wait(30),
 	S.rep(12, S.nway(12, 200, 0), S.add("direction", 5), S.add("speed", 0.5), S.wait(3)),
 	S.set("direction", 90), S.set("speed", 0), S.wait(30),
-	rings([[80, 5], [40, 10], [20, 15], [10, 20], [5, 25]]), S.wait(10), S.wait(30),
-	rings([[120, 5], [90, 10], [72, 15], [45, 20], [30, 25]]), S.wait(10), S.wait(30),
-	rings([[40, 5], [20, 10], [10, 15], [5, 20], [2, 25]]), S.wait(120),
+	// Ring speed ladders capped at 15 (was 25) — see level1's RING_SET note;
+	// stage 2 gets to be a touch faster than stage 1's cap of 14.
+	rings([[80, 4], [40, 7], [20, 10], [10, 12.5], [5, 15]]), S.wait(10), S.wait(30),
+	rings([[120, 4], [90, 7], [72, 10], [45, 12.5], [30, 15]]), S.wait(10), S.wait(30),
+	rings([[40, 4], [20, 7], [10, 10], [5, 12.5], [2, 15]]), S.wait(120),
 	S.set("direction", 90),
 	S.loop(
 		S.set("speed", 3),
@@ -255,7 +257,7 @@ module.exports = level("level2", "Level 2 - Rolling Advance", {
 							S.wait(40),
 							S.radial(10, 6),
 							S.wait(60),
-							S.set("speed", 14),
+							S.set("speed", 12),
 							S.rep(10, S.fire(0, 0), S.add("speed", -1)),
 							S.set("speed", 7),
 							S.wait(60),

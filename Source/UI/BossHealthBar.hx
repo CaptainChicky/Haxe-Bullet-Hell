@@ -31,8 +31,13 @@ class BossHealthBar extends Sprite {
 	private var barWidth:Int;
 	private var nameField:TextField;
 	private var spellField:TextField;
+	private var timerField:TextField;
 	private var fill:Sprite;
 	private var markers:Sprite;
+
+	// Damage ghost: a pale bar that lags behind the real fill and eases down
+	// toward it, so chunks of damage read as a visible "bite".
+	private var ghostFraction:Float = 1.0;
 
 	// Large centered spell card announcement (own panel, below the strip)
 	private var banner:Sprite;
@@ -66,7 +71,13 @@ class BossHealthBar extends Sprite {
 
 		var spellFormat = new TextFormat(fontName, 15, 0xffd766, true);
 		spellFormat.align = TextFormatAlign.RIGHT;
-		spellField = makeField(spellFormat, barWidth * 0.35, 0, barWidth * 0.65);
+		spellField = makeField(spellFormat, barWidth * 0.35, 0, barWidth * 0.65 - 64);
+
+		// Phase timeout countdown (seconds), far right of the text row.
+		// Hidden when the phase has no timeout.
+		var timerFormat = new TextFormat(fontName, 15, 0xffffff, true);
+		timerFormat.align = TextFormatAlign.RIGHT;
+		timerField = makeField(timerFormat, barWidth - 58, 0, 58);
 
 		// Bar backing (inset track under the text row)
 		graphics.lineStyle();
@@ -129,12 +140,26 @@ class BossHealthBar extends Sprite {
 		if (boss != lastBoss || boss.getPhaseIndex() != lastPhase) {
 			lastBoss = boss;
 			lastPhase = boss.getPhaseIndex();
+			ghostFraction = 1.0;
 			refreshLabels(boss);
 			raiseBanner(boss);
 		}
 
 		updateBanner();
+		updateTimer(boss);
 		redrawFill(boss);
+	}
+
+	/** Countdown to the phase timeout; turns red in the last ten seconds. */
+	private function updateTimer(boss:BossEnemy):Void {
+		var remaining = boss.getPhaseTimeoutRemaining();
+		if (remaining < 0) {
+			timerField.text = "";
+			return;
+		}
+		var seconds = Std.int((remaining + 59) / 60);
+		timerField.textColor = (seconds <= 10) ? 0xff5566 : 0xffffff;
+		timerField.text = Std.string(seconds);
 	}
 
 	private function refreshLabels(boss:BossEnemy):Void {
@@ -213,13 +238,28 @@ class BossHealthBar extends Sprite {
 		var fraction:Float = boss.getPhaseHealth() / boss.getPhaseMaxHealth();
 		if (fraction < 0) fraction = 0;
 
+		// Ghost eases down toward the live fraction (snaps up on phase reset)
+		if (ghostFraction < fraction) ghostFraction = fraction;
+		ghostFraction += (fraction - ghostFraction) * 0.06;
+
 		var remaining = boss.getPhaseCount() - boss.getPhaseIndex() - 1;
 		var color = PHASE_COLORS[remaining < PHASE_COLORS.length ? remaining : PHASE_COLORS.length - 1];
 
 		fill.graphics.clear();
+		if (ghostFraction > fraction + 0.002) {
+			fill.graphics.beginFill(0xffffff, 0.35);
+			fill.graphics.drawRoundRect(0, 0, (barWidth - 4) * ghostFraction, BAR_HEIGHT, 6, 6);
+			fill.graphics.endFill();
+		}
 		if (fraction > 0) {
-			fill.graphics.beginFill(color, boss.isInvulnerable() ? 0.45 : 0.9);
-			fill.graphics.drawRoundRect(0, 0, (barWidth - 4) * fraction, BAR_HEIGHT, 6, 6);
+			var barAlpha = boss.isInvulnerable() ? 0.45 : 0.9;
+			var w = (barWidth - 4) * fraction;
+			fill.graphics.beginFill(color, barAlpha);
+			fill.graphics.drawRoundRect(0, 0, w, BAR_HEIGHT, 6, 6);
+			fill.graphics.endFill();
+			// Bright core strip gives the bar depth
+			fill.graphics.beginFill(0xffffff, barAlpha * 0.25);
+			fill.graphics.drawRoundRect(1, 1.5, w - 2 > 0 ? w - 2 : 0, BAR_HEIGHT * 0.35, 3, 3);
 			fill.graphics.endFill();
 		}
 	}

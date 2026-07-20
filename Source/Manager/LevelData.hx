@@ -47,6 +47,7 @@ typedef BossData = {
 typedef BossPhaseData = {
 	@:optional var name:String; // Spell card name shown on the boss bar
 	var health:Int; // Damage needed to clear this phase
+	@:optional var timeoutFrames:Null<Int>; // Phase auto-clears (no drops) after this many frames; absent = no timeout
 	@:optional var pattern:String; // Pattern template name (Assets/patterns/<name>.json)
 	@:optional var patternConfig:Dynamic; // Parameters for the pattern / inline script
 	@:optional var script:Array<Dynamic>; // Inline shot script actions (instead of pattern)
