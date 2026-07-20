@@ -565,6 +565,9 @@ class Main extends Sprite {
 			// Check for god mode sequence "6969"
 			if (keySequence == "6969") {
 				player.toggleGodMode();
+				if (player.isGodMode()) {
+					setPower(PlayerShootingPattern.MAX_POWER);
+				}
 				keySequence = ""; // Reset after activating
 			}
 		}
