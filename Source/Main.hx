@@ -302,11 +302,13 @@ class Main extends Sprite {
 				player.respawn();
 			}
 
-			// Fresh run: reset score, lives, bombs, power (per difficulty)
+			// Fresh run: reset score, lives, bombs, power (per difficulty).
+			// God mode toggled on the title screen carries into the run, so
+			// keep its max-power grant instead of zeroing it.
 			score = 0;
 			lives = GameSettings.startingLives();
 			bombs = GameSettings.startingBombs();
-			power = 0;
+			power = player.isGodMode() ? PlayerShootingPattern.MAX_POWER : 0;
 			hud.setScore(score);
 			hud.setLives(lives);
 			hud.setBombs(bombs);
