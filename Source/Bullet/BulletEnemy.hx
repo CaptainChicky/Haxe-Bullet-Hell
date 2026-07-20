@@ -60,8 +60,6 @@ class BulletEnemy extends Sprite {
 	private var ghostOrigin:GhostOrigin = null; // dead parent's ghost (offset mode)
 	private var bindRetained:Bool = false; // holds a refcount on the anchor
 
-	private var spawnTime:Int = Lib.getTimer();
-
 	// Random salt so bullet sprite spin isn't uniform across bullets.
 	private var salt:Float = Math.random() * 20;
 
@@ -87,13 +85,13 @@ class BulletEnemy extends Sprite {
 		bitmap.y = -bitmap.height / 2;
 		addChild(bitmap);
 		collisionRadius = Math.max(bmd.width, bmd.height) / 2;
-		if (resolved.scale != 1) {
-			scaleX = resolved.scale;
-			scaleY = resolved.scale;
-			collisionRadius *= resolved.scale;
+		// Skin-level scale and the prototype's per-bullet `size` stack
+		var totalScale = resolved.scale * prototype.size;
+		if (totalScale != 1) {
+			scaleX = totalScale;
+			scaleY = totalScale;
+			collisionRadius *= totalScale;
 		}
-
-		spawnTime = Lib.getTimer();
 	}
 
 	/** Attach a script this bullet runs on its own (called by the emitter). */
@@ -126,9 +124,12 @@ class BulletEnemy extends Sprite {
 	}
 
 	private inline function updateVelocity():Void {
+		// Difficulty scales displacement here, at integration, so shot
+		// scripts keep seeing exactly the speeds they authored.
 		var rad = direction * Math.PI / 180;
-		velocityX = Math.cos(rad) * speed;
-		velocityY = Math.sin(rad) * speed;
+		var scaled = speed * manager.GameSettings.bulletSpeedMultiplier();
+		velocityX = Math.cos(rad) * scaled;
+		velocityY = Math.sin(rad) * scaled;
 	}
 
 	/** Advance one frame. Driven centrally by CollisionManager (bullets must
@@ -263,17 +264,17 @@ class BulletEnemy extends Sprite {
 			return;
 		}
 
-		// Despawn outside stage boundaries.
-		var stageWidth:Int = Lib.current.stage.stageWidth;
-		var stageHeight:Int = Lib.current.stage.stageHeight;
+		// Despawn outside the fixed playfield (not the live window size, which
+		// shrinks when the fullscreen window minimizes on focus loss).
+		var stageWidth:Int = Main.fieldWidth;
+		var stageHeight:Int = Main.fieldHeight;
 		if (x < -100 || x > stageWidth + 100 || y < -100 || y > stageHeight + 100) {
 			despawn();
 			return;
 		}
 
-		// Cosmetic sprite spin based on time since spawn.
-		var deltaTime:Float = (Lib.getTimer() - spawnTime) / 1000.0;
-		rotation = salt + (ROTATION_SPEED * deltaTime);
+		// Cosmetic sprite spin from frames alive (freezes cleanly with pause).
+		rotation = salt + (ROTATION_SPEED * age / 60.0);
 	}
 
 	/** Public destroy hook (used by the Vanish command via BulletSubEmitter). */

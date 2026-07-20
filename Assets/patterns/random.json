@@ -32,10 +32,27 @@
     {
       "control": "Loop",
       "actions": [
-        {"control": "RandomSpeed", "min": "$minSpeed", "max": "$maxSpeed"},
-        {"control": "RandomAngle", "min": "$baseAngle - $angleSpread", "max": "$baseAngle + $angleSpread"},
-        {"control": "Fire", "angle": 0, "speed": 0},
-        {"control": "Wait", "frames": "$fireDelay"}
+        {
+          "control": "Random",
+          "prop": "speed",
+          "min": "$minSpeed",
+          "max": "$maxSpeed"
+        },
+        {
+          "control": "Random",
+          "prop": "direction",
+          "min": "$baseAngle - $angleSpread",
+          "max": "$baseAngle + $angleSpread"
+        },
+        {
+          "control": "Fire",
+          "angle": 0,
+          "speed": 0
+        },
+        {
+          "control": "Wait",
+          "frames": "$fireDelay"
+        }
       ]
     }
   ]

@@ -45,6 +45,11 @@ class ShotPrototype {
 	/** Frames the bullet lives before auto-despawn. <= 0 means unlimited. */
 	public var lifetime:Float = 0;
 
+	/** Visual scale multiplier for the spawned bullet (collision radius
+	 *  follows). Multiplies on top of any skin-level sprite scale. Distinct
+	 *  from the Scale command, which shapes spawn PLACEMENT, not the bullet. */
+	public var size:Float = 1;
+
 	// --- Binding --------------------------------------------------------------
 	public static inline final BIND_NONE:Int = 0;
 	public static inline final BIND_POSITION:Int = 1;
@@ -101,6 +106,7 @@ class ShotPrototype {
 		p.minSpeed = minSpeed;
 		p.maxSpeed = maxSpeed;
 		p.lifetime = lifetime;
+		p.size = size;
 		p.bindMode = bindMode; // config travels; bindSource (runtime wiring) does not
 		p.subCommands = subCommands;
 		for (k in vars.keys()) p.vars.set(k, vars.get(k));
@@ -121,6 +127,7 @@ class ShotPrototype {
 			case "minSpeed": minSpeed;
 			case "maxSpeed": maxSpeed;
 			case "lifetime": lifetime;
+			case "size": size;
 			case "bindMode": bindMode;
 			default: vars.exists(name) ? vars.get(name) : 0;
 		}
@@ -140,6 +147,7 @@ class ShotPrototype {
 			case "minSpeed": minSpeed = value;
 			case "maxSpeed": maxSpeed = value;
 			case "lifetime": lifetime = value;
+			case "size": size = value;
 			case "bindMode": bindMode = Std.int(value);
 			default: vars.set(name, value);
 		}

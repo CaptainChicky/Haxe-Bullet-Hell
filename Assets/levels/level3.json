@@ -1,19 +1,39 @@
 {
-  "name": "Level 3 \u2013 The Firedancer's Gauntlet",
+  "name": "Level 3 – The Firedancer's Gauntlet",
   "dialogue": {
     "intro": [
-      {"speaker": "Firedancer", "portrait": "assets/Enemy.png", "side": "right",
-       "text": "So you're the storm that scattered my swarm. Every dance ends, Aviator."},
-      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
-       "text": "Then let's make the last one worth watching."},
-      {"speaker": "Firedancer", "portrait": "assets/Enemy.png", "side": "right",
-       "text": "Burn brightly, little bird. The gauntlet is open!"}
+      {
+        "speaker": "Firedancer",
+        "portrait": "assets/Enemy.png",
+        "side": "right",
+        "text": "So you're the storm that scattered my swarm. Every dance ends, Aviator."
+      },
+      {
+        "speaker": "Aviator",
+        "portrait": "assets/Player.png",
+        "side": "left",
+        "text": "Then let's make the last one worth watching."
+      },
+      {
+        "speaker": "Firedancer",
+        "portrait": "assets/Enemy.png",
+        "side": "right",
+        "text": "Burn brightly, little bird. The gauntlet is open!"
+      }
     ],
     "outro": [
-      {"speaker": "Firedancer", "portrait": "assets/Enemy.png", "side": "right",
-       "text": "Beautiful... like falling embers. The sky is yours, for now."},
-      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
-       "text": "For now is enough. Time to fly home."}
+      {
+        "speaker": "Firedancer",
+        "portrait": "assets/Enemy.png",
+        "side": "right",
+        "text": "Beautiful... like falling embers. The sky is yours, for now."
+      },
+      {
+        "speaker": "Aviator",
+        "portrait": "assets/Player.png",
+        "side": "left",
+        "text": "For now is enough. Time to fly home."
+      }
     ]
   },
   "waves": [
@@ -21,7 +41,7 @@
       "startTime": 0,
       "enemies": [
         {
-          "spawnTime": 0.0,
+          "spawnTime": 0,
           "x": -50,
           "y": 90,
           "pattern": "spiral",
@@ -738,7 +758,7 @@
       "startTime": 4,
       "enemies": [
         {
-          "spawnTime": 0.0,
+          "spawnTime": 0,
           "x": 500,
           "y": -50,
           "pattern": "radial",
@@ -754,7 +774,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 0,
-                "vy": 3.0
+                "vy": 3
               },
               {
                 "type": "Wait",
@@ -825,7 +845,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.4
               },
               {
@@ -897,7 +917,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.4
               },
               {
@@ -906,7 +926,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.433333333333333
               },
               {
@@ -915,7 +935,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.4666666666666663
               },
               {
@@ -924,7 +944,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.5
               },
               {
@@ -951,7 +971,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 0,
-                "vy": 3.0
+                "vy": 3
               },
               {
                 "type": "Wait",
@@ -1022,7 +1042,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.4
               },
               {
@@ -1094,7 +1114,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.4
               },
               {
@@ -1103,7 +1123,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.433333333333333
               },
               {
@@ -1112,7 +1132,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.4666666666666663
               },
               {
@@ -1121,7 +1141,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.5
               },
               {
@@ -1148,7 +1168,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 0,
-                "vy": 3.0
+                "vy": 3
               },
               {
                 "type": "Wait",
@@ -1219,7 +1239,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.4
               },
               {
@@ -1291,7 +1311,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.4
               },
               {
@@ -1300,7 +1320,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.433333333333333
               },
               {
@@ -1309,7 +1329,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.4666666666666663
               },
               {
@@ -1318,7 +1338,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.5
               },
               {
@@ -1352,7 +1372,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 0.625
               },
               {
@@ -1361,7 +1381,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 2.0,
+                "vx": 2,
                 "vy": 0.75
               },
               {
@@ -1370,7 +1390,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 1.0,
+                "vx": 1,
                 "vy": 0.875
               },
               {
@@ -1379,8 +1399,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 1.0
+                "vx": 0,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1389,7 +1409,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 0.75,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1398,7 +1418,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 1.5,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1407,7 +1427,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 2.25,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1415,8 +1435,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
-                "vy": 1.0
+                "vx": 3,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1425,7 +1445,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 2.25,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1434,7 +1454,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 1.5,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1443,7 +1463,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 0.75,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1451,62 +1471,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": -0.75,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": -1.5,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": -2.25,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": -3.0,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": -2.25,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": -1.5,
-                "vy": 1.0
+                "vx": 0,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1515,7 +1481,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -0.75,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1523,8 +1489,62 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 1.0
+                "vx": -1.5,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.25,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -3,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.25,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -1.5,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -0.75,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1588,7 +1608,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 0.625
               },
               {
@@ -1597,7 +1617,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -2.0,
+                "vx": -2,
                 "vy": 0.75
               },
               {
@@ -1606,7 +1626,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -1.0,
+                "vx": -1,
                 "vy": 0.875
               },
               {
@@ -1615,8 +1635,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 1.0
+                "vx": 0,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1625,7 +1645,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -0.75,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1634,7 +1654,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -1.5,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1643,7 +1663,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -2.25,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1651,8 +1671,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
-                "vy": 1.0
+                "vx": -3,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1661,7 +1681,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -2.25,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1670,7 +1690,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -1.5,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1679,7 +1699,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -0.75,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1687,62 +1707,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 0.75,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 1.5,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 2.25,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 3.0,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 2.25,
-                "vy": 1.0
-              },
-              {
-                "type": "Wait",
-                "frames": 12
-              },
-              {
-                "type": "SetVelocity",
-                "vx": 1.5,
-                "vy": 1.0
+                "vx": 0,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1751,7 +1717,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 0.75,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1759,8 +1725,62 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 1.0
+                "vx": 1.5,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.25,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 3,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2.25,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 1.5,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0.75,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 12
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -1806,7 +1826,7 @@
           }
         },
         {
-          "spawnTime": 1.0,
+          "spawnTime": 1,
           "x": 900,
           "y": -50,
           "pattern": "shotspeed",
@@ -1896,7 +1916,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.6
               },
               {
@@ -1968,7 +1988,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.6
               },
               {
@@ -1977,7 +1997,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.5666666666666664
               },
               {
@@ -1986,7 +2006,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.533333333333333
               },
               {
@@ -1995,7 +2015,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.5
               },
               {
@@ -2055,7 +2075,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.5
               },
               {
@@ -2127,7 +2147,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.5
               },
               {
@@ -2199,7 +2219,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.5
               },
               {
@@ -2271,7 +2291,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.5
               },
               {
@@ -2281,7 +2301,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 0.75,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -2299,7 +2319,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 2.25,
-                "vy": 2.0
+                "vy": 2
               },
               {
                 "type": "Wait",
@@ -2307,7 +2327,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 2.5
               },
               {
@@ -2379,7 +2399,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -2.7199999999999998,
-                "vy": 3.0
+                "vy": 3
               },
               {
                 "type": "Wait",
@@ -2468,7 +2488,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 2.7199999999999998,
-                "vy": 3.0
+                "vy": 3
               },
               {
                 "type": "Wait",
@@ -2518,7 +2538,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 0.5
               },
               {
@@ -2527,7 +2547,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 2.0,
+                "vx": 2,
                 "vy": 0.6000000000000001
               },
               {
@@ -2536,7 +2556,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 1.0,
+                "vx": 1,
                 "vy": 0.7000000000000001
               },
               {
@@ -2545,7 +2565,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.8
               },
               {
@@ -2581,7 +2601,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 0.8
               },
               {
@@ -2617,7 +2637,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.8
               },
               {
@@ -2653,7 +2673,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 0.8
               },
               {
@@ -2689,7 +2709,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.8
               },
               {
@@ -2725,7 +2745,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 0.8
               },
               {
@@ -2761,7 +2781,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.8
               },
               {
@@ -2797,8 +2817,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
-                "vy": 3.0
+                "vx": 3,
+                "vy": 3
               },
               {
                 "type": "Wait",
@@ -2825,7 +2845,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 0.45
               },
               {
@@ -2834,7 +2854,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -2.0,
+                "vx": -2,
                 "vy": 0.5
               },
               {
@@ -2843,7 +2863,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -1.0,
+                "vx": -1,
                 "vy": 0.55
               },
               {
@@ -2852,7 +2872,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -2924,7 +2944,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -2996,7 +3016,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -3068,7 +3088,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -3140,7 +3160,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -3176,7 +3196,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 2.5
               },
               {
@@ -3187,7 +3207,7 @@
           }
         },
         {
-          "spawnTime": 1.0,
+          "spawnTime": 1,
           "x": 500,
           "y": -50,
           "pattern": "parallel",
@@ -3276,7 +3296,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.5
               },
               {
@@ -3348,7 +3368,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.5
               },
               {
@@ -3357,7 +3377,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.5
               },
               {
@@ -3366,7 +3386,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.5
               },
               {
@@ -3375,7 +3395,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.5
               },
               {
@@ -3475,7 +3495,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.5
               },
               {
@@ -3547,7 +3567,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.5
               },
               {
@@ -3556,7 +3576,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.5
               },
               {
@@ -3565,7 +3585,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.5
               },
               {
@@ -3574,7 +3594,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.5
               },
               {
@@ -3610,7 +3630,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 0.45
               },
               {
@@ -3619,7 +3639,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 2.0,
+                "vx": 2,
                 "vy": 0.5
               },
               {
@@ -3628,7 +3648,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 1.0,
+                "vx": 1,
                 "vy": 0.55
               },
               {
@@ -3637,7 +3657,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -3709,7 +3729,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -3781,7 +3801,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -3853,7 +3873,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -3889,7 +3909,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 2.5
               },
               {
@@ -3916,7 +3936,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 0.45
               },
               {
@@ -3925,7 +3945,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -2.0,
+                "vx": -2,
                 "vy": 0.5
               },
               {
@@ -3934,7 +3954,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -1.0,
+                "vx": -1,
                 "vy": 0.55
               },
               {
@@ -3943,7 +3963,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -4015,7 +4035,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -4087,7 +4107,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -4159,7 +4179,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -4195,7 +4215,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 2.5
               },
               {
@@ -4241,8 +4261,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": -2.0
+                "vx": 0,
+                "vy": -2
               },
               {
                 "type": "Wait",
@@ -4250,8 +4270,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": -4.0
+                "vx": 0,
+                "vy": -4
               },
               {
                 "type": "Wait",
@@ -4259,8 +4279,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": -6.0
+                "vx": 0,
+                "vy": -6
               },
               {
                 "type": "Wait",
@@ -4268,8 +4288,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": -8.0
+                "vx": 0,
+                "vy": -8
               },
               {
                 "type": "Wait",
@@ -4331,7 +4351,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 1.8
               },
               {
@@ -4367,7 +4387,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.8
               },
               {
@@ -4403,7 +4423,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 1.8
               },
               {
@@ -4439,7 +4459,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.8
               },
               {
@@ -4448,7 +4468,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.7
               },
               {
@@ -4457,7 +4477,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.6
               },
               {
@@ -4466,7 +4486,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.5
               },
               {
@@ -4524,7 +4544,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 1.8
               },
               {
@@ -4560,7 +4580,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.8
               },
               {
@@ -4596,7 +4616,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 1.8
               },
               {
@@ -4632,7 +4652,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.8
               },
               {
@@ -4641,7 +4661,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.7
               },
               {
@@ -4650,7 +4670,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.6
               },
               {
@@ -4659,7 +4679,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.5
               },
               {
@@ -4842,7 +4862,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.5
               },
               {
@@ -4914,7 +4934,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.5
               },
               {
@@ -4986,7 +5006,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.5
               },
               {
@@ -4995,7 +5015,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.5
               },
               {
@@ -5004,7 +5024,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.5
               },
               {
@@ -5013,7 +5033,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.5
               },
               {
@@ -5047,7 +5067,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 0.325
               },
               {
@@ -5056,7 +5076,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 2.0,
+                "vx": 2,
                 "vy": 0.35
               },
               {
@@ -5065,7 +5085,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 1.0,
+                "vx": 1,
                 "vy": 0.375
               },
               {
@@ -5074,7 +5094,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -5146,7 +5166,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -5218,7 +5238,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -5290,7 +5310,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -5362,7 +5382,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -5398,8 +5418,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
-                "vy": 2.0
+                "vx": 3,
+                "vy": 2
               },
               {
                 "type": "Wait",
@@ -5427,7 +5447,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 0.325
               },
               {
@@ -5436,7 +5456,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -2.0,
+                "vx": -2,
                 "vy": 0.35
               },
               {
@@ -5445,7 +5465,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -1.0,
+                "vx": -1,
                 "vy": 0.375
               },
               {
@@ -5454,7 +5474,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -5526,7 +5546,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -5598,7 +5618,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -5670,7 +5690,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -5742,7 +5762,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -5778,8 +5798,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
-                "vy": 2.0
+                "vx": -3,
+                "vy": 2
               },
               {
                 "type": "Wait",
@@ -5879,7 +5899,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.7
               },
               {
@@ -5951,7 +5971,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.7
               },
               {
@@ -5960,7 +5980,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.6333333333333333
               },
               {
@@ -5969,7 +5989,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.5666666666666664
               },
               {
@@ -5978,7 +5998,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.5
               },
               {
@@ -6036,8 +6056,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
-                "vy": 2.0
+                "vx": 3,
+                "vy": 2
               },
               {
                 "type": "Wait",
@@ -6125,8 +6145,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
-                "vy": 2.0
+                "vx": -3,
+                "vy": 2
               },
               {
                 "type": "Wait",
@@ -6214,8 +6234,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
-                "vy": 2.0
+                "vx": 3,
+                "vy": 2
               },
               {
                 "type": "Wait",
@@ -6280,11 +6300,13 @@
                   "value": 1
                 },
                 {
-                  "control": "SetAngle",
+                  "control": "Set",
+                  "prop": "direction",
                   "value": 90
                 },
                 {
-                  "control": "SetSpeed",
+                  "control": "Set",
+                  "prop": "speed",
                   "value": 0
                 },
                 {
@@ -6363,7 +6385,8 @@
                           ]
                         },
                         {
-                          "control": "AddAngle",
+                          "control": "Add",
+                          "prop": "direction",
                           "delta": 1.4
                         },
                         {
@@ -6460,7 +6483,8 @@
                           ]
                         },
                         {
-                          "control": "AddAngle",
+                          "control": "Add",
+                          "prop": "direction",
                           "delta": -1.4
                         },
                         {
@@ -6889,7 +6913,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 0.45
               },
               {
@@ -6898,7 +6922,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 2.0,
+                "vx": 2,
                 "vy": 0.5
               },
               {
@@ -6907,7 +6931,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 1.0,
+                "vx": 1,
                 "vy": 0.55
               },
               {
@@ -6916,7 +6940,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -6988,7 +7012,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -7060,7 +7084,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -7132,7 +7156,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -7168,7 +7192,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 2.5
               },
               {
@@ -7196,7 +7220,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 0.45
               },
               {
@@ -7205,7 +7229,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -2.0,
+                "vx": -2,
                 "vy": 0.5
               },
               {
@@ -7214,7 +7238,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -1.0,
+                "vx": -1,
                 "vy": 0.55
               },
               {
@@ -7223,7 +7247,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -7295,7 +7319,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -7367,7 +7391,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -7439,7 +7463,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.6
               },
               {
@@ -7475,7 +7499,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 2.5
               },
               {
@@ -7509,7 +7533,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.6
               },
               {
@@ -7518,7 +7542,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.2
               },
               {
@@ -7527,7 +7551,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.7999999999999998
               },
               {
@@ -7536,7 +7560,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.3999999999999999
               },
               {
@@ -7545,7 +7569,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 1.0,
+                "vx": 1,
                 "vy": 0.3
               },
               {
@@ -7554,7 +7578,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -1.0,
+                "vx": -1,
                 "vy": 0.3
               },
               {
@@ -7590,7 +7614,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.5
               },
               {
@@ -7622,7 +7646,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 0,
-                "vy": 3.0
+                "vy": 3
               },
               {
                 "type": "Wait",
@@ -7693,7 +7717,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.4
               },
               {
@@ -7702,7 +7726,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.2666666666666666
               },
               {
@@ -7711,7 +7735,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.133333333333333
               },
               {
@@ -7720,8 +7744,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 5.0
+                "vx": 0,
+                "vy": 5
               },
               {
                 "type": "Wait",
@@ -7747,7 +7771,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 0,
-                "vy": 3.0
+                "vy": 3
               },
               {
                 "type": "Wait",
@@ -7818,7 +7842,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.4
               },
               {
@@ -7827,7 +7851,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.2666666666666666
               },
               {
@@ -7836,7 +7860,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.133333333333333
               },
               {
@@ -7845,8 +7869,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 5.0
+                "vx": 0,
+                "vy": 5
               },
               {
                 "type": "Wait",
@@ -7986,7 +8010,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 1.2
               },
               {
@@ -8075,7 +8099,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 1.2
               },
               {
@@ -8144,7 +8168,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.8
               },
               {
@@ -8153,7 +8177,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.6
               },
               {
@@ -8162,7 +8186,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.4
               },
               {
@@ -8171,7 +8195,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.2
               },
               {
@@ -8189,7 +8213,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 1.0,
+                "vx": 1,
                 "vy": 1.1
               },
               {
@@ -8207,8 +8231,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 2.0,
-                "vy": 1.0
+                "vx": 2,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8217,7 +8241,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 1.3333333333333335,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8226,7 +8250,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 0.6666666666666667,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8234,8 +8258,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 1.0
+                "vx": 0,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8244,7 +8268,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -0.6666666666666665,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8253,7 +8277,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -1.3333333333333335,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8261,8 +8285,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -2.0,
-                "vy": 1.0
+                "vx": -2,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8279,7 +8303,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -1.0,
+                "vx": -1,
                 "vy": 2.5
               },
               {
@@ -8297,8 +8321,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 4.0
+                "vx": 0,
+                "vy": 4
               },
               {
                 "type": "Wait",
@@ -8315,7 +8339,7 @@
           "health": 20,
           "patternConfig": {
             "radius": 150,
-            "scaleX": 1.0,
+            "scaleX": 1,
             "scaleY": 0.35,
             "count": 16,
             "fireDelay": 6,
@@ -8327,7 +8351,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.8
               },
               {
@@ -8336,7 +8360,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.6
               },
               {
@@ -8345,7 +8369,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.4
               },
               {
@@ -8354,7 +8378,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.2
               },
               {
@@ -8372,7 +8396,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -1.0,
+                "vx": -1,
                 "vy": 1.1
               },
               {
@@ -8390,8 +8414,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -2.0,
-                "vy": 1.0
+                "vx": -2,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8400,7 +8424,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -1.3333333333333335,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8409,7 +8433,7 @@
               {
                 "type": "SetVelocity",
                 "vx": -0.6666666666666667,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8417,8 +8441,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 1.0
+                "vx": 0,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8427,7 +8451,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 0.6666666666666665,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8436,7 +8460,7 @@
               {
                 "type": "SetVelocity",
                 "vx": 1.3333333333333335,
-                "vy": 1.0
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8444,8 +8468,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 2.0,
-                "vy": 1.0
+                "vx": 2,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8462,7 +8486,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 1.0,
+                "vx": 1,
                 "vy": 2.5
               },
               {
@@ -8480,8 +8504,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 4.0
+                "vx": 0,
+                "vy": 4
               },
               {
                 "type": "Wait",
@@ -8491,14 +8515,14 @@
           }
         },
         {
-          "spawnTime": 3.0,
+          "spawnTime": 3,
           "x": 900,
           "y": -50,
           "pattern": "clover",
           "health": 24,
           "patternConfig": {
             "radius": 200,
-            "scaleX": 1.0,
+            "scaleX": 1,
             "scaleY": 0.4,
             "count": 20,
             "fireDelay": 5,
@@ -8510,7 +8534,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.6
               },
               {
@@ -8519,7 +8543,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.4
               },
               {
@@ -8528,7 +8552,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.2
               },
               {
@@ -8537,8 +8561,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 1.0
+                "vx": 0,
+                "vy": 1
               },
               {
                 "type": "Wait",
@@ -8550,7 +8574,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.625
               },
               {
@@ -8559,7 +8583,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.25
               },
               {
@@ -8568,7 +8592,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.875
               },
               {
@@ -8577,7 +8601,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.5
               },
               {
@@ -8604,7 +8628,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 0.325
               },
               {
@@ -8613,7 +8637,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 2.0,
+                "vx": 2,
                 "vy": 0.35
               },
               {
@@ -8622,7 +8646,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 1.0,
+                "vx": 1,
                 "vy": 0.375
               },
               {
@@ -8631,7 +8655,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -8703,7 +8727,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -8775,7 +8799,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -8847,7 +8871,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -8919,7 +8943,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -8955,8 +8979,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
-                "vy": 2.0
+                "vx": 3,
+                "vy": 2
               },
               {
                 "type": "Wait",
@@ -8966,7 +8990,7 @@
           }
         },
         {
-          "spawnTime": 2.0,
+          "spawnTime": 2,
           "x": 1850,
           "y": 240,
           "pattern": "sniper",
@@ -8982,7 +9006,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
+                "vx": -3,
                 "vy": 0.325
               },
               {
@@ -8991,7 +9015,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -2.0,
+                "vx": -2,
                 "vy": 0.35
               },
               {
@@ -9000,7 +9024,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -1.0,
+                "vx": -1,
                 "vy": 0.375
               },
               {
@@ -9009,7 +9033,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -9081,7 +9105,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -9153,7 +9177,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -9225,7 +9249,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -9297,7 +9321,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.4
               },
               {
@@ -9333,8 +9357,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": -3.0,
-                "vy": 2.0
+                "vx": -3,
+                "vy": 2
               },
               {
                 "type": "Wait",
@@ -9527,7 +9551,7 @@
           }
         },
         {
-          "spawnTime": 3.0,
+          "spawnTime": 3,
           "x": -50,
           "y": 240,
           "pattern": "spiral",
@@ -9647,7 +9671,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.725
               },
               {
@@ -9656,7 +9680,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.25
               },
               {
@@ -9665,7 +9689,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.7750000000000001
               },
               {
@@ -9674,7 +9698,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.30000000000000004
               },
               {
@@ -9737,8 +9761,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": -3.0
+                "vx": 0,
+                "vy": -3
               },
               {
                 "type": "Wait",
@@ -9773,7 +9797,7 @@
             "actions": [
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.725
               },
               {
@@ -9782,7 +9806,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 1.25
               },
               {
@@ -9791,7 +9815,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.7750000000000001
               },
               {
@@ -9800,7 +9824,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 0.30000000000000004
               },
               {
@@ -9863,8 +9887,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": -3.0
+                "vx": 0,
+                "vy": -3
               },
               {
                 "type": "Wait",
@@ -9963,7 +9987,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.6
               },
               {
@@ -9972,7 +9996,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.4
               },
               {
@@ -9981,7 +10005,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.2
               },
               {
@@ -9990,8 +10014,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 5.0
+                "vx": 0,
+                "vy": 5
               },
               {
                 "type": "Wait",
@@ -10090,7 +10114,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.6
               },
               {
@@ -10099,7 +10123,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.4
               },
               {
@@ -10108,7 +10132,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.2
               },
               {
@@ -10117,8 +10141,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 5.0
+                "vx": 0,
+                "vy": 5
               },
               {
                 "type": "Wait",
@@ -10181,7 +10205,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 3.0,
+                "vx": 3,
                 "vy": 2.6
               },
               {
@@ -10217,7 +10241,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 2.6
               },
               {
@@ -10226,7 +10250,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 3.4
               },
               {
@@ -10235,7 +10259,7 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
+                "vx": 0,
                 "vy": 4.2
               },
               {
@@ -10244,8 +10268,8 @@
               },
               {
                 "type": "SetVelocity",
-                "vx": 0.0,
-                "vy": 5.0
+                "vx": 0,
+                "vy": 5
               },
               {
                 "type": "Wait",
@@ -10475,13 +10499,15 @@
                                 "speed": 0
                               },
                               {
-                                "control": "AddAngle",
+                                "control": "Add",
+                                "prop": "direction",
                                 "delta": 180
                               }
                             ]
                           },
                           {
-                            "control": "AddAngle",
+                            "control": "Add",
+                            "prop": "direction",
                             "delta": 30
                           },
                           {
@@ -10493,7 +10519,8 @@
                     ],
                     [
                       {
-                        "control": "AddAngle",
+                        "control": "Add",
+                        "prop": "direction",
                         "delta": 90
                       },
                       {
@@ -10506,19 +10533,21 @@
                             "actions": [
                               {
                                 "control": "Line",
-                                "count": 7,
                                 "prop": "speed",
+                                "count": 7,
                                 "from": 3,
                                 "to": 10.2
                               },
                               {
-                                "control": "AddAngle",
+                                "control": "Add",
+                                "prop": "direction",
                                 "delta": 180
                               }
                             ]
                           },
                           {
-                            "control": "AddAngle",
+                            "control": "Add",
+                            "prop": "direction",
                             "delta": 30
                           },
                           {
@@ -10536,11 +10565,13 @@
                   "value": 1
                 },
                 {
-                  "control": "SetAngle",
+                  "control": "Set",
+                  "prop": "direction",
                   "value": 90
                 },
                 {
-                  "control": "SetSpeed",
+                  "control": "Set",
+                  "prop": "speed",
                   "value": 0
                 },
                 {
@@ -10660,7 +10691,8 @@
                                       "speed": 0
                                     },
                                     {
-                                      "control": "AddAngle",
+                                      "control": "Add",
+                                      "prop": "direction",
                                       "delta": 14
                                     },
                                     {
@@ -10682,7 +10714,8 @@
                                   "value": 3.5
                                 },
                                 {
-                                  "control": "SetAngle",
+                                  "control": "Set",
+                                  "prop": "direction",
                                   "value": 180
                                 },
                                 {
@@ -10694,7 +10727,8 @@
                                       "speed": 0
                                     },
                                     {
-                                      "control": "AddAngle",
+                                      "control": "Add",
+                                      "prop": "direction",
                                       "delta": -14
                                     },
                                     {
@@ -10783,7 +10817,8 @@
                                     "speed": 0
                                   },
                                   {
-                                    "control": "AddSpeed",
+                                    "control": "Add",
+                                    "prop": "speed",
                                     "delta": -0.9
                                   }
                                 ]
@@ -11091,11 +11126,13 @@
                   "value": 1
                 },
                 {
-                  "control": "SetAngle",
+                  "control": "Set",
+                  "prop": "direction",
                   "value": 90
                 },
                 {
-                  "control": "SetSpeed",
+                  "control": "Set",
+                  "prop": "speed",
                   "value": 0
                 },
                 {
@@ -11182,7 +11219,8 @@
                             "count": 14,
                             "actions": [
                               {
-                                "control": "SetAngle",
+                                "control": "Set",
+                                "prop": "direction",
                                 "value": 90
                               },
                               {
@@ -11192,7 +11230,8 @@
                                 "speed": 0
                               },
                               {
-                                "control": "AddSpeed",
+                                "control": "Add",
+                                "prop": "speed",
                                 "delta": 0.35
                               },
                               {
@@ -11302,7 +11341,8 @@
                             "value": 3.5
                           },
                           {
-                            "control": "SetAngle",
+                            "control": "Set",
+                            "prop": "direction",
                             "value": 90
                           },
                           {
@@ -11316,7 +11356,8 @@
                                 "speed": 0
                               },
                               {
-                                "control": "AddAngle",
+                                "control": "Add",
+                                "prop": "direction",
                                 "delta": 17
                               },
                               {
@@ -11368,7 +11409,7 @@
                       {
                         "control": "Tween",
                         "prop": "speed",
-                        "to": 2.0,
+                        "to": 2,
                         "frames": 26
                       },
                       {
@@ -11649,7 +11690,8 @@
                             ]
                           },
                           {
-                            "control": "AddAngle",
+                            "control": "Add",
+                            "prop": "direction",
                             "delta": 1.3
                           },
                           {
@@ -11666,7 +11708,8 @@
                   "frames": 30
                 },
                 {
-                  "control": "SetAngle",
+                  "control": "Set",
+                  "prop": "direction",
                   "value": 90
                 },
                 {
@@ -11789,7 +11832,8 @@
                                     "speed": 0
                                   },
                                   {
-                                    "control": "AddSpeed",
+                                    "control": "Add",
+                                    "prop": "speed",
                                     "delta": -1
                                   }
                                 ]
@@ -11805,7 +11849,8 @@
                                 "value": 4
                               },
                               {
-                                "control": "SetAngle",
+                                "control": "Set",
+                                "prop": "direction",
                                 "value": 90
                               },
                               {
@@ -11819,7 +11864,8 @@
                                     "speed": 0
                                   },
                                   {
-                                    "control": "AddAngle",
+                                    "control": "Add",
+                                    "prop": "direction",
                                     "delta": 15
                                   },
                                   {

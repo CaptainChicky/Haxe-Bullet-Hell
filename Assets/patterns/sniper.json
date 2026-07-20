@@ -32,22 +32,60 @@
     {
       "control": "Loop",
       "actions": [
-        {"control": "SetSpeed", "value": "$bulletSpeed"},
-        {"control": "SetOffset", "distance": 0, "angle": 0},
-        {"control": "RandomAngle", "min": 0, "max": 360},
-        {"control": "CopyAngleToOffset"},
-        {"control": "AddOffset", "distanceDelta": "$orbitDistance", "angleDelta": 0},
-        {"control": "AimAtPlayer"},
+        {
+          "control": "Set",
+          "prop": "speed",
+          "value": "$bulletSpeed"
+        },
+        {
+          "control": "SetOffset",
+          "distance": 0,
+          "angle": 0
+        },
+        {
+          "control": "Random",
+          "prop": "direction",
+          "min": 0,
+          "max": 360
+        },
+        {
+          "control": "Copy",
+          "from": "direction",
+          "to": "offsetAngle"
+        },
+        {
+          "control": "AddOffset",
+          "distanceDelta": "$orbitDistance",
+          "angleDelta": 0
+        },
+        {
+          "control": "AimAtPlayer"
+        },
         {
           "control": "Rep",
           "count": "$burstCount",
           "actions": [
-            {"control": "Fire", "angle": 0, "speed": 0},
-            {"control": "AddSpeed", "delta": -1.0}
+            {
+              "control": "Fire",
+              "angle": 0,
+              "speed": 0
+            },
+            {
+              "control": "Add",
+              "prop": "speed",
+              "delta": -1
+            }
           ]
         },
-        {"control": "SetOffset", "distance": 0, "angle": 0},
-        {"control": "Wait", "frames": "$patternDelay"}
+        {
+          "control": "SetOffset",
+          "distance": 0,
+          "angle": 0
+        },
+        {
+          "control": "Wait",
+          "frames": "$patternDelay"
+        }
       ]
     }
   ]

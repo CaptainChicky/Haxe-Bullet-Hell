@@ -24,15 +24,38 @@
     }
   },
   "script": [
-    {"control": "SetSpeed", "value": "$bulletSpeed"},
-    {"control": "SetAngle", "value": 90},
-    {"control": "SetOffset", "distance": "$orbitDistance", "angle": 0},
+    {
+      "control": "Set",
+      "prop": "speed",
+      "value": "$bulletSpeed"
+    },
+    {
+      "control": "Set",
+      "prop": "direction",
+      "value": 90
+    },
+    {
+      "control": "SetOffset",
+      "distance": "$orbitDistance",
+      "angle": 0
+    },
     {
       "control": "Loop",
       "actions": [
-        {"control": "Fire", "angle": 0, "speed": 0},
-        {"control": "AddOffset", "distanceDelta": 0, "angleDelta": "$rotationSpeed * $fireDelay"},
-        {"control": "Wait", "frames": "$fireDelay"}
+        {
+          "control": "Fire",
+          "angle": 0,
+          "speed": 0
+        },
+        {
+          "control": "AddOffset",
+          "distanceDelta": 0,
+          "angleDelta": "$rotationSpeed * $fireDelay"
+        },
+        {
+          "control": "Wait",
+          "frames": "$fireDelay"
+        }
       ]
     }
   ]

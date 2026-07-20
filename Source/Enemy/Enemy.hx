@@ -1,6 +1,5 @@
 package enemy;
 
-import openfl.Lib;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
@@ -11,7 +10,9 @@ import shot.GhostOrigin.IMovable;
 class Enemy extends Sprite implements IMovable {
 	public static inline final ROTATION_SPEED:Float = -40.0; // Rotation speed in degrees per second
 
-	private var spawnTime:Int = Lib.getTimer(); // To store the time of enemy spawn
+	// Frames since spawn, advanced only while unpaused — drives the cosmetic
+	// spin. Wall-clock time made the sprite snap forward after a pause.
+	private var ageFrames:Int = 0;
 
 	// Add a random salt to the rotation speed to make the enemy's rotation less uniform from other enemies
 	private var salt:Float = Math.random() * 20; // gives a decimal between 0 inclusive and 10 exclusive
@@ -149,9 +150,10 @@ class Enemy extends Sprite implements IMovable {
 		x += velocityX;
 		y += velocityY;
 
-		// Get the width and height of the stage (window screen)
-		var stageWidth:Int = Lib.current.stage.stageWidth;
-		var stageHeight:Int = Lib.current.stage.stageHeight;
+		// Cull against the fixed playfield, never the live window size (which
+		// shrinks when the fullscreen window minimizes on focus loss).
+		var stageWidth:Int = Main.fieldWidth;
+		var stageHeight:Int = Main.fieldHeight;
 
 		// Check if the enemy is out of the stage boundaries
 		if (x < -100 || x > stageWidth + 100 || y < -100 || y > stageHeight + 100) {
@@ -161,14 +163,8 @@ class Enemy extends Sprite implements IMovable {
 			return;
 		}
 
-		// Update the enemy's rotation based on the elapsed time since the last frame
-		// will rotate based on spawn time
-		var currentTime:Int = Lib.getTimer();
-		var deltaTime:Float = (currentTime - spawnTime) / 1000.0; // Convert milliseconds to seconds
-
-		// Rotate the player
-		// the salt adds between 0 and 10 degrees to the initial rotational position
-		// delta position updates betwene every frame
-		rotation = salt + (ROTATION_SPEED * deltaTime);
+		// Cosmetic spin from frames alive (salt staggers enemies apart)
+		ageFrames++;
+		rotation = salt + (ROTATION_SPEED * ageFrames / 60.0);
 	}
 }

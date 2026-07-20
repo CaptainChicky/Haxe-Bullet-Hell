@@ -19,14 +19,33 @@
     }
   },
   "script": [
-    {"control": "SetSpeed", "value": "$bulletSpeed"},
-    {"control": "SetAngle", "value": 0},
+    {
+      "control": "Set",
+      "prop": "speed",
+      "value": "$bulletSpeed"
+    },
+    {
+      "control": "Set",
+      "prop": "direction",
+      "value": 0
+    },
     {
       "control": "Loop",
       "actions": [
-        {"control": "Radial", "count": "$bulletCount", "speed": "$bulletSpeed"},
-        {"control": "AddAngle", "delta": "$rotationSpeed"},
-        {"control": "Wait", "frames": 20}
+        {
+          "control": "Radial",
+          "count": "$bulletCount",
+          "speed": "$bulletSpeed"
+        },
+        {
+          "control": "Add",
+          "prop": "direction",
+          "delta": "$rotationSpeed"
+        },
+        {
+          "control": "Wait",
+          "frames": 20
+        }
       ]
     }
   ]

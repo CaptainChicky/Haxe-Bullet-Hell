@@ -1,6 +1,5 @@
 package player;
 
-import openfl.Lib;
 import openfl.events.Event;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
@@ -10,7 +9,8 @@ import openfl.Assets;
 class Player extends Sprite {
 	public static inline final ROTATION_SPEED:Float = 40.0; // Rotation speed in degrees per second
 
-	private var spawnTime:Int = Lib.getTimer(); // To store the time of player spawn
+	// Frames since spawn (drives cosmetic spin; freezes cleanly with pause)
+	private var ageFrames:Int = 0;
 
 	// Movement state
 	private var moveUp:Bool = false;
@@ -227,13 +227,9 @@ class Player extends Sprite {
 	private function everyFrame(event:Event):Void {
 		if (Main.gamePaused) return;
 
-		// Update the player's rotation based on the elapsed time since the last frame
-		// will rotate based on spawn time
-		var currentTime:Int = Lib.getTimer();
-		var deltaTime:Float = (currentTime - spawnTime) / 1000.0;  // Convert milliseconds to seconds
-
-		// Rotate the player
-		rotation = ROTATION_SPEED * deltaTime;
+		// Cosmetic spin from frames alive
+		ageFrames++;
+		rotation = ROTATION_SPEED * ageFrames / 60.0;
 
 		// Invincibility blink; restore base alpha when it runs out
 		if (invincibleFrames > 0) {

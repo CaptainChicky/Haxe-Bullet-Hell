@@ -298,11 +298,11 @@ class TestShot {
 
 		// --- Spiral: fire every frame, +12 degrees each shot --------------------
 		var spiral = compile('[
-			{"control": "SetSpeed", "value": "$$bulletSpeed"},
-			{"control": "SetAngle", "value": 0},
+			{"control": "Set", "prop": "speed", "value": "$$bulletSpeed"},
+			{"control": "Set", "prop": "direction", "value": 0},
 			{"control": "Loop", "actions": [
 				{"control": "Fire", "angle": 0, "speed": 0},
-				{"control": "AddAngle", "delta": 12},
+				{"control": "Add", "prop": "direction", "delta": 12},
 				{"control": "Wait", "frames": 1}
 			]}
 		]', {bulletSpeed: 5});
@@ -324,7 +324,7 @@ class TestShot {
 
 		// --- NWay geometry -------------------------------------------------------
 		var nway = compile('[
-			{"control": "SetAngle", "value": 90},
+			{"control": "Set", "prop": "direction", "value": 90},
 			{"control": "NWay", "count": 3, "angle": 90, "speed": 4}
 		]');
 		em = run(nway, 1);
@@ -349,10 +349,10 @@ class TestShot {
 
 		// --- Concurrent: independent prototype clones, parent resumes after -----
 		var conc = compile('[
-			{"control": "SetSpeed", "value": 7},
+			{"control": "Set", "prop": "speed", "value": 7},
 			{"control": "Concurrent", "branches": [
-				[{"control": "SetAngle", "value": 10}, {"control": "Wait", "frames": 2}, {"control": "Fire", "angle": 0, "speed": 0}],
-				[{"control": "SetAngle", "value": 20}, {"control": "Fire", "angle": 0, "speed": 0}]
+				[{"control": "Set", "prop": "direction", "value": 10}, {"control": "Wait", "frames": 2}, {"control": "Fire", "angle": 0, "speed": 0}],
+				[{"control": "Set", "prop": "direction", "value": 20}, {"control": "Fire", "angle": 0, "speed": 0}]
 			]},
 			{"control": "Fire", "angle": 99, "speed": 1}
 		]');

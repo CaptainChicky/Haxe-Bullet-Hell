@@ -103,7 +103,7 @@ class CollisionManager extends Sprite {
 				var dx:Float = bullet.x - enemy.x;
 				var dy:Float = bullet.y - enemy.y;
 				if (dx * dx + dy * dy < hitDistance * hitDistance) {
-					enemy.takeDamage(1);
+					enemy.takeDamage(bullet.damage);
 					if (!enemy.isAlive() && onEnemyKilled != null) {
 						onEnemyKilled(enemy);
 					}

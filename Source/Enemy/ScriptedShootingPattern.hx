@@ -17,10 +17,14 @@ class ScriptedShootingPattern extends EnemyShootingPattern {
 	private var ghostMovement:MovementScript = null;
 	private var ghostActive:Bool = false;
 
-	public function new(enemy:Enemy, commands:Array<IShotCommand>, collisionManager:CollisionManager, ?bulletSprite:String) {
+	public function new(enemy:Enemy, commands:Array<IShotCommand>, collisionManager:CollisionManager, ?bulletSprite:String, bulletSize:Float = 1) {
 		super(enemy);
 		this.emitter = new EnemyBulletEmitter(enemy, collisionManager, bulletSprite);
-		this.runner = new ScriptRunner(emitter, commands);
+		// Baseline bullet size (bosses fire bigger rounds); scripts can still
+		// override it with Set/Tween on "size".
+		var proto = new shot.ShotPrototype();
+		proto.size = bulletSize;
+		this.runner = new ScriptRunner(emitter, commands, proto);
 	}
 
 	// Runs the shot script while shooting, and keeps a ghost origin ticking

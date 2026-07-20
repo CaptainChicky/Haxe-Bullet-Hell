@@ -32,6 +32,10 @@ class StageManager {
 	private var state:StageState = Idle;
 	private var delayCounter:Int = 0;
 	private var currentLevel:LevelData = null;
+	private var runSingle:Bool = false;
+
+	/** A stage is starting (1-based number) — retheme backgrounds etc. */
+	public var onStageBegin:Int->Void = null;
 
 	/** Show a centered overlay message. */
 	public var onStageMessage:String->Void = null;
@@ -52,10 +56,17 @@ class StageManager {
 		this.stages = stages;
 	}
 
-	/** Start a fresh run from stage 1. */
-	public function startRun():Void {
-		index = 0;
+	/** Start a fresh run. Defaults to the full campaign from stage 1;
+	 *  practice mode passes a start index with single = true to play exactly
+	 *  one stage and then report the run as cleared. */
+	public function startRun(startIndex:Int = 0, single:Bool = false):Void {
+		index = (startIndex >= 0 && startIndex < stages.length) ? startIndex : 0;
+		runSingle = single;
 		startStage();
+	}
+
+	public function getStageCount():Int {
+		return stages.length;
 	}
 
 	public function stop():Void {
@@ -67,6 +78,7 @@ class StageManager {
 	}
 
 	private function startStage():Void {
+		if (onStageBegin != null) onStageBegin(index + 1);
 		if (onStageMessage != null) onStageMessage("Stage " + (index + 1));
 		currentLevel = levelManager.prepare(stages[index]);
 		state = Intro;
@@ -86,7 +98,7 @@ class StageManager {
 	}
 
 	private function stageCleared():Void {
-		if (index < stages.length - 1) {
+		if (!runSingle && index < stages.length - 1) {
 			state = ClearDelay;
 			delayCounter = CLEAR_DELAY_FRAMES;
 			if (onStageMessage != null) onStageMessage("Stage " + (index + 1) + " Clear!");

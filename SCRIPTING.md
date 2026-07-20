@@ -50,12 +50,15 @@ Add a field to `ShotPrototype` and a case in its `getProp`/`setProp` — the gen
 
 ## JSON reference
 
-All legacy controls still work (`Fire`, `Wait`, `Loop`, `Rep`, `Concurrent`, `SetAngle`, `AddAngle`, `SetSpeed`, `AddSpeed`, `SetOffset`, `AddOffset`, `CopyAngleToOffset`, `CopyOffsetToAngle`, `RandomSpeed`, `RandomAngle`, `AimAtPlayer`, `Radial`, `NWay`). `Fire`/`Radial`/`NWay` keep the convention that a literal `0` for angle/speed means "use the prototype's current value".
+Canonical controls: `Wait`, `Loop`, `Rep`, `Concurrent`, `Sub`, `Scope`, `Vanish`, `Fire`, `Radial`, `NWay`, `Line`, `Dup`, `Set`, `Add`, `Random`, `Copy`, `Tween`, `SetOffset`, `AddOffset`, `Rotate`, `Scale`, `Bind`, `AimAtPlayer`. `Fire`/`Radial`/`NWay` keep the convention that a literal `0` for angle/speed means "use the prototype's current value".
 
-New generic controls:
+The old alias controls (`SetAngle`, `AddAngle`, `SetSpeed`, `AddSpeed`, `CopyAngleToOffset`, `CopyOffsetToAngle`, `RandomSpeed`, `RandomAngle`) were **removed** after all content migrated to the generic notation — write `{"control": "Set", "prop": "direction", ...}` etc. instead.
+
+The generic property controls:
 
 ```jsonc
 {"control": "Set",    "prop": "accel", "value": 0.1}        // prototype.accel = 0.1
+{"control": "Set",    "prop": "size",  "value": 2}          // bullet visual + hitbox scale (boss default 1.5)
 {"control": "Add",    "prop": "turn",  "delta": -0.5}       // curving bullets
 {"control": "Random", "prop": "speed", "min": 2, "max": 6}
 {"control": "Copy",   "from": "direction", "to": "offsetAngle"}

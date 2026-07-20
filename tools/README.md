@@ -79,8 +79,10 @@ object the engine parses, so anything you can write by hand you can write here.
 | `S.fire(angle, speed)` / `S.radial(n, s)` / `S.nway(n, a, s)` | Fire / Radial / NWay |
 | `S.line(n, prop, from, to)` / `S.dup(n, props)` | Line / Dup |
 | `S.set(p, v)` / `S.add(p, d)` / `S.random(p, min, max)` | Set / Add / Random |
+| `S.size(v)` | Set (prop "size": bullet visual + hitbox scale) |
 | `S.copy(from, to, scale?)` / `S.tween(p, to, f, rel?)` | Copy / Tween |
-| `S.offset(dist, angle)` / `S.rotate(deg, withDir?)` | SetOffset / Rotate |
+| `S.offset(dist, angle)` / `S.addOffset(dDelta, aDelta)` | SetOffset / AddOffset |
+| `S.rotate(deg, withDir?)` | Rotate |
 | `S.scale(f)` / `S.scaleXY(x, y)` | Scale |
 | `S.bind(mode)` / `S.aim()` | Bind / AimAtPlayer |
 

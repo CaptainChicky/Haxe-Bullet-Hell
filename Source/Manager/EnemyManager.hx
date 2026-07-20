@@ -56,7 +56,7 @@ class EnemyManager extends Sprite {
 	}
 
 	public function spawnEnemy(x:Float, y:Float, patternType:String, patternConfig:Dynamic, health:Int = 1, velocityX:Float = 0, velocityY:Float = 0, movementScriptData:Dynamic = null, ?spriteName:String):Enemy {
-		var enemy:Enemy = new Enemy(health, spriteName);
+		var enemy:Enemy = new Enemy(GameSettings.scaleHealth(health), spriteName);
 		enemy.x = x;
 		enemy.y = y;
 		enemy.setVelocity(velocityX, velocityY);
@@ -195,7 +195,9 @@ class EnemyManager extends Sprite {
 		// Create scripted pattern if we have commands
 		if (commands != null && commands.length > 0) {
 			var collisionManager = EnemyShootingPattern.getCollisionManager();
-			var pattern = new ScriptedShootingPattern(enemy, commands, collisionManager, spriteName);
+			// Bosses fire visibly bigger bullets by default
+			var bulletSize:Float = Std.isOfType(enemy, BossEnemy) ? BossEnemy.BULLET_SIZE : 1;
+			var pattern = new ScriptedShootingPattern(enemy, commands, collisionManager, spriteName, bulletSize);
 			return pattern;
 		}
 

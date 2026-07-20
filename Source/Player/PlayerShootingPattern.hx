@@ -33,6 +33,11 @@ class PlayerShootingPattern extends Sprite {
 	private var collisionManager:CollisionManager;
 	private var shotType:PlayerShotType = Spread;
 
+	// Power level 0..MAX (from collected items): every 4 power = +1 damage
+	// per bullet, so max power triples the volley's punch.
+	public static inline final MAX_POWER:Int = 8;
+	private var power:Int = 0;
+
 	public function new(player:Player, collisionManager:CollisionManager) {
 		super();
 		this.player = player;
@@ -41,6 +46,11 @@ class PlayerShootingPattern extends Sprite {
 
 	public function setShotType(type:PlayerShotType):Void {
 		shotType = type;
+	}
+
+	/** Set the current power level (clamped to 0..MAX_POWER). */
+	public function setPower(value:Int):Void {
+		power = value < 0 ? 0 : (value > MAX_POWER ? MAX_POWER : value);
 	}
 
 	public function getShotType():PlayerShotType {
@@ -102,7 +112,10 @@ class PlayerShootingPattern extends Sprite {
 	}
 
 	private function spawnPlayerBullet():Void {
+		manager.AudioManager.sfxFire();
 		var shots = volley(player.isFocused());
+
+		var damage = 1 + Std.int(power / 4);
 
 		for (config in shots) {
 			var bullet:BulletPlayer = new BulletPlayer();
@@ -110,6 +123,7 @@ class PlayerShootingPattern extends Sprite {
 			bullet.y = player.y;
 			bullet.velocityX = config.velX;
 			bullet.velocityY = config.velY;
+			bullet.damage = damage;
 
 			if (config.turnRate != null && config.turnRate != 0) {
 				bullet.enableHoming(config.turnRate, collisionManager.getEnemyManager());

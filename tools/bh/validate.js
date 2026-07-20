@@ -41,17 +41,11 @@ const CONTROLS = {
 	Scale: { req: [], opt: ["factor", "x", "y"] },
 	Bind: { req: ["mode"], opt: [] },
 	AimAtPlayer: { req: [], opt: [] },
-	// legacy aliases (existing content)
-	SetAngle: { req: ["value"], opt: [] },
-	AddAngle: { req: ["delta"], opt: [] },
-	SetSpeed: { req: ["value"], opt: [] },
-	AddSpeed: { req: ["delta"], opt: [] },
 	SetOffset: { req: ["distance", "angle"], opt: [] },
 	AddOffset: { req: ["distanceDelta", "angleDelta"], opt: [] },
-	CopyAngleToOffset: { req: [], opt: [] },
-	CopyOffsetToAngle: { req: [], opt: [] },
-	RandomSpeed: { req: ["min", "max"], opt: [] },
-	RandomAngle: { req: ["min", "max"], opt: [] },
+	// NOTE: the legacy aliases (SetAngle, SetSpeed, RandomAngle, ...) were
+	// removed from the engine after all content migrated to Set/Add/Random/
+	// Copy; they now correctly fail validation as unknown controls.
 };
 
 // Fields holding names/enums rather than numeric expressions.

@@ -2,12 +2,14 @@ package;
 
 import manager.*;
 import enemy.*;
+import item.Item.ItemType;
 import player.PlayerShootingPattern;
 import player.PlayerShootingPattern.PlayerShotType;
 import player.Player;
 import ui.HUD;
 import ui.DialogueManager;
 import ui.BossHealthBar;
+import ui.StageBackground;
 import openfl.ui.Keyboard;
 import openfl.events.KeyboardEvent;
 import openfl.text.Font;
@@ -31,9 +33,17 @@ class Main extends Sprite {
 	private var stageWidth:Int;
 	private var stageHeight:Int;
 
+	// Playfield size, cached once at init. Culling and spawn math must use
+	// these instead of live stage dimensions: on native the exclusive-
+	// fullscreen window minimizes on focus loss and the live stage size
+	// shrinks, which used to cull right/bottom-edge enemies and bullets
+	// before the auto-pause landed.
+	public static var fieldWidth(default, null):Int = 800;
+	public static var fieldHeight(default, null):Int = 600;
+
 	// Center message panel (title screen, stage announcements, game over)
 	private static inline final MESSAGE_PANEL_W:Int = 560;
-	private static inline final MESSAGE_PANEL_H:Int = 190;
+	private static inline final MESSAGE_PANEL_H:Int = 240;
 
 	private var player:Player;
 	private var currentGameState:GameState;
@@ -61,6 +71,8 @@ class Main extends Sprite {
 	private var levelManager:LevelManager;
 	private var collisionManager:CollisionManager;
 	private var stageManager:StageManager;
+	private var itemManager:ItemManager;
+	private var background:StageBackground;
 
 	// Run state
 	private static inline final START_LIVES:Int = 3;
@@ -70,9 +82,15 @@ class Main extends Sprite {
 	private static inline final SCORE_PER_HEALTH:Int = 100;
 	private static inline final SCORE_PER_GRAZE:Int = 10;
 
+	private static inline final POINT_ITEM_SCORE:Int = 500;
+	private static inline final MAX_LIVES:Int = 8;
+	private static inline final MAX_BOMBS:Int = 8;
+	private static inline final DEATH_POWER_LOSS:Int = 2;
+
 	private var score:Int = 0;
 	private var lives:Int = START_LIVES;
 	private var bombs:Int = START_BOMBS;
+	private var power:Int = 0;
 	private var hud:HUD;
 	private var bossBar:BossHealthBar;
 	private var bombFlash:Sprite;
@@ -113,10 +131,22 @@ class Main extends Sprite {
 
 		stageWidth = Lib.current.stage.stageWidth;
 		stageHeight = Lib.current.stage.stageHeight;
+		fieldWidth = stageWidth;
+		fieldHeight = stageHeight;
+
+		// Scrolling stage backdrop — must be the very first child so
+		// everything else renders above it.
+		background = new StageBackground(stageWidth, stageHeight);
+		addChild(background);
 
 		// Create managers
 		enemyManager = new EnemyManager();
 		addChild(enemyManager); // Add to display tree so enemies are rendered
+
+		// Item drops render above enemies but under the player
+		itemManager = new ItemManager();
+		itemManager.onCollected = onItemCollected;
+		addChild(itemManager);
 
 		// Create player with stage dimensions
 		player = new Player(stageWidth, stageHeight);
@@ -137,7 +167,13 @@ class Main extends Sprite {
 		EnemyShootingPattern.setCollisionManager(collisionManager);
 
 		// Create stage manager (sequences the stage list into a run)
+		AudioManager.init();
+
 		stageManager = new StageManager(levelManager, enemyManager, STAGES);
+		stageManager.onStageBegin = function(stageNumber:Int) {
+			background.setTheme(stageNumber);
+			AudioManager.playMusic(stageNumber);
+		};
 		stageManager.onStageMessage = showMessage;
 		stageManager.onMessageClear = hideMessage;
 		stageManager.onAllStagesCleared = onAllStagesCleared;
@@ -151,9 +187,10 @@ class Main extends Sprite {
 		// Set player death callback
 		player.setOnDeathCallback(onPlayerDeath);
 
-		// Scoring hooks
+		// Scoring + item-drop hooks
 		collisionManager.onEnemyKilled = function(enemy:Enemy) {
 			addScore(enemy.getMaxHealth() * SCORE_PER_HEALTH);
+			itemManager.dropForEnemy(enemy);
 		};
 		collisionManager.onGraze = function() {
 			addScore(SCORE_PER_GRAZE);
@@ -192,11 +229,12 @@ class Main extends Sprite {
 		messageField.wordWrap = true;
 		showMessage(titleText());
 
-		// HUD (score / lives / bombs, top-right)
+		// HUD (score / lives / bombs / power, top-right)
 		hud = new HUD(stageWidth, uiFont.fontName);
 		hud.setScore(score);
 		hud.setLives(lives);
 		hud.setBombs(bombs);
+		hud.setPower(power, PlayerShootingPattern.MAX_POWER);
 		addChild(hud);
 
 		// Boss status strip (hidden until a boss fight starts)
@@ -258,21 +296,31 @@ class Main extends Sprite {
 				player.respawn();
 			}
 
-			// Fresh run: reset score, lives, bombs
+			// Fresh run: reset score, lives, bombs, power (per difficulty)
 			score = 0;
-			lives = START_LIVES;
-			bombs = START_BOMBS;
+			lives = GameSettings.startingLives();
+			bombs = GameSettings.startingBombs();
+			power = 0;
 			hud.setScore(score);
 			hud.setLives(lives);
 			hud.setBombs(bombs);
+			hud.setPower(power, PlayerShootingPattern.MAX_POWER);
+			if (playerShootingPattern != null) {
+				playerShootingPattern.setPower(power);
+			}
 
 			// Clear everything when restarting
 			collisionManager.clearAllBullets();
 			enemyManager.clearAllEnemies();
+			itemManager.clear();
 			dialogueManager.cancel();
 
-			// Start the run from stage 1
-			stageManager.startRun();
+			// Full campaign, or a single stage in practice mode
+			if (GameSettings.practiceStage > 0) {
+				stageManager.startRun(GameSettings.practiceStage - 1, true);
+			} else {
+				stageManager.startRun();
+			}
 		}
 	}
 
@@ -287,7 +335,7 @@ class Main extends Sprite {
 		if (!gamePaused) {
 			gamePaused = true;
 			pausedPrevMessage = (messagePanel.alpha > 0) ? messageField.text : null;
-			showMessage("PAUSED\nESC to resume");
+			showMessage(pauseText());
 		} else {
 			gamePaused = false;
 			if (pausedPrevMessage != null) {
@@ -297,6 +345,35 @@ class Main extends Sprite {
 				messagePanel.alpha = 0;
 			}
 		}
+		AudioManager.setMusicDucked(gamePaused);
+	}
+
+	private function pauseText():String {
+		return "PAUSED\nESC to resume"
+			+ "\nM music: " + (AudioManager.musicMuted ? "Off" : "On")
+			+ " · [ ] volume: " + Math.round(AudioManager.musicVolume * 100) + "%";
+	}
+
+	/** Music controls (work on any screen, paused included). Returns true if
+	 *  the key was a music key. */
+	private function handleMusicKeys(keyCode:Int):Bool {
+		switch (keyCode) {
+			case 77: // "m"
+				AudioManager.toggleMusicMuted();
+			case 219: // "["
+				AudioManager.nudgeMusicVolume(-0.1);
+			case 221: // "]"
+				AudioManager.nudgeMusicVolume(0.1);
+			default:
+				return false;
+		}
+		// Refresh whichever settings text is on screen
+		if (gamePaused) {
+			showMessage(pauseText());
+		} else {
+			refreshTitleMessage();
+		}
+		return true;
 	}
 
 	private function shotTypeName(type:PlayerShotType):String {
@@ -308,9 +385,17 @@ class Main extends Sprite {
 	}
 
 	private function titleText():String {
-		return "Press SPACE to start"
+		var practice = (GameSettings.practiceStage == 0)
+			? "Off"
+			: "Stage " + GameSettings.practiceStage;
+		return "BULLET HELL"
+			+ "\nPress SPACE to start"
 			+ "\nARROW KEYS move · Z shoot · X bomb · SHIFT focus · ESC pause"
-			+ "\nShot type [1/2/3]: " + shotTypeName(shotType);
+			+ "\nShot type [1/2/3]: " + shotTypeName(shotType)
+			+ "\nD difficulty: " + GameSettings.difficultyName()
+			+ " · P practice: " + practice
+			+ "\nM music: " + (AudioManager.musicMuted ? "Off" : "On")
+			+ " · [ ] volume: " + Math.round(AudioManager.musicVolume * 100) + "%";
 	}
 
 	/** Select a shot type (title / game-over screen only). */
@@ -320,8 +405,12 @@ class Main extends Sprite {
 			playerShootingPattern.setShotType(type);
 		}
 		hud.setShotType(shotTypeName(type));
-		// Refresh the hint line if the title message is on screen
-		if (currentGameState == Paused && StringTools.startsWith(messageField.text, "Press SPACE")) {
+		refreshTitleMessage();
+	}
+
+	/** Re-render the title panel if it is currently on screen. */
+	private function refreshTitleMessage():Void {
+		if (currentGameState == Paused && StringTools.startsWith(messageField.text, "BULLET HELL")) {
 			showMessage(titleText());
 		}
 	}
@@ -352,6 +441,33 @@ class Main extends Sprite {
 		hud.setScore(score);
 	}
 
+	/** Clamp + apply a new power level to shot strength and the HUD. */
+	private function setPower(value:Int):Void {
+		power = value < 0 ? 0 : (value > PlayerShootingPattern.MAX_POWER ? PlayerShootingPattern.MAX_POWER : value);
+		playerShootingPattern.setPower(power);
+		hud.setPower(power, PlayerShootingPattern.MAX_POWER);
+	}
+
+	private function onItemCollected(type:ItemType):Void {
+		AudioManager.sfxItemPickup();
+		switch (type) {
+			case PowerItem:
+				setPower(power + 1);
+			case PointItem:
+				addScore(POINT_ITEM_SCORE);
+			case BombItem:
+				if (bombs < MAX_BOMBS) {
+					bombs++;
+					hud.setBombs(bombs);
+				}
+			case LifeItem:
+				if (lives < MAX_LIVES) {
+					lives++;
+					hud.setLives(lives);
+				}
+		}
+	}
+
 	private function useBomb():Void {
 		if (currentGameState != Playing || !player.isAlive() || bombs <= 0) {
 			return;
@@ -359,6 +475,7 @@ class Main extends Sprite {
 
 		bombs--;
 		hud.setBombs(bombs);
+		AudioManager.sfxBomb();
 
 		// Wipe every enemy bullet and give the player breathing room
 		collisionManager.clearEnemyBullets();
@@ -370,8 +487,10 @@ class Main extends Sprite {
 
 	private function onAllStagesCleared():Void {
 		currentGameState = Paused;
+		AudioManager.stopMusic();
 		playerShootingPattern.stopShooting();
-		showMessage("ALL STAGES CLEAR!\nFinal Score: " + score + "\n\nPress SPACE to play again");
+		var headline = (GameSettings.practiceStage > 0) ? "PRACTICE COMPLETE!" : "ALL STAGES CLEAR!";
+		showMessage(headline + "\nFinal Score: " + score + "\n\nPress SPACE to play again");
 	}
 
 	private function keyDown(event:KeyboardEvent):Void {
@@ -380,8 +499,13 @@ class Main extends Sprite {
 			return;
 		}
 
-		// While paused only ESC does anything; keyUp still runs, so held
-		// movement/focus keys release cleanly even if let go mid-pause.
+		// Music settings live on the pause/title "menu" but work anywhere
+		if (handleMusicKeys(event.keyCode)) {
+			return;
+		}
+
+		// While paused only ESC and music keys do anything; keyUp still runs,
+		// so held movement/focus keys release cleanly even if let go mid-pause.
 		if (gamePaused) {
 			return;
 		}
@@ -411,12 +535,18 @@ class Main extends Sprite {
 			}
 		}
 
-		// Shot type select on the title / game-over screen
+		// Title / game-over screen settings: shot type, difficulty, practice
 		if (currentGameState == Paused) {
 			switch (event.keyCode) {
 				case 49: selectShotType(Spread); // "1"
 				case 50: selectShotType(Pierce); // "2"
 				case 51: selectShotType(Homing); // "3"
+				case 68: // "d"
+					GameSettings.cycleDifficulty();
+					refreshTitleMessage();
+				case 80: // "p"
+					GameSettings.cyclePractice(stageManager.getStageCount());
+					refreshTitleMessage();
 				default:
 			}
 		}
@@ -461,12 +591,16 @@ class Main extends Sprite {
 	private function onPlayerDeath():Void {
 		lives--;
 		hud.setLives(lives);
+		AudioManager.sfxPlayerDeath();
 
 		if (lives > 0) {
 			// Respawn mid-run: clear the bullet field so the return is fair,
 			// refill bombs (per-life stock), and grant invincibility frames.
+			// Some power spills out as recoverable items where the player died.
+			itemManager.spillPower(player.x, player.y, DEATH_POWER_LOSS);
+			setPower(power - DEATH_POWER_LOSS);
 			collisionManager.clearEnemyBullets();
-			bombs = START_BOMBS;
+			bombs = GameSettings.startingBombs();
 			hud.setBombs(bombs);
 			player.respawn();
 			player.setInvincible(RESPAWN_INVINCIBLE_FRAMES);
@@ -476,6 +610,7 @@ class Main extends Sprite {
 		// Out of lives: game over
 		trace("GAME OVER!");
 		currentGameState = Paused;
+		AudioManager.stopMusic();
 		stageManager.stop();
 		dialogueManager.cancel();
 		showMessage("GAME OVER\nFinal Score: " + score + "\n\nPress SPACE to restart");
@@ -500,11 +635,17 @@ class Main extends Sprite {
 			return;
 		}
 
+		// Backdrop drifts on every unpaused frame (title screen included)
+		background.update();
+		AudioManager.tick();
+
 		if (currentGameState == Playing) {
 			// Player handles its own movement and boundaries
 			// (frozen while a conversation is on screen)
 			if (!dialogueManager.isActive()) {
 				player.updateMovement();
+				// Items fall / magnet / collect against the live player
+				itemManager.update(player);
 			}
 
 			// Stage progression (pauses automatically outside Playing)
@@ -544,6 +685,15 @@ class Main extends Sprite {
 	}
 
 	public static function main() {
+		#if sys
+		// SDL minimizes exclusive-fullscreen windows on focus loss, which is
+		// why Win+Shift+S used to capture the desktop instead of the game.
+		// SDL re-reads this hint from the environment on every focus-loss
+		// event, so setting it here (after window creation) still works: the
+		// window now stays visible, the DEACTIVATE auto-pause freezes play,
+		// and the snip overlay can capture the paused game.
+		Sys.putEnv("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
+		#end
 		Lib.current.stage.align = openfl.display.StageAlign.TOP_LEFT;
 		Lib.current.addChild(new Main());
 	}

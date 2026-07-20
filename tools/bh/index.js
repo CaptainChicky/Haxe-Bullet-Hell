@@ -64,6 +64,8 @@ const S = {
 
 	// --- prototype properties ----------------------------------------------
 	set: (prop, value) => ({ control: "Set", prop, value }),
+	/** Bullet visual + hitbox scale (engine "size" property; bosses default 1.5). */
+	size: (value) => ({ control: "Set", prop: "size", value }),
 	add: (prop, delta) => ({ control: "Add", prop, delta }),
 	random: (prop, min, max) => ({ control: "Random", prop, min, max }),
 	copy: (from, to, scale) => scale === undefined
@@ -75,6 +77,7 @@ const S = {
 
 	// --- placement / transforms --------------------------------------------
 	offset: (distance, angle) => ({ control: "SetOffset", distance, angle }),
+	addOffset: (distanceDelta, angleDelta) => ({ control: "AddOffset", distanceDelta, angleDelta }),
 	rotate: (degrees, withDirection = false) => withDirection
 		? { control: "Rotate", degrees, withDirection: true }
 		: { control: "Rotate", degrees },

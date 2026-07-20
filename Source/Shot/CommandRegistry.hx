@@ -48,8 +48,9 @@ typedef CommandParser = (data:Dynamic, ctx:CompileContext) -> IShotCommand;
  * This is the extension point that replaces the old ShootingAction enum:
  * adding a bullet behavior means writing an IShotCommand class and calling
  * register() - no enum, no interpreter switch, no PatternLoader edits.
- * All legacy control names are registered as aliases of the generic
- * property commands, so existing pattern JSON keeps working unchanged.
+ * Only canonical control names are registered; the legacy aliases
+ * (SetAngle, SetSpeed, RandomAngle, ...) were removed after all content
+ * was migrated to the generic Set/Add/Random/Copy notation.
  */
 class CommandRegistry {
 	private static var parsers:Map<String, CommandParser> = null;
@@ -147,6 +148,10 @@ class CommandRegistry {
 		parsers.set("Tween", (d, c) -> new TweenCommand(c.str(d.prop, "direction"), c.val(d.to), c.int(d.frames), d.relative == true));
 
 		// --- Spawn placement transforms ---------------------------------------
+		// {"control": "SetOffset", "distance": 40, "angle": 90}  polar spawn offset
+		// {"control": "AddOffset", "distanceDelta": 5, "angleDelta": 15}
+		parsers.set("SetOffset", (d, c) -> new OffsetCommand(c.val(d.distance), c.val(d.angle), false));
+		parsers.set("AddOffset", (d, c) -> new OffsetCommand(c.val(d.distanceDelta), c.val(d.angleDelta), true));
 		// {"control": "Rotate", "degrees": 15}                   rotates (x,y) + offsetAngle
 		// {"control": "Rotate", "degrees": 15, "withDirection": true}   ...and direction
 		// {"control": "Scale", "factor": 2}                      scales x, y, offsetDistance
@@ -172,16 +177,5 @@ class CommandRegistry {
 		// --- Aiming -----------------------------------------------------------
 		parsers.set("AimAtPlayer", (d, c) -> new AimAtTargetCommand());
 
-		// --- Legacy aliases (existing pattern JSON keeps working) --------------
-		parsers.set("SetAngle", (d, c) -> new SetPropCommand("direction", c.val(d.value)));
-		parsers.set("AddAngle", (d, c) -> new AddPropCommand("direction", c.val(d.delta)));
-		parsers.set("SetSpeed", (d, c) -> new SetPropCommand("speed", c.val(d.value)));
-		parsers.set("AddSpeed", (d, c) -> new AddPropCommand("speed", c.val(d.delta)));
-		parsers.set("SetOffset", (d, c) -> new OffsetCommand(c.val(d.distance), c.val(d.angle), false));
-		parsers.set("AddOffset", (d, c) -> new OffsetCommand(c.val(d.distanceDelta), c.val(d.angleDelta), true));
-		parsers.set("CopyAngleToOffset", (d, c) -> new CopyPropCommand("direction", "offsetAngle"));
-		parsers.set("CopyOffsetToAngle", (d, c) -> new CopyPropCommand("offsetAngle", "direction"));
-		parsers.set("RandomSpeed", (d, c) -> new RandomPropCommand("speed", c.val(d.min), c.val(d.max)));
-		parsers.set("RandomAngle", (d, c) -> new RandomPropCommand("direction", c.val(d.min), c.val(d.max)));
 	}
 }

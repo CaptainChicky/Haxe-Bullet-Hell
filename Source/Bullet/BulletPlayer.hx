@@ -2,7 +2,6 @@ package bullet;
 
 import enemy.Enemy;
 import manager.EnemyManager;
-import openfl.Lib;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
@@ -17,6 +16,9 @@ class BulletPlayer extends Sprite {
 	public var velocityX:Float;
 	public var velocityY:Float;
 
+	/** Damage dealt on hit; scales with the player's power level. */
+	public var damage:Int = 1;
+
 	/** Collision radius, cached at construction (see BulletEnemy.collisionRadius). */
 	public var collisionRadius(default, null):Float = 0;
 
@@ -26,7 +28,8 @@ class BulletPlayer extends Sprite {
 	private var homingSpeed:Float = 0; // px per frame
 	private var enemySource:EnemyManager = null;
 
-	private var spawnTime:Int = Lib.getTimer(); // To store the time of bullet spawn
+	// Frames since spawn (drives cosmetic spin; freezes cleanly with pause)
+	private var ageFrames:Int = 0;
 
 	// Add a random salt to the rotation speed to make the bullet's rotation less uniform from other bullets
 	private var salt:Float = Math.random() * 20; // gives a decimal between 0 inclusive and 10 exclusive
@@ -107,8 +110,9 @@ class BulletPlayer extends Sprite {
 		y += velocityY;
 
 		// Get the width and height of the stage (window screen)
-		var stageWidth:Int = Lib.current.stage.stageWidth;
-		var stageHeight:Int = Lib.current.stage.stageHeight;
+		// Fixed playfield, not live window size (see Enemy.update).
+		var stageWidth:Int = Main.fieldWidth;
+		var stageHeight:Int = Main.fieldHeight;
 
 		// Check if the bullet is out of the stage boundaries
 		if (x < -100 || x > stageWidth + 100 || y < -100 || y > stageHeight + 100) {
@@ -119,13 +123,9 @@ class BulletPlayer extends Sprite {
 			return;
 		}
 
-		// Update the bullet's rotation based on the elapsed time since its spawn
-		var currentTime:Int = Lib.getTimer();
-		var deltaTime:Float = (currentTime - spawnTime) / 1000.0; // Convert milliseconds to seconds
-
-		// Rotate the bullet
+		// Cosmetic spin from frames alive
 		// the salt adds between 0 and 10 degrees to the initial rotational position
-		// delta position updates betwene every frame
-		rotation = salt + (ROTATION_SPEED * deltaTime);
+		ageFrames++;
+		rotation = salt + (ROTATION_SPEED * ageFrames / 60.0);
 	}
 }

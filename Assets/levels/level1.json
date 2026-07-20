@@ -2,16 +2,32 @@
   "name": "Level 1 - Introduction",
   "dialogue": {
     "intro": [
-      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
-       "text": "The border's gone quiet... too quiet. Something is stirring past the treeline."},
-      {"speaker": "???", "portrait": "assets/Enemy.png", "side": "right",
-       "text": "Turn back, little bird. The sky belongs to the Swarm tonight."},
-      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
-       "text": "Funny, I was about to say the same thing to you."}
+      {
+        "speaker": "Aviator",
+        "portrait": "assets/Player.png",
+        "side": "left",
+        "text": "The border's gone quiet... too quiet. Something is stirring past the treeline."
+      },
+      {
+        "speaker": "???",
+        "portrait": "assets/Enemy.png",
+        "side": "right",
+        "text": "Turn back, little bird. The sky belongs to the Swarm tonight."
+      },
+      {
+        "speaker": "Aviator",
+        "portrait": "assets/Player.png",
+        "side": "left",
+        "text": "Funny, I was about to say the same thing to you."
+      }
     ],
     "outro": [
-      {"speaker": "Aviator", "portrait": "assets/Player.png", "side": "left",
-       "text": "Scouts, nothing more. Whoever sent them is still out there."}
+      {
+        "speaker": "Aviator",
+        "portrait": "assets/Player.png",
+        "side": "left",
+        "text": "Scouts, nothing more. Whoever sent them is still out there."
+      }
     ]
   },
   "waves": [
@@ -33,13 +49,34 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "SetVelocity", "vx": 2, "vy": 0},
-              {"type": "Wait", "frames": 225},
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 60},
-              {"type": "SetVelocity", "vx": 0, "vy": 1},
-              {"type": "Wait", "frames": 120},
-              {"type": "Stop"}
+              {
+                "type": "SetVelocity",
+                "vx": 2,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 225
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 60
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 120
+              },
+              {
+                "type": "Stop"
+              }
             ]
           }
         },
@@ -56,13 +93,34 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "SetVelocity", "vx": -2, "vy": 0},
-              {"type": "Wait", "frames": 225},
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 60},
-              {"type": "SetVelocity", "vx": 0, "vy": 1},
-              {"type": "Wait", "frames": 120},
-              {"type": "Stop"}
+              {
+                "type": "SetVelocity",
+                "vx": -2,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 225
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 60
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 120
+              },
+              {
+                "type": "Stop"
+              }
             ]
           }
         }
@@ -84,9 +142,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "SetVelocity", "vx": 0, "vy": 2},
-              {"type": "Wait", "frames": 75},
-              {"type": "Stop"}
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2
+              },
+              {
+                "type": "Wait",
+                "frames": 75
+              },
+              {
+                "type": "Stop"
+              }
             ]
           }
         },
@@ -103,9 +170,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "SetVelocity", "vx": 0, "vy": 2},
-              {"type": "Wait", "frames": 75},
-              {"type": "Stop"}
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2
+              },
+              {
+                "type": "Wait",
+                "frames": 75
+              },
+              {
+                "type": "Stop"
+              }
             ]
           }
         },
@@ -123,9 +199,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "SetVelocity", "vx": 0, "vy": 1.5},
-              {"type": "Wait", "frames": 100},
-              {"type": "Stop"}
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.5
+              },
+              {
+                "type": "Wait",
+                "frames": 100
+              },
+              {
+                "type": "Stop"
+              }
             ]
           }
         }
@@ -149,18 +234,56 @@
           "movementScript": {
             "loop": true,
             "actions": [
-              {"type": "SetVelocity", "vx": 0, "vy": 2},
-              {"type": "Wait", "frames": 75},
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 30},
-              {"type": "SetVelocity", "vx": 2, "vy": 0},
-              {"type": "Wait", "frames": 60},
-              {"type": "SetVelocity", "vx": -2, "vy": 0},
-              {"type": "Wait", "frames": 120},
-              {"type": "SetVelocity", "vx": 2, "vy": 0},
-              {"type": "Wait", "frames": 60},
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 30}
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2
+              },
+              {
+                "type": "Wait",
+                "frames": 75
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 30
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 60
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 120
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 2,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 60
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 30
+              }
             ]
           }
         },
@@ -177,9 +300,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "SetVelocity", "vx": 2, "vy": 0},
-              {"type": "Wait", "frames": 150},
-              {"type": "Stop"}
+              {
+                "type": "SetVelocity",
+                "vx": 2,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 150
+              },
+              {
+                "type": "Stop"
+              }
             ]
           }
         },
@@ -196,9 +328,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "SetVelocity", "vx": -2, "vy": 0},
-              {"type": "Wait", "frames": 150},
-              {"type": "Stop"}
+              {
+                "type": "SetVelocity",
+                "vx": -2,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 150
+              },
+              {
+                "type": "Stop"
+              }
             ]
           }
         }
@@ -215,124 +356,365 @@
           "health": 50,
           "patternConfig": {
             "patternScript": {
-                "actions": [
-                    {"control": "SetAngle", "value": 90},
-                    {"control": "SetSpeed", "value": 4},
-
+              "actions": [
+                {
+                  "control": "Set",
+                  "prop": "direction",
+                  "value": 90
+                },
+                {
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 4
+                },
+                {
+                  "control": "Rep",
+                  "count": 8,
+                  "actions": [
                     {
-                    "control": "Rep",
-                    "count": 8,
-                    "actions": [
-                        {"control": "NWay", "count": 5, "angle": 90, "speed": 0},
-                        {"control": "AddAngle", "delta": 2},
-                        {"control": "AddSpeed", "delta": 0.5},
-                        {"control": "Wait", "frames": 3}
-                    ]
+                      "control": "NWay",
+                      "count": 5,
+                      "angle": 90,
+                      "speed": 0
                     },
-
-                    {"control": "SetAngle", "value": 90},
-                    {"control": "SetSpeed", "value": 4},
-
-                    {"control": "Wait", "frames": 30},
-
                     {
-                    "control": "Rep",
-                    "count": 8,
-                    "actions": [
-                        {"control": "NWay", "count": 8, "angle": 45, "speed": 0},
-                        {"control": "AddAngle", "delta": -4},
-                        {"control": "AddSpeed", "delta": 1},
-                        {"control": "Wait", "frames": 3}
-                    ]
+                      "control": "Add",
+                      "prop": "direction",
+                      "delta": 2
                     },
-
-                    {"control": "SetAngle", "value": 90},
-                    {"control": "SetSpeed", "value": 4},
-
-                    {"control": "Wait", "frames": 30},
-
                     {
-                    "control": "Rep",
-                    "count": 12,
-                    "actions": [
-                        {"control": "NWay", "count": 12, "angle": 200, "speed": 0},
-                        {"control": "AddAngle", "delta": 5},
-                        {"control": "AddSpeed", "delta": 0.5},
-                        {"control": "Wait", "frames": 3}
-                    ]
+                      "control": "Add",
+                      "prop": "speed",
+                      "delta": 0.5
                     },
-
-                    {"control": "SetAngle", "value": 90},
-                    {"control": "SetSpeed", "value": 0},
-
-                    {"control": "Wait", "frames": 30},
-
-                    {"control": "Radial", "count": 120, "speed": 5},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 90, "speed": 10},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 72, "speed": 15},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 45, "speed": 20},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 30, "speed": 25},
-                    {"control": "Wait", "frames": 10},
-
-                    {"control": "Wait", "frames": 30},
-
-                    {"control": "Radial", "count": 120, "speed": 5},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 90, "speed": 10},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 72, "speed": 15},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 45, "speed": 20},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 30, "speed": 25},
-                    {"control": "Wait", "frames": 10},
-
-                    {"control": "Wait", "frames": 30},
-
-                    {"control": "Radial", "count": 120, "speed": 5},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 90, "speed": 10},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 72, "speed": 15},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 45, "speed": 20},
-                    {"control": "Wait", "frames": 10},
-                    {"control": "Radial", "count": 30, "speed": 25},
-                    {"control": "Wait", "frames": 120},
-
-                    {"control": "SetAngle", "value": 90},
                     {
-                    "control": "Loop",
-                    "actions": [
-                        {"control": "SetSpeed", "value": 3},
-                        {
-                        "control": "Rep",
-                        "count": 10,
-                        "actions": [
-                            {"control": "Fire", "angle": 0, "speed": 0},
-                            {"control": "AddSpeed", "delta": 0.2},
-                            {"control": "Wait", "frames": 5}
-                        ]
-                        },
-                        {"control": "Wait", "frames": 30},
-
-                        {"control": "Radial", "count": 120, "speed": 2},
-                        {"control": "Wait", "frames": 10},
-                        {"control": "Radial", "count": 90, "speed": 3},
-                        {"control": "Wait", "frames": 10},
-                        {"control": "Radial", "count": 72, "speed": 5},
-                        {"control": "Wait", "frames": 10},
-                        {"control": "Radial", "count": 45, "speed": 8},
-                        {"control": "Wait", "frames": 10},
-                        {"control": "Radial", "count": 30, "speed": 12},
-                        {"control": "Wait", "frames": 120}
-                    ]
+                      "control": "Wait",
+                      "frames": 3
                     }
-                ]
+                  ]
+                },
+                {
+                  "control": "Set",
+                  "prop": "direction",
+                  "value": 90
+                },
+                {
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 4
+                },
+                {
+                  "control": "Wait",
+                  "frames": 30
+                },
+                {
+                  "control": "Rep",
+                  "count": 8,
+                  "actions": [
+                    {
+                      "control": "NWay",
+                      "count": 8,
+                      "angle": 45,
+                      "speed": 0
+                    },
+                    {
+                      "control": "Add",
+                      "prop": "direction",
+                      "delta": -4
+                    },
+                    {
+                      "control": "Add",
+                      "prop": "speed",
+                      "delta": 1
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 3
+                    }
+                  ]
+                },
+                {
+                  "control": "Set",
+                  "prop": "direction",
+                  "value": 90
+                },
+                {
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 4
+                },
+                {
+                  "control": "Wait",
+                  "frames": 30
+                },
+                {
+                  "control": "Rep",
+                  "count": 12,
+                  "actions": [
+                    {
+                      "control": "NWay",
+                      "count": 12,
+                      "angle": 200,
+                      "speed": 0
+                    },
+                    {
+                      "control": "Add",
+                      "prop": "direction",
+                      "delta": 5
+                    },
+                    {
+                      "control": "Add",
+                      "prop": "speed",
+                      "delta": 0.5
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 3
+                    }
+                  ]
+                },
+                {
+                  "control": "Set",
+                  "prop": "direction",
+                  "value": 90
+                },
+                {
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 0
+                },
+                {
+                  "control": "Wait",
+                  "frames": 30
+                },
+                {
+                  "control": "Radial",
+                  "count": 120,
+                  "speed": 5
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 90,
+                  "speed": 10
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 72,
+                  "speed": 15
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 45,
+                  "speed": 20
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 30,
+                  "speed": 25
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Wait",
+                  "frames": 30
+                },
+                {
+                  "control": "Radial",
+                  "count": 120,
+                  "speed": 5
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 90,
+                  "speed": 10
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 72,
+                  "speed": 15
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 45,
+                  "speed": 20
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 30,
+                  "speed": 25
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Wait",
+                  "frames": 30
+                },
+                {
+                  "control": "Radial",
+                  "count": 120,
+                  "speed": 5
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 90,
+                  "speed": 10
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 72,
+                  "speed": 15
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 45,
+                  "speed": 20
+                },
+                {
+                  "control": "Wait",
+                  "frames": 10
+                },
+                {
+                  "control": "Radial",
+                  "count": 30,
+                  "speed": 25
+                },
+                {
+                  "control": "Wait",
+                  "frames": 120
+                },
+                {
+                  "control": "Set",
+                  "prop": "direction",
+                  "value": 90
+                },
+                {
+                  "control": "Loop",
+                  "actions": [
+                    {
+                      "control": "Set",
+                      "prop": "speed",
+                      "value": 3
+                    },
+                    {
+                      "control": "Rep",
+                      "count": 10,
+                      "actions": [
+                        {
+                          "control": "Fire",
+                          "angle": 0,
+                          "speed": 0
+                        },
+                        {
+                          "control": "Add",
+                          "prop": "speed",
+                          "delta": 0.2
+                        },
+                        {
+                          "control": "Wait",
+                          "frames": 5
+                        }
+                      ]
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 30
+                    },
+                    {
+                      "control": "Radial",
+                      "count": 120,
+                      "speed": 2
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 10
+                    },
+                    {
+                      "control": "Radial",
+                      "count": 90,
+                      "speed": 3
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 10
+                    },
+                    {
+                      "control": "Radial",
+                      "count": 72,
+                      "speed": 5
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 10
+                    },
+                    {
+                      "control": "Radial",
+                      "count": 45,
+                      "speed": 8
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 10
+                    },
+                    {
+                      "control": "Radial",
+                      "count": 30,
+                      "speed": 12
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 120
+                    }
+                  ]
+                }
+              ]
             }
           }
         }
@@ -360,15 +742,43 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "SetVelocity", "vx": 2, "vy": 0},
-              {"type": "Wait", "frames": 225},
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 60},
-              {"type": "SetVelocity", "vx": 0, "vy": 1},
-              {"type": "Wait", "frames": 120},
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 600},
-              {"type": "SetVelocity", "vx": 0, "vy": -1}
+              {
+                "type": "SetVelocity",
+                "vx": 2,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 225
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 60
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1
+              },
+              {
+                "type": "Wait",
+                "frames": 120
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 600
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -1
+              }
             ]
           }
         },
@@ -381,17 +791,33 @@
           "patternConfig": {
             "startDelay": 180,
             "bulletSpeed": 5,
-            "rotationChange": 12.0,
+            "rotationChange": 12,
             "fireDelay": 1
           },
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "SetVelocity", "vx": 3.5, "vy": 0},
-              {"type": "Wait", "frames": 180},
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 660},
-              {"type": "SetVelocity", "vx": 0, "vy": -1}
+              {
+                "type": "SetVelocity",
+                "vx": 3.5,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 180
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 660
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -1
+              }
             ]
           }
         },
@@ -410,9 +836,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 720},
-              {"type": "SetVelocity", "vx": 0, "vy": -1}
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 720
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -1
+              }
             ]
           }
         },
@@ -425,26 +860,68 @@
           "patternConfig": {
             "patternScript": {
               "actions": [
-                {"control": "SetAngle", "value": 90},
-                {"control": "SetSpeed", "value": 4},
+                {
+                  "control": "Set",
+                  "prop": "direction",
+                  "value": 90
+                },
+                {
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 4
+                },
                 {
                   "control": "Loop",
                   "actions": [
-                    {"control": "NWay", "count": 10, "angle": 90, "speed": 0},
-                    {"control": "Wait", "frames": 60},
-                    {"control": "Radial", "count": 36, "speed": 0},
-                    {"control": "Wait", "frames": 60},
-                    {"control": "SetSpeed", "value": 14},
+                    {
+                      "control": "NWay",
+                      "count": 10,
+                      "angle": 90,
+                      "speed": 0
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 60
+                    },
+                    {
+                      "control": "Radial",
+                      "count": 36,
+                      "speed": 0
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 60
+                    },
+                    {
+                      "control": "Set",
+                      "prop": "speed",
+                      "value": 14
+                    },
                     {
                       "control": "Rep",
                       "count": 10,
                       "actions": [
-                        {"control": "Fire", "angle": 0, "speed": 0},
-                        {"control": "AddSpeed", "delta": -1}
+                        {
+                          "control": "Fire",
+                          "angle": 0,
+                          "speed": 0
+                        },
+                        {
+                          "control": "Add",
+                          "prop": "speed",
+                          "delta": -1
+                        }
                       ]
                     },
-                    {"control": "SetSpeed", "value": 5},
-                    {"control": "Wait", "frames": 60}
+                    {
+                      "control": "Set",
+                      "prop": "speed",
+                      "value": 5
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 60
+                    }
                   ]
                 }
               ]
@@ -453,9 +930,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 720},
-              {"type": "SetVelocity", "vx": 0, "vy": -1}
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 720
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -1
+              }
             ]
           }
         },
@@ -475,9 +961,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 720},
-              {"type": "SetVelocity", "vx": 0, "vy": -1}
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 720
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -1
+              }
             ]
           }
         },
@@ -497,9 +992,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 720},
-              {"type": "SetVelocity", "vx": 0, "vy": -1}
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 720
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -1
+              }
             ]
           }
         },
@@ -512,32 +1016,86 @@
           "patternConfig": {
             "patternScript": {
               "actions": [
-                {"control": "SetAngle", "value": 90},
-                {"control": "SetSpeed", "value": 5},
+                {
+                  "control": "Set",
+                  "prop": "direction",
+                  "value": 90
+                },
+                {
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 5
+                },
                 {
                   "control": "Concurrent",
                   "branches": [
                     [
-                      {"control": "Loop", "actions": [
-                        {"control": "Fire", "angle": 0, "speed": 0},
-                        {"control": "AddAngle", "delta": 16},
-                        {"control": "Wait", "frames": 2}
-                      ]}
+                      {
+                        "control": "Loop",
+                        "actions": [
+                          {
+                            "control": "Fire",
+                            "angle": 0,
+                            "speed": 0
+                          },
+                          {
+                            "control": "Add",
+                            "prop": "direction",
+                            "delta": 16
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 2
+                          }
+                        ]
+                      }
                     ],
                     [
-                      {"control": "SetAngle", "value": 180},
-                      {"control": "SetSpeed", "value": 8},
-                      {"control": "Loop", "actions": [
-                        {"control": "Fire", "angle": 0, "speed": 0},
-                        {"control": "AddAngle", "delta": -8},
-                        {"control": "Wait", "frames": 0.8}
-                      ]}
+                      {
+                        "control": "Set",
+                        "prop": "direction",
+                        "value": 180
+                      },
+                      {
+                        "control": "Set",
+                        "prop": "speed",
+                        "value": 8
+                      },
+                      {
+                        "control": "Loop",
+                        "actions": [
+                          {
+                            "control": "Fire",
+                            "angle": 0,
+                            "speed": 0
+                          },
+                          {
+                            "control": "Add",
+                            "prop": "direction",
+                            "delta": -8
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 0.8
+                          }
+                        ]
+                      }
                     ],
                     [
-                      {"control": "Loop", "actions": [
-                        {"control": "Fire", "angle": 90, "speed": 0},
-                        {"control": "Wait", "frames": 8}
-                      ]}
+                      {
+                        "control": "Loop",
+                        "actions": [
+                          {
+                            "control": "Fire",
+                            "angle": 90,
+                            "speed": 0
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 8
+                          }
+                        ]
+                      }
                     ]
                   ]
                 }
@@ -547,9 +1105,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 720},
-              {"type": "SetVelocity", "vx": 0, "vy": -1}
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 720
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -1
+              }
             ]
           }
         },
@@ -570,9 +1137,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 720},
-              {"type": "SetVelocity", "vx": 0, "vy": -1}
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 720
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -1
+              }
             ]
           }
         },
@@ -585,31 +1161,81 @@
           "patternConfig": {
             "patternScript": {
               "actions": [
-                {"control": "SetAngle", "value": 90},
-                {"control": "SetSpeed", "value": 12},
+                {
+                  "control": "Set",
+                  "prop": "direction",
+                  "value": 90
+                },
+                {
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 12
+                },
                 {
                   "control": "Concurrent",
                   "branches": [
                     [
-                      {"control": "Loop", "actions": [
-                        {"control": "Radial", "count": 10, "speed": 0},
-                        {"control": "AddAngle", "delta": 8},
-                        {"control": "Wait", "frames": 4}
-                      ]}
+                      {
+                        "control": "Loop",
+                        "actions": [
+                          {
+                            "control": "Radial",
+                            "count": 10,
+                            "speed": 0
+                          },
+                          {
+                            "control": "Add",
+                            "prop": "direction",
+                            "delta": 8
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 4
+                          }
+                        ]
+                      }
                     ],
                     [
-                      {"control": "Loop", "actions": [
-                        {"control": "Radial", "count": 4, "speed": 0},
-                        {"control": "AddAngle", "delta": 4},
-                        {"control": "Wait", "frames": 2}
-                      ]}
+                      {
+                        "control": "Loop",
+                        "actions": [
+                          {
+                            "control": "Radial",
+                            "count": 4,
+                            "speed": 0
+                          },
+                          {
+                            "control": "Add",
+                            "prop": "direction",
+                            "delta": 4
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 2
+                          }
+                        ]
+                      }
                     ],
                     [
-                      {"control": "Loop", "actions": [
-                        {"control": "Radial", "count": 4, "speed": 0},
-                        {"control": "AddAngle", "delta": -4},
-                        {"control": "Wait", "frames": 2}
-                      ]}
+                      {
+                        "control": "Loop",
+                        "actions": [
+                          {
+                            "control": "Radial",
+                            "count": 4,
+                            "speed": 0
+                          },
+                          {
+                            "control": "Add",
+                            "prop": "direction",
+                            "delta": -4
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 2
+                          }
+                        ]
+                      }
                     ]
                   ]
                 }
@@ -619,9 +1245,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 720},
-              {"type": "SetVelocity", "vx": 0, "vy": -1}
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 720
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -1
+              }
             ]
           }
         },
@@ -634,15 +1269,36 @@
           "patternConfig": {
             "patternScript": {
               "actions": [
-                {"control": "SetSpeed", "value": 7},
-                {"control": "SetOffset", "distance": 80, "angle": 0},
+                {
+                  "control": "Set",
+                  "prop": "speed",
+                  "value": 7
+                },
+                {
+                  "control": "SetOffset",
+                  "distance": 80,
+                  "angle": 0
+                },
                 {
                   "control": "Loop",
                   "actions": [
-                    {"control": "AimAtPlayer"},
-                    {"control": "Radial", "count": 20, "speed": 0},
-                    {"control": "AddOffset", "distanceDelta": 0, "angleDelta": 25},
-                    {"control": "Wait", "frames": 12}
+                    {
+                      "control": "AimAtPlayer"
+                    },
+                    {
+                      "control": "Radial",
+                      "count": 20,
+                      "speed": 0
+                    },
+                    {
+                      "control": "AddOffset",
+                      "distanceDelta": 0,
+                      "angleDelta": 25
+                    },
+                    {
+                      "control": "Wait",
+                      "frames": 12
+                    }
                   ]
                 }
               ]
@@ -651,9 +1307,18 @@
           "movementScript": {
             "loop": false,
             "actions": [
-              {"type": "Stop"},
-              {"type": "Wait", "frames": 1200},
-              {"type": "SetVelocity", "vx": 0, "vy": -1}
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 1200
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -1
+              }
             ]
           }
         }

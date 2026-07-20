@@ -17,13 +17,14 @@ class HUD extends Sprite {
 	private var scoreField:TextField;
 	private var livesField:TextField;
 	private var bombsField:TextField;
+	private var powerField:TextField;
 	private var shotField:TextField;
 
 	public function new(stageWidth:Int, fontName:String) {
 		super();
 
 		// Subtle backing panel so the numbers read over any bullet pattern
-		var rows = 4;
+		var rows = 5;
 		var panelHeight = rows * ROW_HEIGHT + PAD * 2 - 6;
 		graphics.beginFill(0x0d0d16, 0.55);
 		graphics.drawRoundRect(0, 0, PANEL_WIDTH, panelHeight, 14, 14);
@@ -37,7 +38,8 @@ class HUD extends Sprite {
 		scoreField = makeField(fontName, PAD + ROW_HEIGHT * 0, 0xffd766); // gold: the number that matters
 		livesField = makeField(fontName, PAD + ROW_HEIGHT * 1, 0xff8899); // soft red
 		bombsField = makeField(fontName, PAD + ROW_HEIGHT * 2, 0x99ccff); // soft blue
-		shotField = makeField(fontName, PAD + ROW_HEIGHT * 3, 0xbbbbcc); // neutral
+		powerField = makeField(fontName, PAD + ROW_HEIGHT * 3, 0xffaa66); // orange (power items)
+		shotField = makeField(fontName, PAD + ROW_HEIGHT * 4, 0xbbbbcc); // neutral
 	}
 
 	private function makeField(fontName:String, y:Float, color:Int):TextField {
@@ -80,6 +82,10 @@ class HUD extends Sprite {
 
 	public function setBombs(value:Int):Void {
 		bombsField.text = "Bombs  " + repeatMarks(value, 8);
+	}
+
+	public function setPower(value:Int, max:Int):Void {
+		powerField.text = (value >= max) ? "Power  MAX" : "Power  " + value + " / " + max;
 	}
 
 	public function setShotType(name:String):Void {

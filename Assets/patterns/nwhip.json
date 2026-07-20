@@ -44,8 +44,16 @@
     }
   },
   "script": [
-    {"control": "SetSpeed", "value": "$baseBulletSpeed"},
-    {"control": "SetAngle", "value": "$fireAngle"},
+    {
+      "control": "Set",
+      "prop": "speed",
+      "value": "$baseBulletSpeed"
+    },
+    {
+      "control": "Set",
+      "prop": "direction",
+      "value": "$fireAngle"
+    },
     {
       "control": "Loop",
       "actions": [
@@ -53,15 +61,42 @@
           "control": "Rep",
           "count": "$numberOfBullets",
           "actions": [
-            {"control": "NWay", "count": "$numberOfWhips", "angle": 90, "speed": 0},
-            {"control": "AddAngle", "delta": "$angleChange"},
-            {"control": "AddSpeed", "delta": "$speedChange"},
-            {"control": "Wait", "frames": "$bulletDelay"}
+            {
+              "control": "NWay",
+              "count": "$numberOfWhips",
+              "angle": 90,
+              "speed": 0
+            },
+            {
+              "control": "Add",
+              "prop": "direction",
+              "delta": "$angleChange"
+            },
+            {
+              "control": "Add",
+              "prop": "speed",
+              "delta": "$speedChange"
+            },
+            {
+              "control": "Wait",
+              "frames": "$bulletDelay"
+            }
           ]
         },
-        {"control": "SetSpeed", "value": "$baseBulletSpeed"},
-        {"control": "SetAngle", "value": "$fireAngle"},
-        {"control": "Wait", "frames": "$patternDelay"}
+        {
+          "control": "Set",
+          "prop": "speed",
+          "value": "$baseBulletSpeed"
+        },
+        {
+          "control": "Set",
+          "prop": "direction",
+          "value": "$fireAngle"
+        },
+        {
+          "control": "Wait",
+          "frames": "$patternDelay"
+        }
       ]
     }
   ]

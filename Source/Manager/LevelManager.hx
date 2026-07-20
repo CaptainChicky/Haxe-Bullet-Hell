@@ -12,8 +12,14 @@ class LevelManager extends Sprite {
 	private var enemyManager:EnemyManager;
 	private var currentLevel:LevelData;
 
+	// Level clock in seconds, accumulated from unpaused frames — never wall
+	// clock. Wall clock kept ticking through pause/minimize, so waves and
+	// spawns skipped ahead by the pause length on resume; frame time makes an
+	// ESC pause and a focus-loss pause exactly equivalent (both freeze it).
+	private static inline final FRAME_SECONDS:Float = 1.0 / 60.0;
+
 	private var currentWaveIndex:Int = 0;
-	private var levelStartTime:Float = 0;
+	private var levelTime:Float = 0;
 	private var waveStartTime:Float = 0;
 
 	private var pendingSpawns:Array<{spawnData:EnemySpawnData, waveStartTime:Float}>;
@@ -74,7 +80,7 @@ class LevelManager extends Sprite {
 		}
 
 		currentWaveIndex = 0;
-		levelStartTime = Lib.getTimer() / 1000.0;
+		levelTime = 0;
 		isLevelActive = true;
 		pendingSpawns = new Array();
 
@@ -92,11 +98,9 @@ class LevelManager extends Sprite {
 		}
 
 		var wave:WaveData = currentLevel.waves[currentWaveIndex];
-		var currentTime:Float = Lib.getTimer() / 1000.0;
-		var timeSinceLevelStart:Float = currentTime - levelStartTime;
 
 		// Check if it's time to start this wave
-		if (timeSinceLevelStart >= wave.startTime) {
+		if (levelTime >= wave.startTime) {
 			startWave(wave);
 			currentWaveIndex++;
 
@@ -107,7 +111,7 @@ class LevelManager extends Sprite {
 
 	private function startWave(wave:WaveData):Void {
 		trace("Starting wave with " + wave.enemies.length + " enemy spawn(s)");
-		waveStartTime = Lib.getTimer() / 1000.0;
+		waveStartTime = levelTime;
 
 		// Queue all enemy spawns for this wave
 		for (enemySpawn in wave.enemies) {
@@ -125,7 +129,7 @@ class LevelManager extends Sprite {
 			return;
 		}
 
-		var currentTime:Float = Lib.getTimer() / 1000.0;
+		levelTime += FRAME_SECONDS;
 
 		// Check if we should start a new wave
 		if (isLevelActive) {
@@ -136,7 +140,7 @@ class LevelManager extends Sprite {
 		var i:Int = pendingSpawns.length - 1;
 		while (i >= 0) {
 			var pending = pendingSpawns[i];
-			var timeSinceWaveStart:Float = currentTime - pending.waveStartTime;
+			var timeSinceWaveStart:Float = levelTime - pending.waveStartTime;
 
 			if (timeSinceWaveStart >= pending.spawnData.spawnTime) {
 				// Spawn the enemy

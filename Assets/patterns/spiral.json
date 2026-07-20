@@ -9,7 +9,7 @@
     },
     "rotationChange": {
       "type": "float",
-      "default": 12.0,
+      "default": 12,
       "description": "Degrees to rotate between each shot"
     },
     "fireDelay": {
@@ -19,14 +19,33 @@
     }
   },
   "script": [
-    {"control": "SetSpeed", "value": "$bulletSpeed"},
-    {"control": "SetAngle", "value": 0},
+    {
+      "control": "Set",
+      "prop": "speed",
+      "value": "$bulletSpeed"
+    },
+    {
+      "control": "Set",
+      "prop": "direction",
+      "value": 0
+    },
     {
       "control": "Loop",
       "actions": [
-        {"control": "Fire", "angle": 0, "speed": 0},
-        {"control": "AddAngle", "delta": "$rotationChange"},
-        {"control": "Wait", "frames": "$fireDelay"}
+        {
+          "control": "Fire",
+          "angle": 0,
+          "speed": 0
+        },
+        {
+          "control": "Add",
+          "prop": "direction",
+          "delta": "$rotationChange"
+        },
+        {
+          "control": "Wait",
+          "frames": "$fireDelay"
+        }
       ]
     }
   ],

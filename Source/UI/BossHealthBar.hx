@@ -9,13 +9,20 @@ import openfl.text.TextFormatAlign;
 /**
  * Boss status strip across the top of the screen: boss name, dots for the
  * phases still to come, the current phase's spell card name, and the phase
- * health bar. Poll track() every frame from Main; it hides itself when no
- * boss is alive.
+ * health bar — all on a dark backing panel (the playfield is white, so
+ * unbacked text/dots were unreadable). A new phase also raises a large
+ * centered spell card banner that holds, then fades.
+ * Poll track() every frame from Main; it hides itself when no boss is alive.
  */
 class BossHealthBar extends Sprite {
 	private static inline final BAR_HEIGHT:Int = 10;
-	private static inline final ROW_HEIGHT:Int = 20;
-	private static inline final SPELL_FLASH_FRAMES:Int = 45;
+	private static inline final ROW_HEIGHT:Int = 22;
+	private static inline final PANEL_PAD:Int = 8;
+
+	// Spell card intro banner: slide/fade in, hold, fade out (frames)
+	private static inline final BANNER_IN:Int = 20;
+	private static inline final BANNER_HOLD:Int = 100;
+	private static inline final BANNER_OUT:Int = 40;
 
 	// Phase fill colors, indexed by phases REMAINING after this one
 	// (final phase red, earlier phases cooler)
@@ -27,9 +34,14 @@ class BossHealthBar extends Sprite {
 	private var fill:Sprite;
 	private var markers:Sprite;
 
+	// Large centered spell card announcement (own panel, below the strip)
+	private var banner:Sprite;
+	private var bannerField:TextField;
+	private var bannerFrames:Int = 0;
+	private static inline final BANNER_TOTAL:Int = BANNER_IN + BANNER_HOLD + BANNER_OUT;
+
 	private var lastBoss:BossEnemy = null;
 	private var lastPhase:Int = -1;
-	private var spellFlash:Int = 0;
 
 	public function new(stageWidth:Int, fontName:String) {
 		super();
@@ -41,6 +53,14 @@ class BossHealthBar extends Sprite {
 		mouseEnabled = false;
 		visible = false;
 
+		// Dark backing panel behind the whole strip (text row + bar)
+		var panelH = ROW_HEIGHT + BAR_HEIGHT + PANEL_PAD * 2;
+		graphics.beginFill(0x0d0d16, 0.85);
+		graphics.drawRoundRect(-PANEL_PAD, -PANEL_PAD, barWidth + PANEL_PAD * 2, panelH, 12, 12);
+		graphics.endFill();
+		graphics.lineStyle(1, 0x8899cc, 0.5);
+		graphics.drawRoundRect(-PANEL_PAD, -PANEL_PAD, barWidth + PANEL_PAD * 2, panelH, 12, 12);
+
 		var nameFormat = new TextFormat(fontName, 15, 0xffffff, true);
 		nameField = makeField(nameFormat, 0, 0, barWidth * 0.5);
 
@@ -48,21 +68,37 @@ class BossHealthBar extends Sprite {
 		spellFormat.align = TextFormatAlign.RIGHT;
 		spellField = makeField(spellFormat, barWidth * 0.35, 0, barWidth * 0.65);
 
-		// Bar backing
-		graphics.beginFill(0x0d0d16, 0.7);
-		graphics.drawRoundRect(0, ROW_HEIGHT + 2, barWidth, BAR_HEIGHT + 4, 8, 8);
+		// Bar backing (inset track under the text row)
+		graphics.lineStyle();
+		graphics.beginFill(0x000000, 0.6);
+		graphics.drawRoundRect(0, ROW_HEIGHT, barWidth, BAR_HEIGHT + 4, 8, 8);
 		graphics.endFill();
-		graphics.lineStyle(1, 0x8899cc, 0.5);
-		graphics.drawRoundRect(0, ROW_HEIGHT + 2, barWidth, BAR_HEIGHT + 4, 8, 8);
+		graphics.lineStyle(1, 0x8899cc, 0.7);
+		graphics.drawRoundRect(0, ROW_HEIGHT, barWidth, BAR_HEIGHT + 4, 8, 8);
 
 		fill = new Sprite();
 		fill.x = 2;
-		fill.y = ROW_HEIGHT + 4;
+		fill.y = ROW_HEIGHT + 2;
 		addChild(fill);
 
 		markers = new Sprite();
-		markers.y = 10;
 		addChild(markers);
+
+		// Centered spell card banner (positions relative to this strip's x)
+		banner = new Sprite();
+		banner.visible = false;
+		banner.mouseEnabled = false;
+		addChild(banner);
+
+		var bannerFormat = new TextFormat(fontName, 28, 0xffd766, true);
+		bannerFormat.align = TextFormatAlign.CENTER;
+		bannerField = new TextField();
+		bannerField.embedFonts = true;
+		bannerField.defaultTextFormat = bannerFormat;
+		bannerField.selectable = false;
+		bannerField.width = barWidth;
+		bannerField.height = 44;
+		banner.addChild(bannerField);
 	}
 
 	private function makeField(format:TextFormat, x:Float, y:Float, width:Float):TextField {
@@ -84,6 +120,8 @@ class BossHealthBar extends Sprite {
 			visible = false;
 			lastBoss = null;
 			lastPhase = -1;
+			bannerFrames = 0;
+			banner.visible = false;
 			return;
 		}
 		visible = true;
@@ -92,33 +130,82 @@ class BossHealthBar extends Sprite {
 			lastBoss = boss;
 			lastPhase = boss.getPhaseIndex();
 			refreshLabels(boss);
-			spellFlash = SPELL_FLASH_FRAMES;
+			raiseBanner(boss);
 		}
 
-		// Spell card name fades/slides in at the start of each phase
-		if (spellFlash > 0) {
-			spellFlash--;
-			var t = 1 - spellFlash / SPELL_FLASH_FRAMES;
-			spellField.alpha = t;
-			spellField.y = -6 * (1 - t);
-		}
-
+		updateBanner();
 		redrawFill(boss);
 	}
 
 	private function refreshLabels(boss:BossEnemy):Void {
 		nameField.text = boss.getBossName();
-		var spell = boss.getPhaseName();
-		spellField.text = spell;
+		spellField.text = boss.getPhaseName();
 
-		// One dot per phase still to come after the current one
+		// One dot per phase still to come after the current one, drawn as
+		// bright discs with dark outline rings so they read on any backdrop.
 		markers.graphics.clear();
 		var remaining = boss.getPhaseCount() - boss.getPhaseIndex() - 1;
-		var nameWidth = nameField.textWidth + 8;
+		var dotY = ROW_HEIGHT / 2 - 1;
+		var dotX = nameField.textWidth + 16;
 		for (i in 0...remaining) {
+			markers.graphics.lineStyle(2, 0x0d0d16);
 			markers.graphics.beginFill(0xffd766);
-			markers.graphics.drawCircle(nameWidth + 10 + i * 14, 0, 4);
+			markers.graphics.drawCircle(dotX + i * 16, dotY, 5);
 			markers.graphics.endFill();
+		}
+	}
+
+	/** Big centered spell card announcement at the start of each phase. */
+	private function raiseBanner(boss:BossEnemy):Void {
+		var spell = boss.getPhaseName();
+		if (spell == null || spell.length == 0) {
+			banner.visible = false;
+			bannerFrames = 0;
+			return;
+		}
+		bannerField.text = spell;
+
+		// Size the panel to the text
+		var w = bannerField.textWidth + 60;
+		var h = bannerField.textHeight + 24;
+		bannerField.width = w;
+		bannerField.y = 10;
+		banner.graphics.clear();
+		banner.graphics.beginFill(0x0d0d16, 0.85);
+		banner.graphics.drawRoundRect(0, 0, w, h, 14, 14);
+		banner.graphics.endFill();
+		banner.graphics.lineStyle(2, 0xffd766, 0.8);
+		banner.graphics.drawRoundRect(0, 0, w, h, 14, 14);
+
+		banner.x = (barWidth - w) / 2;
+		banner.visible = true;
+		bannerFrames = BANNER_TOTAL;
+	}
+
+	private function updateBanner():Void {
+		if (bannerFrames <= 0) {
+			return;
+		}
+		bannerFrames--;
+
+		var sinceStart = BANNER_TOTAL - bannerFrames;
+		var baseY = ROW_HEIGHT + BAR_HEIGHT + 40;
+		if (sinceStart < BANNER_IN) {
+			// Slide down + fade in
+			var t = sinceStart / BANNER_IN;
+			banner.alpha = t;
+			banner.y = baseY - 18 * (1 - t);
+		} else if (bannerFrames < BANNER_OUT) {
+			// Fade out
+			banner.alpha = bannerFrames / BANNER_OUT;
+			banner.y = baseY;
+		} else {
+			banner.alpha = 1;
+			banner.y = baseY;
+		}
+
+		if (bannerFrames == 0) {
+			banner.visible = false;
 		}
 	}
 
