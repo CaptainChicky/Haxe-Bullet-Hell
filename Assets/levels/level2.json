@@ -1529,6 +1529,142 @@
       "enemies": [
         {
           "spawnTime": 0,
+          "x": 700,
+          "y": -60,
+          "pattern": "amitaba",
+          "patternConfig": {
+            "spinStep": 0.35,
+            "holdFrames": 260,
+            "cycleDelay": 80
+          },
+          "health": 180,
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 150
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 780
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -2.5
+              }
+            ]
+          }
+        },
+        {
+          "spawnTime": 4,
+          "x": 1500,
+          "y": 250,
+          "pattern": "sniper",
+          "patternConfig": {
+            "bulletSpeed": 11,
+            "burstCount": 3,
+            "burstDelay": 4,
+            "patternDelay": 60
+          },
+          "health": 18,
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": -1.6,
+                "vy": 0
+              },
+              {
+                "type": "Wait",
+                "frames": 80
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 420
+              },
+              {
+                "type": "SetVelocity",
+                "vx": -2.4,
+                "vy": -1
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 102,
+      "enemies": [
+        {
+          "spawnTime": 0,
           "x": 500,
           "y": -50,
           "pattern": "orbit",
@@ -1717,7 +1853,106 @@
       ]
     },
     {
-      "startTime": 98,
+      "startTime": 118,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 900,
+          "y": -60,
+          "pattern": "starry",
+          "patternConfig": {
+            "radius": 240,
+            "lineBullets": 25,
+            "spacing": 64,
+            "spinStep": 0.3,
+            "holdFrames": 300
+          },
+          "health": 200,
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.5
+              },
+              {
+                "type": "Wait",
+                "frames": 160
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.46
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 2.13
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 1.57
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.93
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.37
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 0.04
+              },
+              {
+                "type": "Wait",
+                "frames": 5
+              },
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 800
+              },
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": -2.5
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 134,
       "enemies": [
         {
           "spawnTime": 0,

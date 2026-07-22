@@ -214,8 +214,30 @@ module.exports = level("level2", "Level 2 - Rolling Advance", {
 			}),
 		]),
 
-		// -- heavies: the orbit satellite and a wide whip platform
+		// -- STATIC GEOMETRY I: the manji glyph. It parks at center-left and
+		//    inscribes itself; the four nested laser pods are the real threat,
+		//    the glyph itself is a slowly turning maze that breaks outward.
 		wave(84, [
+			spawn({
+				at: [700, -60], time: 0,
+				pattern: "amitaba", health: 180,
+				config: { spinStep: 0.35, holdFrames: 260, cycleDelay: 80 },
+				move: dropIn(2.5, 150, 780, -2.5),
+			}),
+			spawn({
+				at: [1500, 250], time: 4,
+				pattern: "sniper", health: 18,
+				config: { bulletSpeed: 11, burstCount: 3, burstDelay: 4, patternDelay: 60 },
+				move: M.script({},
+					M.drift(-1.6, 0, 80),
+					M.hold(420),
+					M.vel(-2.4, -1),
+				),
+			}),
+		]),
+
+		// -- heavies: the orbit satellite and a wide whip platform
+		wave(102, [
 			spawn({
 				at: [500, -50], time: 0,
 				pattern: "orbit", health: 90,
@@ -230,9 +252,22 @@ module.exports = level("level2", "Level 2 - Rolling Advance", {
 			}),
 		]),
 
+		// -- STATIC GEOMETRY II: the hexagram. Sits high and centered so all six
+		//    extended edges run off every side of the field; the safe pockets are
+		//    the triangles' cells, and they rotate.
+		wave(118, [
+			spawn({
+				at: [CX, -60], time: 0,
+				pattern: "starry", health: 200,
+				// Long edges: 25 x 64px = 1600px, so every line runs off the field.
+				config: { radius: 240, lineBullets: 25, spacing: 64, spinStep: 0.3, holdFrames: 300 },
+				move: dropIn(2.5, 160, 800, -2.5),
+			}),
+		]),
+
 		// -- FINALE: the simpleburst commander — twin concurrent barrages,
 		//    stays until destroyed
-		wave(98, [
+		wave(134, [
 			spawn({
 				at: [950, -80], time: 0,
 				pattern: "custom-boss-simpleburst", health: 320,

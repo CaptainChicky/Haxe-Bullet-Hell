@@ -1,0 +1,199 @@
+{
+  "name": "starry",
+  "description": "Two overlapping equilateral triangles (a hexagram) whose six edges extend outward past the playfield — a rigid, slowly turning wall of bullets that breaks outward along the edge normals when the hold ends",
+  "parameters": {
+    "radius": {
+      "type": "float",
+      "default": 230,
+      "description": "Circumradius of each triangle (vertex distance)"
+    },
+    "lineBullets": {
+      "type": "int",
+      "default": 21,
+      "description": "Bullets per extended edge (odd = one on the foot point)"
+    },
+    "spacing": {
+      "type": "float",
+      "default": 60,
+      "description": "Distance between adjacent bullets along an edge"
+    },
+    "baseAngle": {
+      "type": "float",
+      "default": 0,
+      "description": "Starting rotation of the whole star"
+    },
+    "spinStep": {
+      "type": "float",
+      "default": 0.25,
+      "description": "Star rotation, degrees per frame (0 = frozen)"
+    },
+    "holdFrames": {
+      "type": "int",
+      "default": 300,
+      "description": "Frames the star holds before breaking apart"
+    },
+    "releaseSpeed": {
+      "type": "float",
+      "default": 2.2,
+      "description": "Speed each bullet leaves at when the star breaks"
+    },
+    "drawDelay": {
+      "type": "int",
+      "default": 1,
+      "description": "Frames between edges while the star inscribes itself"
+    },
+    "cycleDelay": {
+      "type": "int",
+      "default": 110,
+      "description": "Frames between one star and the next"
+    }
+  },
+  "script": [
+    {
+      "control": "Set",
+      "prop": "speed",
+      "value": 0
+    },
+    {
+      "control": "Bind",
+      "mode": "offset"
+    },
+    {
+      "control": "SetOffset",
+      "distance": 0,
+      "angle": 0
+    },
+    {
+      "control": "Sub",
+      "actions": [
+        {
+          "control": "Rep",
+          "count": "$holdFrames",
+          "actions": [
+            {
+              "control": "Rotate",
+              "degrees": "$spinStep"
+            },
+            {
+              "control": "Wait",
+              "frames": 1
+            }
+          ]
+        },
+        {
+          "control": "Scope",
+          "actions": [
+            {
+              "control": "Set",
+              "prop": "x",
+              "value": 0
+            },
+            {
+              "control": "Set",
+              "prop": "y",
+              "value": 0
+            },
+            {
+              "control": "SetOffset",
+              "distance": 0,
+              "angle": 0
+            },
+            {
+              "control": "Set",
+              "prop": "speed",
+              "value": "$releaseSpeed"
+            },
+            {
+              "control": "Set",
+              "prop": "direction",
+              "value": "outAngle + $spinStep * $holdFrames"
+            },
+            {
+              "control": "Fire",
+              "angle": 0,
+              "speed": 0
+            }
+          ]
+        },
+        {
+          "control": "Vanish"
+        }
+      ]
+    },
+    {
+      "control": "Loop",
+      "actions": [
+        {
+          "control": "Set",
+          "prop": "edge",
+          "value": 0
+        },
+        {
+          "control": "Rep",
+          "count": 6,
+          "actions": [
+            {
+              "control": "Set",
+              "prop": "n",
+              "value": "edge * 60 + 30 + $baseAngle"
+            },
+            {
+              "control": "Set",
+              "prop": "t",
+              "value": "n + 90"
+            },
+            {
+              "control": "Set",
+              "prop": "outAngle",
+              "value": "n"
+            },
+            {
+              "control": "Set",
+              "prop": "s",
+              "value": "-($lineBullets - 1) * $spacing / 2"
+            },
+            {
+              "control": "Rep",
+              "count": "$lineBullets",
+              "actions": [
+                {
+                  "control": "Set",
+                  "prop": "x",
+                  "value": "$radius * cos(60) * cos(n) + s * cos(t)"
+                },
+                {
+                  "control": "Set",
+                  "prop": "y",
+                  "value": "$radius * cos(60) * sin(n) + s * sin(t)"
+                },
+                {
+                  "control": "Fire",
+                  "angle": 0,
+                  "speed": 0
+                },
+                {
+                  "control": "Add",
+                  "prop": "s",
+                  "delta": "$spacing"
+                }
+              ]
+            },
+            {
+              "control": "Add",
+              "prop": "edge",
+              "delta": 1
+            },
+            {
+              "control": "Wait",
+              "frames": "$drawDelay"
+            }
+          ]
+        },
+        {
+          "control": "Wait",
+          "frames": "$holdFrames + $cycleDelay"
+        }
+      ]
+    }
+  ]
+}
