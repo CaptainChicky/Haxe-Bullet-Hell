@@ -79,8 +79,14 @@ class Main extends Sprite {
 
 	/** Container for everything in playfield space, offset to centre the
 	 *  1800x1080 field inside the 16:9 stage. UI (HUD, panels, dialogue, bomb
-	 *  flash) is *not* in here — it lays out against the full stage. */
-	private var world:Sprite;
+	 *  flash) is *not* in here — it lays out against the full stage.
+	 *
+	 *  Static because bullets are spawned far from here (BulletEmitters,
+	 *  PlayerShootingPattern) and MUST land in this container: their positions
+	 *  come from an enemy's or the player's x/y, which are playfield
+	 *  coordinates. Parenting a bullet to the stage root instead draws it
+	 *  FIELD_X pixels left of the thing that fired it. */
+	public static var world(default, null):Sprite;
 
 	// Run state
 	private static inline final START_LIVES:Int = 3;

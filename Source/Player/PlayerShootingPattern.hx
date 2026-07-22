@@ -210,7 +210,10 @@ class PlayerShootingPattern extends Sprite {
 				bullet.enableHoming(config.turnRate, collisionManager.getEnemyManager());
 			}
 
-			Lib.current.addChild(bullet); // Add the bullet to the stage
+			// Playfield space, not the stage root — bullet.x came from player.x,
+			// which is a playfield coordinate (see Main.world).
+			var container:openfl.display.DisplayObjectContainer = (Main.world != null) ? Main.world : Lib.current;
+			container.addChild(bullet);
 
 			// Register bullet with collision manager
 			if (collisionManager != null) {

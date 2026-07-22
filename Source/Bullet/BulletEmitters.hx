@@ -8,6 +8,7 @@ import shot.ShotPrototype;
 import shot.ScriptRunner;
 import shot.ShotEmitter;
 import openfl.Lib;
+import openfl.display.DisplayObjectContainer;
 
 /**
  * Shared bullet-materialization logic: builds a BulletEnemy from a cloned
@@ -69,7 +70,13 @@ private class EmitterBase implements IGhostAnchor {
 		bullet.x = x;
 		bullet.y = y;
 
-		Lib.current.addChild(bullet);
+		// Playfield space, not the stage root: x/y above came from
+		// getOriginX/Y, i.e. the firing enemy's playfield coordinates. The
+		// stage root is offset from the playfield by FIELD_X (see Main.world),
+		// so parenting here is what keeps bullets emerging from the enemy
+		// rather than 60px to its left.
+		var container:DisplayObjectContainer = (Main.world != null) ? Main.world : Lib.current;
+		container.addChild(bullet);
 
 		if (collisionManager != null) {
 			collisionManager.registerEnemyBullet(bullet);

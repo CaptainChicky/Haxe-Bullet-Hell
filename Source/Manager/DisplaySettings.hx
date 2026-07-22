@@ -50,17 +50,55 @@ class DisplaySettings {
 	 *  That is the whole point of the preset list rather than a free resize:
 	 *  the player picks a magnification, not an aspect ratio.
 	 *
-	 *  Standard 16:9 steps rather than arbitrary fractions, and all kept well
-	 *  under 1080p so the window plus title bar and taskbar fits on a 1080p
-	 *  desktop with room to spare. */
-	private static final WINDOW_SIZES:Array<Array<Int>> = [[960, 540], [1280, 720], [1600, 900]];
+	 *  Fallback only: these 1080p-era sizes are used when the display bounds
+	 *  aren't known yet (during boot, or on html5). Once they are, the list is
+	 *  rebuilt from the actual monitor — see refreshWindowSizes, without which
+	 *  every option here is uselessly small on a 1440p or 4K panel. */
+	private static var windowSizes:Array<Array<Int>> = [[960, 540], [1280, 720], [1600, 900]];
+
+	/** Fractions of the largest usable 16:9 box, from small to large. The top
+	 *  step is 1.0 on purpose: the largest windowed option should be as big as
+	 *  a window can actually get, since anyone picking it wants the screen. */
+	private static final SIZE_STEPS:Array<Float> = [0.55, 0.75, 1.0];
+
+	/** Vertical pixels reserved for window chrome: the title bar (~32px) plus
+	 *  the taskbar (~48px), with slack. Both sit *outside* the client area this
+	 *  sizes, so a window given the full display height has its bottom edge
+	 *  pushed off-screen. A fixed reserve rather than a percentage because
+	 *  chrome is a constant number of pixels — scaling it with the display
+	 *  wastes ~180px on a 4K panel, which is where the largest preset should
+	 *  be gaining the most. */
+	private static inline final CHROME_H:Float = 96;
+
+	/** Rebuild the preset list from the display the window is actually on, so
+	 *  "large" means large on a 4K panel too. Every entry is snapped to an
+	 *  exact 16:9 ratio (height forced to a multiple of 9, width derived) —
+	 *  approximate ratios would reintroduce the sub-pixel letterboxing the
+	 *  preset list exists to avoid. */
+	private static function refreshWindowSizes(displayWidth:Float, displayHeight:Float):Void {
+		// Cap by width too: on an ultra-wide, height is the binding constraint,
+		// but on a tall/rotated display the 16:9 box would overflow sideways.
+		var maxH = displayHeight - CHROME_H;
+		var maxByWidth = displayWidth * 9 / 16;
+		if (maxByWidth < maxH) maxH = maxByWidth;
+
+		var sizes:Array<Array<Int>> = [];
+		for (step in SIZE_STEPS) {
+			var units = Math.round(maxH * step / 9); // height in multiples of 9
+			if (units < 30) units = 30; // never below 480x270, which is unplayable
+			sizes.push([units * 16, units * 9]);
+		}
+		windowSizes = sizes;
+		if (windowScale >= windowSizes.length) windowScale = windowSizes.length - 1;
+	}
 
 	/** Borderless desktop fullscreen, not an exclusive display-mode switch:
 	 *  the window stays composited, so Win+Shift+S and other overlays can
 	 *  capture it. Fullscreen is still the default — windowed is opt-in. */
 	public static var mode:Int = FULLSCREEN;
 
-	/** Index into WINDOW_SIZES; 1280x720 by default. */
+	/** Index into windowSizes. Defaults to the middle step — on a 1080p display
+	 *  that lands near 1280x720, and it scales up with the monitor. */
 	public static var windowScale:Int = 1;
 
 	public static function modeName():String {
@@ -68,11 +106,11 @@ class DisplaySettings {
 	}
 
 	public static function windowedWidth():Int {
-		return WINDOW_SIZES[windowScale][0];
+		return windowSizes[windowScale][0];
 	}
 
 	public static function windowedHeight():Int {
-		return WINDOW_SIZES[windowScale][1];
+		return windowSizes[windowScale][1];
 	}
 
 	/** Human-readable window size, e.g. "1440 x 864". Only meaningful in
@@ -91,8 +129,8 @@ class DisplaySettings {
 	public static function cycleWindowScale(step:Int):Void {
 		windowScale += step;
 		if (windowScale < 0) {
-			windowScale = WINDOW_SIZES.length - 1;
-		} else if (windowScale >= WINDOW_SIZES.length) {
+			windowScale = windowSizes.length - 1;
+		} else if (windowScale >= windowSizes.length) {
 			windowScale = 0;
 		}
 	}
@@ -113,6 +151,13 @@ class DisplaySettings {
 		window.fullscreen = false;
 
 		var bounds = (window.display != null) ? window.display.bounds : null;
+
+		// Re-derive the presets every time: window.display follows the window,
+		// so dragging to a second monitor and reopening options offers sizes
+		// that suit *that* monitor.
+		if (bounds != null && bounds.width > 0 && bounds.height > 0) {
+			refreshWindowSizes(bounds.width, bounds.height);
+		}
 
 		if (mode == FULLSCREEN) {
 			window.borderless = true;
@@ -178,7 +223,7 @@ class DisplaySettings {
 				mode = clamp(Std.int(Reflect.field(data, "mode")), 0, MODE_NAMES.length - 1);
 			}
 			if (Reflect.hasField(data, "windowScale")) {
-				windowScale = clamp(Std.int(Reflect.field(data, "windowScale")), 0, WINDOW_SIZES.length - 1);
+				windowScale = clamp(Std.int(Reflect.field(data, "windowScale")), 0, windowSizes.length - 1);
 			}
 		} catch (e:Dynamic) {
 			// Corrupt or unreadable settings file: fall back to the defaults
