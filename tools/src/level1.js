@@ -1,29 +1,25 @@
 "use strict";
 /**
- * Stage 1 — Introduction. DSL rewrite of the hand-written level1.json:
- * same cast (scouts, the sun-explosion midboss, and the unique orbit /
- * nway-radial-line / parallel-spirals / laundry / random-bomb setpieces),
- * but with paced waves, gentler stage-1 bullet speeds, and health tuned to
- * the rebalanced player DPS (~10-25 at stage-1 power).
+ * Stage 1 — Introduction. Scouts and light setpieces building to Vesper, the
+ * Lantern Moth: a proper three-phase stage boss (the old sun-explosion
+ * midboss and its collapsing-ring routine are gone — every ring it fired was
+ * the same idea at five radii).
+ *
+ * Balance model (Touhou Easy/Normal, tuned against the rebalanced player):
+ *  - Stage-1 power is ~10-25 peak single-target DPS, call it ~10-12 effective
+ *    once dodging eats uptime. Boss phases are sized for ~20-28s each, with
+ *    generous timeouts so a weak run can never stall out.
+ *  - Dodge ceiling is deliberately low: nothing faster than ~7 px/frame, and
+ *    everything fast is aimed and telegraphed. The dense layers are all slow.
  *
  * Compile: node tools/compile.js  ->  Assets/levels/level1.json
  */
-const { S, M, spawn, wave, say, level } = require("../bh");
+const { S, M, spawn, wave, say, level, boss, phase } = require("../bh");
 
 // Playfield is ~1800x1080 (fullscreen); CX is the horizontal center.
 const CX = 900;
 
 // --------------------------------------------------------------------- helpers
-
-/** Radial rings fired closest-first: [[count, speed], ...] with a gap between. */
-function rings(pairs, gap = 10) {
-	const out = [];
-	pairs.forEach(([count, speed], i) => {
-		out.push(S.radial(count, speed));
-		if (i < pairs.length - 1) out.push(S.wait(gap));
-	});
-	return out;
-}
 
 /** Enter from the top, settle, sit for `holdFrames`, then fly off the top. */
 function dropIn(speed, enterFrames, holdFrames, exitVy = -2.5) {
@@ -35,36 +31,127 @@ function dropIn(speed, enterFrames, holdFrames, exitVy = -2.5) {
 	);
 }
 
-// ------------------------------------------------------- the sunexplosion boss
+// ------------------------------------------------------- MIDBOSS: Hive Lantern
 
-// Signature midboss script kept intact from the original hand-written level:
-// three widening fans, three volleys of collapsing radial rings, then a
-// looping fire-line + slow-ring barrage until it leaves or dies.
-// Ring speed ladder capped at 14 (was 25): a speed-25 bullet crosses the
-// whole field in ~0.7s, which is Lunatic reaction time — stage 1 should sit
-// around Touhou Easy/Normal, the fast top ring is still a clear overtake.
-const RING_SET = [[110, 4], [84, 6.5], [64, 9], [44, 11.5], [30, 14]];
-
-const sunExplosionScript = [
-	S.set("direction", 90), S.set("speed", 4),
-	S.rep(8, S.nway(5, 90, 0), S.add("direction", 2), S.add("speed", 0.5), S.wait(3)),
-	S.set("direction", 90), S.set("speed", 4), S.wait(30),
-	S.rep(8, S.nway(8, 45, 0), S.add("direction", -4), S.add("speed", 1), S.wait(3)),
-	S.set("direction", 90), S.set("speed", 4), S.wait(30),
-	S.rep(12, S.nway(12, 200, 0), S.add("direction", 5), S.add("speed", 0.5), S.wait(3)),
-	S.set("direction", 90), S.set("speed", 0), S.wait(30),
-	rings(RING_SET), S.wait(10), S.wait(30),
-	rings(RING_SET), S.wait(10), S.wait(30),
-	rings(RING_SET), S.wait(120),
-	S.set("direction", 90),
-	S.loop(
-		S.set("speed", 3),
-		S.rep(10, S.fire(0, 0), S.add("speed", 0.2), S.wait(5)),
-		S.wait(30),
-		rings([[120, 2], [90, 3], [72, 5], [45, 8], [30, 12]]),
-		S.wait(120),
+// Deliberately a trailer for the boss: slow lantern orbs that drift down and
+// pop into a soft petal ring, over a lazy two-arm pinwheel. Holds ~35s.
+const hiveLanternScript = [
+	S.set("direction", 90), S.set("speed", 2.6),
+	S.concurrent(
+		[S.loop(S.radial(3, 0), S.add("direction", 6), S.wait(7))],
+		[S.set("direction", 210), S.loop(S.radial(3, 0), S.add("direction", -6), S.wait(7))],
+		[S.loop(
+			S.wait(120),
+			S.scope(
+				S.size(2.0), S.set("direction", 90), S.set("speed", 1.8),
+				S.sub(
+					S.wait(75),
+					S.scope(S.size(1), S.set("speed", 2.4), S.radial(8, 0)),
+					S.vanish(),
+				),
+				S.dup(2, { x: { from: -220, to: 220 } }),
+			),
+		)],
 	),
 ];
+
+// -------------------------------------------------- BOSS: Vesper, Lantern Moth
+
+// P1 — nonspell: a four-spoke pinwheel that reverses spin every ~2.5s, with
+// aimed dart pairs punching through it. Teaches the two stage-1 skills:
+// read the spoke gaps, and step off the aim line before the darts land.
+const vesperPhase1 = phase({
+	health: 200,
+	timeout: 40,
+	script: [
+		S.set("direction", 90), S.set("speed", 2.8),
+		S.wait(24),
+		S.concurrent(
+			[S.loop(
+				S.rep(30, S.radial(4, 0), S.add("direction", 5.5), S.wait(5)),
+				S.rep(30, S.radial(4, 0), S.add("direction", -5.5), S.wait(5)),
+			)],
+			[S.loop(S.wait(115), S.aim(), S.rep(2, S.nway(3, 18, 5.5), S.wait(10)))],
+		),
+	],
+});
+
+/** A ring that coasts out, stalls to a near-hover, then beats outward again. */
+function wingbeat(count, speed) {
+	return S.scope(
+		S.set("speed", speed),
+		S.sub(
+			S.tween("speed", 0.6, 40),
+			S.wait(22),
+			S.tween("speed", 3.2, 44),
+		),
+		S.radial(count, 0),
+	);
+}
+
+// P2 — spell: the rings hang in the air mid-flight, so the field reads as a
+// set of stalled walls the player weaves through rather than a stream to
+// outrun. Each beat is offset from the last, and the boss drifts sideways so
+// the walls never stack in the same place twice.
+const vesperPhase2 = phase({
+	name: "Moth Sign - Dusted Wingbeat",
+	health: 260,
+	timeout: 50,
+	script: [
+		S.set("direction", 90), S.wait(20),
+		S.concurrent(
+			[S.loop(
+				wingbeat(20, 4.5), S.add("direction", 9), S.wait(58),
+				wingbeat(20, 4.5), S.add("direction", -15), S.wait(58),
+			)],
+			[S.loop(S.wait(150), S.aim(), S.nway(3, 22, 5.0))],
+		),
+	],
+	move: M.script({ loop: true },
+		M.drift(1.4, 0, 130),
+		M.drift(-1.4, 0, 260),
+		M.drift(1.4, 0, 130),
+	),
+});
+
+// P3 — Last Word: lantern orbs (size 2.2) sink slowly across the field and
+// bloom into petal rings on a delay, so the danger is where they *will* be,
+// not where they are. A slow counter-rotating spiral is the canvas under it.
+const lanternVolley = S.scope(
+	S.size(2.2), S.set("direction", 90), S.set("speed", 1.6),
+	S.sub(
+		S.wait(80),
+		S.scope(S.size(1), S.set("speed", 2.6), S.radial(10, 0)),
+		S.vanish(),
+	),
+	S.dup(3, { direction: { from: 70, to: 110 }, x: { from: -300, to: 300 } }),
+);
+
+const vesperPhase3 = phase({
+	name: "Lamp Sign - Candleflame Vigil",
+	health: 320,
+	timeout: 60,
+	script: [
+		S.set("direction", 90), S.set("speed", 2.6),
+		S.wait(24),
+		S.concurrent(
+			[S.loop(S.radial(3, 0), S.add("direction", 6.5), S.wait(6))],
+			[S.set("direction", 240), S.loop(S.radial(3, 0), S.add("direction", -5.5), S.wait(6))],
+			[S.loop(S.wait(105), lanternVolley)],
+			[S.loop(S.wait(200), S.aim(), S.rep(2, S.nway(3, 20, 5.2), S.wait(11)))],
+		),
+	],
+	move: M.script({}, M.stop()),
+});
+
+const vesper = spawn({
+	at: [CX, -80], time: 0,
+	sprite: "enemy2",
+	// entrance glide; phase 1 has no move script so it isn't cut short
+	move: M.script({}, M.drift(0, 3, 100), M.stop()),
+	boss: boss("Vesper, the Lantern Moth",
+		vesperPhase1, vesperPhase2, vesperPhase3),
+});
 
 // ------------------------------------------------------------------- the level
 
@@ -76,7 +163,8 @@ module.exports = level("level1", "Level 1 - Introduction", {
 			say("Aviator", "Funny, I was about to say the same thing to you.", "assets/Player.png", "left"),
 		],
 		outro: [
-			say("Aviator", "Scouts, nothing more. Whoever sent them is still out there.", "assets/Player.png", "left"),
+			say("Vesper", "You put out the lantern... the swarm will scatter without it...", "assets/Enemy(second).png", "right"),
+			say("Aviator", "Scouts and a lamplighter. Whoever lit the fire is still out there.", "assets/Player.png", "left"),
 		],
 	},
 	waves: [
@@ -155,23 +243,23 @@ module.exports = level("level1", "Level 1 - Introduction", {
 			}),
 		]),
 
-		// -- MIDBOSS: the sun-explosion. Sits center-stage through its fan /
-		//    collapsing-ring routine, leaves on its own after ~45s if unbeaten.
+		// -- MIDBOSS: the Hive Lantern — pinwheel canvas plus delayed lantern
+		//    blooms, a preview of Vesper's last phase. Leaves after ~35s.
 		wave(34, [
 			spawn({
 				at: [CX, -80], time: 0,
-				pattern: "sunexplosion", health: 200,
-				script: sunExplosionScript,
+				pattern: "hive-lantern", health: 170,
+				script: hiveLanternScript,
 				move: M.script({},
 					M.drift(0, 3, 110),
-					M.hold(2600),
+					M.hold(2000),
 					M.vel(0, -2.5),
 				),
 			}),
 		]),
 
 		// -- the orbit setpiece: a satellite gunner with escorts
-		wave(58, [
+		wave(52, [
 			spawn({
 				at: [1450, -60], time: 0,
 				pattern: "orbit", health: 26,
@@ -194,7 +282,7 @@ module.exports = level("level1", "Level 1 - Introduction", {
 
 		// -- mixed arms: the nway-radial-line setpiece, a sniper, and a
 		//    random-spray gunner
-		wave(72, [
+		wave(66, [
 			spawn({
 				at: [700, -60], time: 0,
 				pattern: "nway-radial-line", health: 22,
@@ -225,7 +313,7 @@ module.exports = level("level1", "Level 1 - Introduction", {
 		]),
 
 		// -- the parallel-spirals setpiece holds the center alone
-		wave(86, [
+		wave(80, [
 			spawn({
 				at: [CX, -60], time: 0,
 				pattern: "parallel-spirals", health: 26,
@@ -244,8 +332,8 @@ module.exports = level("level1", "Level 1 - Introduction", {
 			}),
 		]),
 
-		// -- finale: laundry tumbler + the aimed random-bomb turret
-		wave(98, [
+		// -- last pressure wave: laundry tumbler + the aimed random-bomb turret
+		wave(92, [
 			spawn({
 				at: [1250, -60], time: 0,
 				pattern: "laundry", health: 26,
@@ -257,7 +345,7 @@ module.exports = level("level1", "Level 1 - Introduction", {
 						[S.loop(S.radial(4, 0), S.add("direction", -4), S.wait(2))],
 					),
 				],
-				move: dropIn(2.5, 100, 780),
+				move: dropIn(2.5, 100, 660),
 			}),
 			spawn({
 				at: [500, -60], time: 2,
@@ -266,8 +354,11 @@ module.exports = level("level1", "Level 1 - Introduction", {
 					S.set("speed", 6), S.offset(80, 0),
 					S.loop(S.aim(), S.radial(20, 0), S.addOffset(0, 25), S.wait(18)),
 				],
-				move: dropIn(2.5, 110, 780),
+				move: dropIn(2.5, 110, 660),
 			}),
 		]),
+
+		// -- BOSS: Vesper, the Lantern Moth
+		wave(106, [vesper]),
 	],
 });

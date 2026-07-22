@@ -23,8 +23,14 @@
     ],
     "outro": [
       {
+        "speaker": "Vesper",
+        "text": "You put out the lantern... the swarm will scatter without it...",
+        "portrait": "assets/Enemy(second).png",
+        "side": "right"
+      },
+      {
         "speaker": "Aviator",
-        "text": "Scouts, nothing more. Whoever sent them is still out there.",
+        "text": "Scouts and a lamplighter. Whoever lit the fire is still out there.",
         "portrait": "assets/Player.png",
         "side": "left"
       }
@@ -1237,7 +1243,7 @@
           "spawnTime": 0,
           "x": 900,
           "y": -80,
-          "pattern": "sunexplosion",
+          "pattern": "hive-lantern",
           "patternConfig": {
             "patternScript": {
               "actions": [
@@ -1249,359 +1255,137 @@
                 {
                   "control": "Set",
                   "prop": "speed",
-                  "value": 4
+                  "value": 2.6
                 },
                 {
-                  "control": "Rep",
-                  "count": 8,
-                  "actions": [
-                    {
-                      "control": "NWay",
-                      "count": 5,
-                      "angle": 90,
-                      "speed": 0
-                    },
-                    {
-                      "control": "Add",
-                      "prop": "direction",
-                      "delta": 2
-                    },
-                    {
-                      "control": "Add",
-                      "prop": "speed",
-                      "delta": 0.5
-                    },
-                    {
-                      "control": "Wait",
-                      "frames": 3
-                    }
-                  ]
-                },
-                {
-                  "control": "Set",
-                  "prop": "direction",
-                  "value": 90
-                },
-                {
-                  "control": "Set",
-                  "prop": "speed",
-                  "value": 4
-                },
-                {
-                  "control": "Wait",
-                  "frames": 30
-                },
-                {
-                  "control": "Rep",
-                  "count": 8,
-                  "actions": [
-                    {
-                      "control": "NWay",
-                      "count": 8,
-                      "angle": 45,
-                      "speed": 0
-                    },
-                    {
-                      "control": "Add",
-                      "prop": "direction",
-                      "delta": -4
-                    },
-                    {
-                      "control": "Add",
-                      "prop": "speed",
-                      "delta": 1
-                    },
-                    {
-                      "control": "Wait",
-                      "frames": 3
-                    }
-                  ]
-                },
-                {
-                  "control": "Set",
-                  "prop": "direction",
-                  "value": 90
-                },
-                {
-                  "control": "Set",
-                  "prop": "speed",
-                  "value": 4
-                },
-                {
-                  "control": "Wait",
-                  "frames": 30
-                },
-                {
-                  "control": "Rep",
-                  "count": 12,
-                  "actions": [
-                    {
-                      "control": "NWay",
-                      "count": 12,
-                      "angle": 200,
-                      "speed": 0
-                    },
-                    {
-                      "control": "Add",
-                      "prop": "direction",
-                      "delta": 5
-                    },
-                    {
-                      "control": "Add",
-                      "prop": "speed",
-                      "delta": 0.5
-                    },
-                    {
-                      "control": "Wait",
-                      "frames": 3
-                    }
-                  ]
-                },
-                {
-                  "control": "Set",
-                  "prop": "direction",
-                  "value": 90
-                },
-                {
-                  "control": "Set",
-                  "prop": "speed",
-                  "value": 0
-                },
-                {
-                  "control": "Wait",
-                  "frames": 30
-                },
-                {
-                  "control": "Radial",
-                  "count": 110,
-                  "speed": 4
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 84,
-                  "speed": 6.5
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 64,
-                  "speed": 9
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 44,
-                  "speed": 11.5
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 30,
-                  "speed": 14
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Wait",
-                  "frames": 30
-                },
-                {
-                  "control": "Radial",
-                  "count": 110,
-                  "speed": 4
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 84,
-                  "speed": 6.5
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 64,
-                  "speed": 9
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 44,
-                  "speed": 11.5
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 30,
-                  "speed": 14
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Wait",
-                  "frames": 30
-                },
-                {
-                  "control": "Radial",
-                  "count": 110,
-                  "speed": 4
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 84,
-                  "speed": 6.5
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 64,
-                  "speed": 9
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 44,
-                  "speed": 11.5
-                },
-                {
-                  "control": "Wait",
-                  "frames": 10
-                },
-                {
-                  "control": "Radial",
-                  "count": 30,
-                  "speed": 14
-                },
-                {
-                  "control": "Wait",
-                  "frames": 120
-                },
-                {
-                  "control": "Set",
-                  "prop": "direction",
-                  "value": 90
-                },
-                {
-                  "control": "Loop",
-                  "actions": [
-                    {
-                      "control": "Set",
-                      "prop": "speed",
-                      "value": 3
-                    },
-                    {
-                      "control": "Rep",
-                      "count": 10,
-                      "actions": [
-                        {
-                          "control": "Fire",
-                          "angle": 0,
-                          "speed": 0
-                        },
-                        {
-                          "control": "Add",
-                          "prop": "speed",
-                          "delta": 0.2
-                        },
-                        {
-                          "control": "Wait",
-                          "frames": 5
-                        }
-                      ]
-                    },
-                    {
-                      "control": "Wait",
-                      "frames": 30
-                    },
-                    {
-                      "control": "Radial",
-                      "count": 120,
-                      "speed": 2
-                    },
-                    {
-                      "control": "Wait",
-                      "frames": 10
-                    },
-                    {
-                      "control": "Radial",
-                      "count": 90,
-                      "speed": 3
-                    },
-                    {
-                      "control": "Wait",
-                      "frames": 10
-                    },
-                    {
-                      "control": "Radial",
-                      "count": 72,
-                      "speed": 5
-                    },
-                    {
-                      "control": "Wait",
-                      "frames": 10
-                    },
-                    {
-                      "control": "Radial",
-                      "count": 45,
-                      "speed": 8
-                    },
-                    {
-                      "control": "Wait",
-                      "frames": 10
-                    },
-                    {
-                      "control": "Radial",
-                      "count": 30,
-                      "speed": 12
-                    },
-                    {
-                      "control": "Wait",
-                      "frames": 120
-                    }
+                  "control": "Concurrent",
+                  "branches": [
+                    [
+                      {
+                        "control": "Loop",
+                        "actions": [
+                          {
+                            "control": "Radial",
+                            "count": 3,
+                            "speed": 0
+                          },
+                          {
+                            "control": "Add",
+                            "prop": "direction",
+                            "delta": 6
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 7
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "control": "Set",
+                        "prop": "direction",
+                        "value": 210
+                      },
+                      {
+                        "control": "Loop",
+                        "actions": [
+                          {
+                            "control": "Radial",
+                            "count": 3,
+                            "speed": 0
+                          },
+                          {
+                            "control": "Add",
+                            "prop": "direction",
+                            "delta": -6
+                          },
+                          {
+                            "control": "Wait",
+                            "frames": 7
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "control": "Loop",
+                        "actions": [
+                          {
+                            "control": "Wait",
+                            "frames": 120
+                          },
+                          {
+                            "control": "Scope",
+                            "actions": [
+                              {
+                                "control": "Set",
+                                "prop": "size",
+                                "value": 2
+                              },
+                              {
+                                "control": "Set",
+                                "prop": "direction",
+                                "value": 90
+                              },
+                              {
+                                "control": "Set",
+                                "prop": "speed",
+                                "value": 1.8
+                              },
+                              {
+                                "control": "Sub",
+                                "actions": [
+                                  {
+                                    "control": "Wait",
+                                    "frames": 75
+                                  },
+                                  {
+                                    "control": "Scope",
+                                    "actions": [
+                                      {
+                                        "control": "Set",
+                                        "prop": "size",
+                                        "value": 1
+                                      },
+                                      {
+                                        "control": "Set",
+                                        "prop": "speed",
+                                        "value": 2.4
+                                      },
+                                      {
+                                        "control": "Radial",
+                                        "count": 8,
+                                        "speed": 0
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "control": "Vanish"
+                                  }
+                                ]
+                              },
+                              {
+                                "control": "Dup",
+                                "count": 2,
+                                "props": {
+                                  "x": {
+                                    "from": -220,
+                                    "to": 220
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
                   ]
                 }
               ]
             }
           },
-          "health": 200,
+          "health": 170,
           "movementScript": {
             "loop": false,
             "actions": [
@@ -1619,7 +1403,7 @@
               },
               {
                 "type": "Wait",
-                "frames": 2600
+                "frames": 2000
               },
               {
                 "type": "SetVelocity",
@@ -1632,7 +1416,7 @@
       ]
     },
     {
-      "startTime": 58,
+      "startTime": 52,
       "enemies": [
         {
           "spawnTime": 0,
@@ -1837,7 +1621,7 @@
       ]
     },
     {
-      "startTime": 72,
+      "startTime": 66,
       "enemies": [
         {
           "spawnTime": 0,
@@ -2187,7 +1971,7 @@
       ]
     },
     {
-      "startTime": 86,
+      "startTime": 80,
       "enemies": [
         {
           "spawnTime": 0,
@@ -2368,7 +2152,7 @@
       ]
     },
     {
-      "startTime": 98,
+      "startTime": 92,
       "enemies": [
         {
           "spawnTime": 0,
@@ -2531,7 +2315,7 @@
               },
               {
                 "type": "Wait",
-                "frames": 780
+                "frames": 660
               },
               {
                 "type": "SetVelocity",
@@ -2656,12 +2440,507 @@
               },
               {
                 "type": "Wait",
-                "frames": 780
+                "frames": 660
               },
               {
                 "type": "SetVelocity",
                 "vx": 0,
                 "vy": -2.5
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "startTime": 106,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 900,
+          "y": -80,
+          "pattern": "inline",
+          "patternConfig": {},
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "SetVelocity",
+                "vx": 0,
+                "vy": 3
+              },
+              {
+                "type": "Wait",
+                "frames": 100
+              },
+              {
+                "type": "Stop"
+              }
+            ]
+          },
+          "sprite": "enemy2",
+          "boss": {
+            "name": "Vesper, the Lantern Moth",
+            "phases": [
+              {
+                "health": 200,
+                "timeoutFrames": 2400,
+                "script": [
+                  {
+                    "control": "Set",
+                    "prop": "direction",
+                    "value": 90
+                  },
+                  {
+                    "control": "Set",
+                    "prop": "speed",
+                    "value": 2.8
+                  },
+                  {
+                    "control": "Wait",
+                    "frames": 24
+                  },
+                  {
+                    "control": "Concurrent",
+                    "branches": [
+                      [
+                        {
+                          "control": "Loop",
+                          "actions": [
+                            {
+                              "control": "Rep",
+                              "count": 30,
+                              "actions": [
+                                {
+                                  "control": "Radial",
+                                  "count": 4,
+                                  "speed": 0
+                                },
+                                {
+                                  "control": "Add",
+                                  "prop": "direction",
+                                  "delta": 5.5
+                                },
+                                {
+                                  "control": "Wait",
+                                  "frames": 5
+                                }
+                              ]
+                            },
+                            {
+                              "control": "Rep",
+                              "count": 30,
+                              "actions": [
+                                {
+                                  "control": "Radial",
+                                  "count": 4,
+                                  "speed": 0
+                                },
+                                {
+                                  "control": "Add",
+                                  "prop": "direction",
+                                  "delta": -5.5
+                                },
+                                {
+                                  "control": "Wait",
+                                  "frames": 5
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "control": "Loop",
+                          "actions": [
+                            {
+                              "control": "Wait",
+                              "frames": 115
+                            },
+                            {
+                              "control": "AimAtPlayer"
+                            },
+                            {
+                              "control": "Rep",
+                              "count": 2,
+                              "actions": [
+                                {
+                                  "control": "NWay",
+                                  "count": 3,
+                                  "angle": 18,
+                                  "speed": 5.5
+                                },
+                                {
+                                  "control": "Wait",
+                                  "frames": 10
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ]
+              },
+              {
+                "health": 260,
+                "name": "Moth Sign - Dusted Wingbeat",
+                "timeoutFrames": 3000,
+                "script": [
+                  {
+                    "control": "Set",
+                    "prop": "direction",
+                    "value": 90
+                  },
+                  {
+                    "control": "Wait",
+                    "frames": 20
+                  },
+                  {
+                    "control": "Concurrent",
+                    "branches": [
+                      [
+                        {
+                          "control": "Loop",
+                          "actions": [
+                            {
+                              "control": "Scope",
+                              "actions": [
+                                {
+                                  "control": "Set",
+                                  "prop": "speed",
+                                  "value": 4.5
+                                },
+                                {
+                                  "control": "Sub",
+                                  "actions": [
+                                    {
+                                      "control": "Tween",
+                                      "prop": "speed",
+                                      "to": 0.6,
+                                      "frames": 40
+                                    },
+                                    {
+                                      "control": "Wait",
+                                      "frames": 22
+                                    },
+                                    {
+                                      "control": "Tween",
+                                      "prop": "speed",
+                                      "to": 3.2,
+                                      "frames": 44
+                                    }
+                                  ]
+                                },
+                                {
+                                  "control": "Radial",
+                                  "count": 20,
+                                  "speed": 0
+                                }
+                              ]
+                            },
+                            {
+                              "control": "Add",
+                              "prop": "direction",
+                              "delta": 9
+                            },
+                            {
+                              "control": "Wait",
+                              "frames": 58
+                            },
+                            {
+                              "control": "Scope",
+                              "actions": [
+                                {
+                                  "control": "Set",
+                                  "prop": "speed",
+                                  "value": 4.5
+                                },
+                                {
+                                  "control": "Sub",
+                                  "actions": [
+                                    {
+                                      "control": "Tween",
+                                      "prop": "speed",
+                                      "to": 0.6,
+                                      "frames": 40
+                                    },
+                                    {
+                                      "control": "Wait",
+                                      "frames": 22
+                                    },
+                                    {
+                                      "control": "Tween",
+                                      "prop": "speed",
+                                      "to": 3.2,
+                                      "frames": 44
+                                    }
+                                  ]
+                                },
+                                {
+                                  "control": "Radial",
+                                  "count": 20,
+                                  "speed": 0
+                                }
+                              ]
+                            },
+                            {
+                              "control": "Add",
+                              "prop": "direction",
+                              "delta": -15
+                            },
+                            {
+                              "control": "Wait",
+                              "frames": 58
+                            }
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "control": "Loop",
+                          "actions": [
+                            {
+                              "control": "Wait",
+                              "frames": 150
+                            },
+                            {
+                              "control": "AimAtPlayer"
+                            },
+                            {
+                              "control": "NWay",
+                              "count": 3,
+                              "angle": 22,
+                              "speed": 5
+                            }
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                "movementScript": {
+                  "loop": true,
+                  "actions": [
+                    {
+                      "type": "SetVelocity",
+                      "vx": 1.4,
+                      "vy": 0
+                    },
+                    {
+                      "type": "Wait",
+                      "frames": 130
+                    },
+                    {
+                      "type": "SetVelocity",
+                      "vx": -1.4,
+                      "vy": 0
+                    },
+                    {
+                      "type": "Wait",
+                      "frames": 260
+                    },
+                    {
+                      "type": "SetVelocity",
+                      "vx": 1.4,
+                      "vy": 0
+                    },
+                    {
+                      "type": "Wait",
+                      "frames": 130
+                    }
+                  ]
+                }
+              },
+              {
+                "health": 320,
+                "name": "Lamp Sign - Candleflame Vigil",
+                "timeoutFrames": 3600,
+                "script": [
+                  {
+                    "control": "Set",
+                    "prop": "direction",
+                    "value": 90
+                  },
+                  {
+                    "control": "Set",
+                    "prop": "speed",
+                    "value": 2.6
+                  },
+                  {
+                    "control": "Wait",
+                    "frames": 24
+                  },
+                  {
+                    "control": "Concurrent",
+                    "branches": [
+                      [
+                        {
+                          "control": "Loop",
+                          "actions": [
+                            {
+                              "control": "Radial",
+                              "count": 3,
+                              "speed": 0
+                            },
+                            {
+                              "control": "Add",
+                              "prop": "direction",
+                              "delta": 6.5
+                            },
+                            {
+                              "control": "Wait",
+                              "frames": 6
+                            }
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "control": "Set",
+                          "prop": "direction",
+                          "value": 240
+                        },
+                        {
+                          "control": "Loop",
+                          "actions": [
+                            {
+                              "control": "Radial",
+                              "count": 3,
+                              "speed": 0
+                            },
+                            {
+                              "control": "Add",
+                              "prop": "direction",
+                              "delta": -5.5
+                            },
+                            {
+                              "control": "Wait",
+                              "frames": 6
+                            }
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "control": "Loop",
+                          "actions": [
+                            {
+                              "control": "Wait",
+                              "frames": 105
+                            },
+                            {
+                              "control": "Scope",
+                              "actions": [
+                                {
+                                  "control": "Set",
+                                  "prop": "size",
+                                  "value": 2.2
+                                },
+                                {
+                                  "control": "Set",
+                                  "prop": "direction",
+                                  "value": 90
+                                },
+                                {
+                                  "control": "Set",
+                                  "prop": "speed",
+                                  "value": 1.6
+                                },
+                                {
+                                  "control": "Sub",
+                                  "actions": [
+                                    {
+                                      "control": "Wait",
+                                      "frames": 80
+                                    },
+                                    {
+                                      "control": "Scope",
+                                      "actions": [
+                                        {
+                                          "control": "Set",
+                                          "prop": "size",
+                                          "value": 1
+                                        },
+                                        {
+                                          "control": "Set",
+                                          "prop": "speed",
+                                          "value": 2.6
+                                        },
+                                        {
+                                          "control": "Radial",
+                                          "count": 10,
+                                          "speed": 0
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "control": "Vanish"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "control": "Dup",
+                                  "count": 3,
+                                  "props": {
+                                    "direction": {
+                                      "from": 70,
+                                      "to": 110
+                                    },
+                                    "x": {
+                                      "from": -300,
+                                      "to": 300
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      [
+                        {
+                          "control": "Loop",
+                          "actions": [
+                            {
+                              "control": "Wait",
+                              "frames": 200
+                            },
+                            {
+                              "control": "AimAtPlayer"
+                            },
+                            {
+                              "control": "Rep",
+                              "count": 2,
+                              "actions": [
+                                {
+                                  "control": "NWay",
+                                  "count": 3,
+                                  "angle": 20,
+                                  "speed": 5.2
+                                },
+                                {
+                                  "control": "Wait",
+                                  "frames": 11
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    ]
+                  }
+                ],
+                "movementScript": {
+                  "loop": false,
+                  "actions": [
+                    {
+                      "type": "Stop"
+                    }
+                  ]
+                }
               }
             ]
           }
