@@ -3,7 +3,6 @@ package manager;
 import shot.ShotCommand.IShotCommand;
 import shot.CommandRegistry;
 import shot.FlowCommands.WaitCommand;
-import openfl.Assets;
 import haxe.Json;
 
 typedef PatternTemplate = {
@@ -31,7 +30,9 @@ class PatternLoader {
 
 		var path = "assets/patterns/" + patternName + ".json";
 		try {
-			var jsonText = Assets.getText(path);
+			// Release builds ship the sealed .dat form; SecureAssets picks it.
+			var jsonText = SecureAssets.getText(path);
+			if (jsonText == null) throw "asset not found";
 			var template:PatternTemplate = Json.parse(jsonText);
 			loadedPatterns.set(patternName, template);
 			return template;

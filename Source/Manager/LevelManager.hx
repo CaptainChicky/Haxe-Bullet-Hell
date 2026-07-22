@@ -2,7 +2,6 @@ package manager;
 
 import manager.EnemyManager;
 import manager.LevelData;
-import openfl.Assets;
 import openfl.events.Event;
 import openfl.display.Sprite;
 import openfl.Lib;
@@ -45,7 +44,9 @@ class LevelManager extends Sprite {
 	 *  any enemy spawns. Returns null on load failure. */
 	public function prepare(levelPath:String):LevelData {
 		try {
-			var levelJson:String = Assets.getText(levelPath);
+			// Release builds ship the sealed .dat form; SecureAssets picks it.
+			var levelJson:String = SecureAssets.getText(levelPath);
+			if (levelJson == null) throw "asset not found: " + levelPath;
 			currentLevel = Json.parse(levelJson);
 			trace("Loaded level: " + currentLevel.name);
 			return currentLevel;

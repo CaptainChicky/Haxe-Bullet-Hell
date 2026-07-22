@@ -6,6 +6,11 @@ I probably will not finish this anytime soon. If anyone wants to help, feel free
 # How to run
 Compile into html5 using `openfl build html5 -release -clean` or `openfl test html5`.
 
+Level and pattern content is authored as JSON in `Assets/` but **ships sealed**:
+release builds package only the `.dat` form, debug builds package only the
+JSON. On a fresh clone run `node tools/seal.js` once before building a release
+(see [tools/README.md](tools/README.md)); builds after that re-seal themselves.
+
 For the native Windows build, use `openfl build windows -release` — the exe lands in `Export/windows/bin/BulletHell.exe` (run it from that folder; it needs `lime.ndll` and `assets/` next to it). It runs fullscreen at 60 fps with vsync (exclusive fullscreen for now, so it minimizes on focus loss — the game auto-pauses when that happens). Note: `<window fps="60" />` in project.xml matters — native targets default to 30 fps and look laggy without it. Text uses the bundled Noto Sans font in `Assets/fonts/`, since system fonts like Verdana don't exist on native targets.
 
 ## Controls

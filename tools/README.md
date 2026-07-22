@@ -9,8 +9,10 @@ the validator can check that content too.
 ```
 tools/
   compile.js       CLI — compile + validate + write
+  seal.js          CLI — seal Assets JSON into the .dat form releases ship
   bh/index.js      the DSL (S = shot scripts, M = movement, level/wave/spawn/pattern)
   bh/validate.js   static validator (shared by compiled and hand-written JSON)
+  bh/crypt.js      the seal container (Haxe half: Source/Manager/AssetSeal.hx)
   src/             your level/pattern sources (*.js) — compiled recursively
 ```
 
@@ -24,6 +26,30 @@ node tools/compile.js --dry      # compile + validate, write nothing
 
 Exit code is 1 on any validation error and nothing is written; warnings don't
 fail the build. Output is deterministic: stable key order, 2-space indent.
+
+## Sealed assets
+
+Release builds don't ship the JSON. `tools/seal.js` turns every
+`Assets/levels/*.json` and `Assets/patterns/*.json` into a `.dat` alongside it,
+and `project.xml` packages `.dat` for release and `.json` for `-debug`. The
+point is only to keep shipped content out of a text editor — the key is in the
+binary, so this is obfuscation, not protection.
+
+```sh
+node tools/seal.js               # (re)seal everything, prune orphaned .dat
+node tools/seal.js --verify      # fail if any .dat is missing or stale
+node tools/seal.js --clean       # delete all .dat
+```
+
+`compile.js` seals automatically after writing, and `--check` verifies seals.
+Run `seal.js` by hand after editing a JSON file directly. `.dat` files are
+build output and gitignored, so **a freshly cloned tree needs one
+`node tools/seal.js` before its first release build** — `lime` enumerates
+assets before the prebuild hook runs, so the hook can't cover that first build.
+It will fail loudly rather than ship an empty game.
+
+`Tests/seal.hxml` cross-checks the Haxe reader against every sealed file; run
+it from the repo root after touching either half of the format.
 
 ## Writing a level
 

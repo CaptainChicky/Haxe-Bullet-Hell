@@ -1,0 +1,7 @@
+# Cross-checks manager.AssetSeal against the sealed .dat files written by
+# tools/seal.js. Run from the repo root: haxe Tests/seal.hxml
+-cp Source
+-cp Tests
+-main TestSeal
+-neko Export/testseal.n
+-cmd neko Export/testseal.n

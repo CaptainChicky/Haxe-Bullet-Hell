@@ -9,7 +9,36 @@
 
 	<haxelib name="openfl" />
 
-	<assets path="Assets" rename="assets" />
+	<!-- Levels and patterns ship sealed (see tools/bh/crypt.js): release builds
+	     package only the .dat form so shipped content can't be opened in a text
+	     editor, debug builds package only the .json so edits show up without a
+	     re-seal. SecureAssets prefers whichever is present. Everything else in
+	     Assets/ (sprites.json, art, fonts) is packaged as-is either way.
+	     lime matches include/exclude filters against bare filenames, not paths,
+	     so the two sealed directories are excluded wholesale here and re-added
+	     below with the right form for the build type. -->
+	<!-- Keeps seals fresh on every build. It does NOT cover a clean checkout:
+	     lime enumerates assets while parsing this file, before prebuild runs,
+	     so the very first build after cloning must be preceded by a manual
+	     `node tools/seal.js` — the guard below is what makes that loud. -->
+	<prebuild command="node tools/seal.js" />
+
+	<!-- .dat files are build output (gitignored), so without this a release
+	     build on a freshly cloned tree would package zero levels and zero
+	     patterns and silently produce a game with no content. Naming one
+	     sealed file explicitly turns that into a build error instead. -->
+	<assets path="Assets/levels/level1.dat" rename="assets/levels/level1.dat" type="binary" unless="debug" />
+
+	<assets path="Assets" rename="assets" exclude="levels|patterns" />
+
+	<assets path="Assets/levels" rename="assets/levels" include="*.json" if="debug" />
+	<assets path="Assets/patterns" rename="assets/patterns" include="*.json" if="debug" />
+
+	<!-- type="binary" matters: lime otherwise classifies .dat as TEXT, and a
+	     text asset can be stored as a string and re-encoded on load, which
+	     would corrupt the ciphertext. -->
+	<assets path="Assets/levels" rename="assets/levels" include="*.dat" type="binary" unless="debug" />
+	<assets path="Assets/patterns" rename="assets/patterns" include="*.dat" type="binary" unless="debug" />
 
 	<!-- The *logical* stage size, not a window size: Main sets
 	     StageScaleMode.SHOW_ALL, so OpenFL scales this to whatever the real
