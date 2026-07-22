@@ -5,7 +5,6 @@ import shot.GhostOrigin.IGhostAnchor;
 import shot.ShotPrototype;
 import shot.ScriptRunner;
 import shot.ShotEmitter.IShotEmitter;
-import openfl.Lib;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
@@ -266,11 +265,27 @@ class BulletEnemy extends Sprite {
 
 		// Despawn outside the fixed playfield, not the live window size (see
 		// Enemy.update) — the window scales, the playfield never does.
-		var stageWidth:Int = Main.fieldWidth;
-		var stageHeight:Int = Main.fieldHeight;
-		if (x < -100 || x > stageWidth + 100 || y < -100 || y > stageHeight + 100) {
-			despawn();
-			return;
+		//
+		// Offset-bound bullets are exempt: their position is dictated entirely
+		// by the parent plus a scripted offset, so leaving the field is
+		// temporary by construction — an orbiting pod around an enemy near the
+		// edge swings out and back every revolution. Culling it deletes half a
+		// formation permanently, since nothing ever respawns it. (This is what
+		// made level 3's pods enemy, which enters at x=1850 with a 120px orbit,
+		// show only one of its two pods.)
+		//
+		// They cannot become immortal: if the parent dies the bullet either
+		// orphan-releases into a normal bullet — cullable again, because
+		// bindMode is reset to BIND_NONE above — or follows a ghost origin,
+		// which force-despawns it at maxOrphanFrames.
+		var positionLocked = (bindMode == ShotPrototype.BIND_OFFSET && bindAnchor != null);
+		if (!positionLocked) {
+			var stageWidth:Int = Main.fieldWidth;
+			var stageHeight:Int = Main.fieldHeight;
+			if (x < -100 || x > stageWidth + 100 || y < -100 || y > stageHeight + 100) {
+				despawn();
+				return;
+			}
 		}
 
 		// Cosmetic sprite spin from frames alive (freezes cleanly with pause).
