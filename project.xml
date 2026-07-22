@@ -11,17 +11,35 @@
 
 	<assets path="Assets" rename="assets" />
 
-	<!-- Native targets default to 30 fps unless set explicitly; the game logic
+	<!-- The *logical* stage size, not a window size: Main sets
+	     StageScaleMode.SHOW_ALL, so OpenFL scales this to whatever the real
+	     window is and stage dimensions stay 1920x1080 everywhere. 16:9 is
+	     chosen so it fills a modern display exactly, with no letterbox bars.
+	     The 1800x1080 playfield that levels are authored against sits centred
+	     inside it — see DisplaySettings.FIELD_W / FIELD_X. Must stay in sync
+	     with DisplaySettings.LOGICAL_W / LOGICAL_H.
+	     Native targets default to 30 fps unless set explicitly; the game logic
 	     is frame-based and tuned for 60. -->
-	<window fps="60" hardware="true" antialiasing="0" />
+	<window width="1920" height="1080" fps="60" hardware="true" antialiasing="0" />
 
-	<!-- Windows: fullscreen-only for now (no fixed resolution: borderless
-	     desktop fullscreen). vsync keeps frame pacing clean at 60Hz.
-	     Known tradeoff: exclusive fullscreen minimizes on focus loss, so
-	     Win+Shift+S capture doesn't work. A borderless-window attempt
-	     (2026-07-18) failed: width/height 0 creates a 0-sized window, and a
-	     runtime resize to desktop bounds didn't take either. Revisit later. -->
-	<window if="windows" fullscreen="true" vsync="true" />
+	<!-- Deliberately NOT fullscreen="true": lime maps that to a real SDL
+	     exclusive-fullscreen display-mode switch, which is not composited, so
+	     Win+Shift+S captures a stale frame (this is why fullscreen screenshots
+	     showed the previous windowed contents). DisplaySettings instead fakes
+	     fullscreen at runtime with borderless + resize-to-display-bounds, which
+	     looks identical and stays capturable.
+	     Created borderless because the default mode is fullscreen and lime's
+	     runtime `window.borderless` setter does not reliably drop an existing
+	     title bar; windowed mode restores the border at runtime, which is the
+	     direction that does work. -->
+	<window if="windows" borderless="true" resizable="true" vsync="true" />
+
+	<!-- Without this, Stage.__resize() sizes the GL back buffer to the *logical*
+	     size (1800x1080) while the viewport is the real window (e.g. 1920x1080).
+	     The mismatch clips the right edge and leaves an uncleared strip — the
+	     "squished, white bar on the right" symptom. openfl_dpi_aware makes the
+	     back buffer track the window instead. See openfl/display/Stage.hx:3175. -->
+	<haxedef name="openfl_dpi_aware" />
 
 	<!-- Strip trace() calls from release builds; per-hit traces are a real
 	     per-frame cost on native. -->

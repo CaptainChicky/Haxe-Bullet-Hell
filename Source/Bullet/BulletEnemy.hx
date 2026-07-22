@@ -264,8 +264,8 @@ class BulletEnemy extends Sprite {
 			return;
 		}
 
-		// Despawn outside the fixed playfield (not the live window size, which
-		// shrinks when the fullscreen window minimizes on focus loss).
+		// Despawn outside the fixed playfield, not the live window size (see
+		// Enemy.update) — the window scales, the playfield never does.
 		var stageWidth:Int = Main.fieldWidth;
 		var stageHeight:Int = Main.fieldHeight;
 		if (x < -100 || x > stageWidth + 100 || y < -100 || y > stageHeight + 100) {

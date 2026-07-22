@@ -150,8 +150,9 @@ class Enemy extends Sprite implements IMovable {
 		x += velocityX;
 		y += velocityY;
 
-		// Cull against the fixed playfield, never the live window size (which
-		// shrinks when the fullscreen window minimizes on focus loss).
+		// Cull against the fixed playfield, never the live window size — the
+		// window is any size the player picked and OpenFL scales to it, so
+		// live stage dimensions have nothing to do with where play happens.
 		var stageWidth:Int = Main.fieldWidth;
 		var stageHeight:Int = Main.fieldHeight;
 

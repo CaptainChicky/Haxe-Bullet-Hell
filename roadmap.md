@@ -13,7 +13,17 @@
 
 **boss fights** - the UI for the fight is subpar, fix this. the bullets the bosses shoot should be averiable in size and sprites can be swapped (make sure of this, for now just make them larger i guess). thespellcar display and remainign dots are almost impossible to see, try doing them again properly like i need to see the name (perhaps theres an animatino to introduce the spellcard after idk) and the dots properly instead of having them blend in.
 
-**Fix fullscreen and esc** - esc when on focus loss (tabbing out) does not preserve some enemies during testing (right side). esc then tabbing out/focus loss should be equivalent to the perfect esc pressing in game. fullscreen should also be screenshottable with sinshifts.
+**Fix esc on focus loss** - esc when on focus loss (tabbing out) does not preserve some enemies during testing (right side). esc then tabbing out/focus loss should be equivalent to the perfect esc pressing in game.
+
+~~fullscreen should also be screenshottable with winshifts~~ — **done 2026-07-21.** Fullscreen is borderless-desktop, not exclusive; the window is deliberately 1px taller than the display so DWM keeps compositing it (see DisplaySettings.apply). Win+Shift+S works on the first press.
+
+**Dynamic screen size support** — the display architecture is done for the common case but has known gaps. Current model: a fixed 1920x1080 logical stage, `StageScaleMode.SHOW_ALL` (aspect-preserving fit + centre), and an 1800x1080 playfield centred inside the stage via Main's `world` container. Levels are authored in playfield coordinates and never see the screen. This is the standard 2D-game approach and is what Touhou does; the pieces below extend it rather than replace it.
+
+- *Non-16:9 monitors.* Today a 4:3 or 21:9 display gets correct centred bars — right, but it wastes screen. Option A (cheap, safe): leave it. Option B: keep the 1800x1080 playfield fixed and let the *stage* widen to the monitor ratio, so UI and background gain room while gameplay stays identical and fair. B is the better end state and the `world`/stage split already exists to support it — the work is making UI lay out against a runtime stage size instead of the constant 1920x1080. Do NOT expand the playfield itself: players on wider monitors would see bullets earlier, which is a competitive advantage.
+- *Native-resolution windowed presets.* `window.display.bounds` is already read in `apply()`. Offer presets derived from the actual display (e.g. 1x/0.75x/0.5x of native) instead of the hardcoded 960x540 / 1280x720 / 1600x900, which are wrong on a 1440p or 4K panel — all three are small there.
+- *HiDPI.* `openfl_dpi_aware` is enabled, so the GL back buffer tracks the real window in physical pixels; untested above 100% scaling. Verify on a 150%/200% display that text and shapes render at full crispness rather than being upscaled from a 96-DPI buffer.
+- *Multi-monitor.* `apply()` uses `window.display`, so it follows whichever display the window is on, but this is untested. Check that toggling fullscreen on a secondary monitor targets that monitor and not the primary.
+- *Ultra-wide / very small.* Sanity-check that SHOW_ALL still produces something playable at extremes (e.g. 32:9, or a 1280x720 laptop) — mainly that HUD text stays legible when scaled down.
 
 **Determine compatability** - determine if you want to keep old compatability patterns. if you decide to get rid of them, rewrite the previous levels using outdated notation into the new notation.
 

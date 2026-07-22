@@ -18,6 +18,7 @@ import openfl.text.TextFormat;
 import openfl.text.TextField;
 import openfl.display.FPS;
 import openfl.display.Sprite;
+import openfl.display.StageScaleMode;
 import openfl.events.Event;
 import openfl.Assets;
 import openfl.Lib;
@@ -33,13 +34,15 @@ class Main extends Sprite {
 	private var stageWidth:Int;
 	private var stageHeight:Int;
 
-	// Playfield size, cached once at init. Culling and spawn math must use
-	// these instead of live stage dimensions: on native the exclusive-
-	// fullscreen window minimizes on focus loss and the live stage size
-	// shrinks, which used to cull right/bottom-edge enemies and bullets
-	// before the auto-pause landed.
-	public static var fieldWidth(default, null):Int = 800;
-	public static var fieldHeight(default, null):Int = 600;
+	// Playfield size — the 1800x1080 box levels are authored against, NOT the
+	// 1920x1080 stage it sits centred inside (see DisplaySettings.FIELD_W and
+	// the `world` container). Fixed rather than read from the live stage: the
+	// window can be fullscreen or any windowed size and OpenFL scales the
+	// logical stage to fit, so live stage dimensions are meaningless here.
+	// Culling, spawn math, and player clamping must all use these.
+	// Kept equal to what init() assigns, so a pre-init read is still correct.
+	public static var fieldWidth(default, null):Int = DisplaySettings.FIELD_W;
+	public static var fieldHeight(default, null):Int = DisplaySettings.FIELD_H;
 
 	// Center message panel (title screen, stage announcements, game over)
 	private static inline final MESSAGE_PANEL_W:Int = 560;
@@ -73,6 +76,11 @@ class Main extends Sprite {
 	private var stageManager:StageManager;
 	private var itemManager:ItemManager;
 	private var background:StageBackground;
+
+	/** Container for everything in playfield space, offset to centre the
+	 *  1800x1080 field inside the 16:9 stage. UI (HUD, panels, dialogue, bomb
+	 *  flash) is *not* in here — it lays out against the full stage. */
+	private var world:Sprite;
 
 	// Run state
 	private static inline final START_LIVES:Int = 3;
@@ -137,41 +145,62 @@ class Main extends Sprite {
 			return;
 		inited = true;
 
-		Lib.current.stage.color = 0xFFFFFF;
+		// Clear colour, which is what shows in the letterbox/pillarbox bars when
+		// the window aspect doesn't match the logical playfield. Black reads as
+		// intentional framing; white read as a rendering glitch.
+		Lib.current.stage.color = 0x000000;
 
-		stageWidth = Lib.current.stage.stageWidth;
-		stageHeight = Lib.current.stage.stageHeight;
-		fieldWidth = stageWidth;
-		fieldHeight = stageHeight;
+		// Render the fixed logical playfield scaled to fit the real window,
+		// preserving aspect (letterbox/pillarbox). Everything below lays out
+		// in logical coordinates and is independent of the actual resolution.
+		Lib.current.stage.scaleMode = StageScaleMode.SHOW_ALL;
+
+		DisplaySettings.load();
+		DisplaySettings.apply();
+
+		stageWidth = DisplaySettings.LOGICAL_W;
+		stageHeight = DisplaySettings.LOGICAL_H;
+		fieldWidth = DisplaySettings.FIELD_W;
+		fieldHeight = DisplaySettings.FIELD_H;
 
 		// Scrolling stage backdrop — must be the very first child so
-		// everything else renders above it.
+		// everything else renders above it. Sized to the whole stage, not the
+		// playfield, so it covers the full screen edge to edge.
 		background = new StageBackground(stageWidth, stageHeight);
 		addChild(background);
 
+		// Every gameplay object lives in here, offset so that playfield
+		// coordinate (0,0) lands at the top-left of the centred 1800x1080 box.
+		// Level scripts and all culling/spawn math stay in playfield space and
+		// never need to know the stage is wider than the field.
+		world = new Sprite();
+		world.x = DisplaySettings.FIELD_X;
+		world.y = DisplaySettings.FIELD_Y;
+		addChild(world);
+
 		// Create managers
 		enemyManager = new EnemyManager();
-		addChild(enemyManager); // Add to display tree so enemies are rendered
+		world.addChild(enemyManager); // Add to display tree so enemies are rendered
 
 		// Item drops render above enemies but under the player
 		itemManager = new ItemManager();
 		itemManager.onCollected = onItemCollected;
-		addChild(itemManager);
+		world.addChild(itemManager);
 
-		// Create player with stage dimensions
-		player = new Player(stageWidth, stageHeight);
-		player.x = stageWidth / 2;
-		player.y = stageHeight - player.height / 2 - 10;
+		// Create player with playfield dimensions
+		player = new Player(fieldWidth, fieldHeight);
+		player.x = fieldWidth / 2;
+		player.y = fieldHeight - player.height / 2 - 10;
 		player.setSpawnPosition(player.x, player.y);
-		addChild(player);
+		world.addChild(player);
 
 		// Create level manager
 		levelManager = new LevelManager(enemyManager);
-		addChild(levelManager);
+		world.addChild(levelManager);
 
 		// Create collision manager
 		collisionManager = new CollisionManager(player, enemyManager);
-		addChild(collisionManager);
+		world.addChild(collisionManager);
 
 		// Set collision manager for enemy patterns
 		EnemyShootingPattern.setCollisionManager(collisionManager);
@@ -365,8 +394,114 @@ class Main extends Sprite {
 		AudioManager.setMusicDucked(gamePaused);
 	}
 
+	/* OPTIONS SCREEN
+	 *
+	 * Reuses the message panel rather than introducing a second UI system:
+	 * it's the same text-in-a-panel idiom as the title and pause screens.
+	 * Reachable with O from either, and closes back to whichever opened it. */
+
+	private static final OPTION_ROWS:Array<String> = ["Display", "Window size", "Music", "Volume"];
+
+	private var optionsOpen:Bool = false;
+	private var optionsCursor:Int = 0;
+
+	/** Panel text to restore when options closes (title or pause screen). */
+	private var optionsReturnText:String = null;
+
+	private function optionsText():String {
+		var lines = "OPTIONS";
+		for (i in 0...OPTION_ROWS.length) {
+			var value = switch (i) {
+				case 0: DisplaySettings.modeName();
+				case 1: DisplaySettings.windowSizeName();
+				case 2: AudioManager.musicMuted ? "Off" : "On";
+				default: Math.round(AudioManager.musicVolume * 100) + "%";
+			}
+			lines += "\n" + (i == optionsCursor ? "> " : "  ") + OPTION_ROWS[i] + ":  " + value;
+		}
+		return lines + "\n\nUP/DOWN select · LEFT/RIGHT change · F11 fullscreen · ESC back";
+	}
+
+	private function openOptions():Void {
+		optionsOpen = true;
+		optionsCursor = 0;
+		optionsReturnText = (messagePanel.alpha > 0) ? messageField.text : null;
+		showMessage(optionsText());
+	}
+
+	private function closeOptions():Void {
+		optionsOpen = false;
+		DisplaySettings.save();
+
+		if (optionsReturnText != null) {
+			showMessage(optionsReturnText);
+			optionsReturnText = null;
+		} else {
+			messagePanel.alpha = 0;
+		}
+	}
+
+	/** Adjust the highlighted option. `step` is -1 or +1. */
+	private function changeOption(step:Int):Void {
+		switch (optionsCursor) {
+			case 0:
+				DisplaySettings.cycleMode();
+				DisplaySettings.apply();
+			case 1:
+				// Only meaningful windowed; changing it in fullscreen would
+				// silently do nothing, so switch to windowed as well.
+				DisplaySettings.cycleWindowScale(step);
+				DisplaySettings.mode = DisplaySettings.WINDOWED;
+				DisplaySettings.apply();
+			case 2:
+				AudioManager.toggleMusicMuted();
+			default:
+				AudioManager.nudgeMusicVolume(step * 0.1);
+		}
+		showMessage(optionsText());
+	}
+
+	/** Options-screen key handling. Returns true if the key was consumed. */
+	private function handleOptionsKeys(keyCode:Int):Bool {
+		if (!optionsOpen) {
+			return false;
+		}
+
+		switch (keyCode) {
+			case Keyboard.ESCAPE, 79: // ESC / "o"
+				closeOptions();
+			case Keyboard.UP:
+				optionsCursor = (optionsCursor + OPTION_ROWS.length - 1) % OPTION_ROWS.length;
+				showMessage(optionsText());
+			case Keyboard.DOWN:
+				optionsCursor = (optionsCursor + 1) % OPTION_ROWS.length;
+				showMessage(optionsText());
+			case Keyboard.LEFT:
+				changeOption(-1);
+			case Keyboard.RIGHT:
+				changeOption(1);
+			default:
+				// Swallow everything else so the game can't be started or
+				// bombed from behind the options panel.
+		}
+		return true;
+	}
+
+	/** F11: flip fullscreen/windowed from anywhere, mid-run included. */
+	private function toggleDisplayMode():Void {
+		DisplaySettings.cycleMode();
+		DisplaySettings.apply();
+		DisplaySettings.save();
+
+		if (optionsOpen) {
+			showMessage(optionsText());
+		} else {
+			refreshTitleMessage();
+		}
+	}
+
 	private function pauseText():String {
-		return "PAUSED\nESC to resume · Q quit to main menu"
+		return "PAUSED\nESC to resume · O options · Q quit to main menu"
 			+ "\nM music: " + (AudioManager.musicMuted ? "Off" : "On")
 			+ " · [ ] volume: " + Math.round(AudioManager.musicVolume * 100) + "%";
 	}
@@ -431,7 +566,8 @@ class Main extends Sprite {
 			+ "\nShot type [1/2/3]: " + shotTypeName(shotType)
 			+ "\nD difficulty: " + GameSettings.difficultyName()
 			+ " · P practice: " + practice
-			+ "\nM music: " + (AudioManager.musicMuted ? "Off" : "On")
+			+ "\nO options (" + DisplaySettings.modeName() + ")"
+			+ " · M music: " + (AudioManager.musicMuted ? "Off" : "On")
 			+ " · [ ] volume: " + Math.round(AudioManager.musicVolume * 100) + "%";
 	}
 
@@ -545,8 +681,26 @@ class Main extends Sprite {
 	}
 
 	private function keyDown(event:KeyboardEvent):Void {
+		// Display mode works anywhere, mid-run included
+		if (event.keyCode == Keyboard.F11) {
+			toggleDisplayMode();
+			return;
+		}
+
+		// The options panel owns every key while it's up (including ESC, so it
+		// closes options rather than toggling pause underneath)
+		if (handleOptionsKeys(event.keyCode)) {
+			return;
+		}
+
 		if (event.keyCode == Keyboard.ESCAPE) {
 			togglePause();
+			return;
+		}
+
+		// "o" opens options from the title screen or the pause panel
+		if (event.keyCode == 79 && (gamePaused || currentGameState == Paused)) {
+			openOptions();
 			return;
 		}
 
@@ -747,12 +901,13 @@ class Main extends Sprite {
 
 	public static function main() {
 		#if sys
-		// SDL minimizes exclusive-fullscreen windows on focus loss, which is
-		// why Win+Shift+S used to capture the desktop instead of the game.
-		// SDL re-reads this hint from the environment on every focus-loss
-		// event, so setting it here (after window creation) still works: the
-		// window now stays visible, the DEACTIVATE auto-pause freezes play,
-		// and the snip overlay can capture the paused game.
+		// SDL minimizes windows carrying its fullscreen flag on focus loss.
+		// The game no longer uses that flag (fullscreen is faked with
+		// borderless + resize, see DisplaySettings.apply), so this is belt and
+		// braces rather than the load-bearing fix it once was — it only still
+		// matters if anything ever sets a real SDL fullscreen mode again.
+		// SDL re-reads the hint from the environment on every focus-loss
+		// event, so setting it here, after window creation, works fine.
 		Sys.putEnv("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0");
 		#end
 		Lib.current.stage.align = openfl.display.StageAlign.TOP_LEFT;
