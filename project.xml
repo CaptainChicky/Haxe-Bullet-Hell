@@ -17,16 +17,21 @@
 	     lime matches include/exclude filters against bare filenames, not paths,
 	     so the two sealed directories are excluded wholesale here and re-added
 	     below with the right form for the build type. -->
-	<!-- Keeps seals fresh on every build. It does NOT cover a clean checkout:
-	     lime enumerates assets while parsing this file, before prebuild runs,
-	     so the very first build after cloning must be preceded by a manual
-	     `node tools/seal.js` — the guard below is what makes that loud. -->
+	<!-- Release builds should go through `node tools/release.js <target>`, which
+	     seals the .dat, runs the build, then deletes them so the working tree
+	     stays JSON-only. This prebuild is a safety net for anyone who runs
+	     `openfl build -release` directly with stale .dat already present — it
+	     refreshes their contents. It can NOT cover a tree with no .dat at all:
+	     lime enumerates assets while parsing this file, before prebuild runs, so
+	     the .dat must exist before the build starts — the guard below is what
+	     makes a missing-seal build fail loudly instead of shipping empty. -->
 	<prebuild command="node tools/seal.js" />
 
-	<!-- .dat files are build output (gitignored), so without this a release
-	     build on a freshly cloned tree would package zero levels and zero
-	     patterns and silently produce a game with no content. Naming one
-	     sealed file explicitly turns that into a build error instead. -->
+	<!-- .dat files are build output (gitignored, and normally not present at
+	     rest since release.js cleans them). Without this, a release build with
+	     no .dat on disk would package zero levels and zero patterns and silently
+	     produce a game with no content. Naming one sealed file explicitly turns
+	     that into a build error telling you to build via tools/release.js. -->
 	<assets path="Assets/levels/level1.dat" rename="assets/levels/level1.dat" type="binary" unless="debug" />
 
 	<assets path="Assets" rename="assets" exclude="levels|patterns" />

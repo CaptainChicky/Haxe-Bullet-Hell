@@ -29,11 +29,21 @@ fail the build. Output is deterministic: stable key order, 2-space indent.
 
 ## Sealed assets
 
-Release builds don't ship the JSON. `tools/seal.js` turns every
-`Assets/levels/*.json` and `Assets/patterns/*.json` into a `.dat` alongside it,
-and `project.xml` packages `.dat` for release and `.json` for `-debug`. The
-point is only to keep shipped content out of a text editor — the key is in the
-binary, so this is obfuscation, not protection.
+Release builds don't ship the JSON. Each `Assets/levels/*.json` and
+`Assets/patterns/*.json` is sealed into a `.dat` alongside it, and `project.xml`
+packages `.dat` for release and `.json` for `-debug`. The point is only to keep
+shipped content out of a text editor — the key is in the binary (and in this
+public repo), so this is obfuscation, not protection.
+
+**Build a release through the wrapper**, which seals, builds, then cleans up so
+the working tree only ever holds the editable JSON at rest:
+
+```sh
+node tools/release.js windows        # openfl build windows -release
+node tools/release.js html5 -clean   # openfl build html5 -release -clean
+```
+
+`tools/seal.js` is the underlying step, if you need it directly:
 
 ```sh
 node tools/seal.js               # (re)seal everything, prune orphaned .dat
@@ -41,15 +51,16 @@ node tools/seal.js --verify      # fail if any .dat is missing or stale
 node tools/seal.js --clean       # delete all .dat
 ```
 
-`compile.js` seals automatically after writing, and `--check` verifies seals.
-Run `seal.js` by hand after editing a JSON file directly. `.dat` files are
-build output and gitignored, so **a freshly cloned tree needs one
-`node tools/seal.js` before its first release build** — `lime` enumerates
-assets before the prebuild hook runs, so the hook can't cover that first build.
-It will fail loudly rather than ship an empty game.
+`.dat` files are gitignored build output and are normally absent at rest.
+`lime` enumerates assets while parsing `project.xml` — before any hook runs — so
+the `.dat` must exist *before* the build starts; that's why `release.js` seals
+first rather than relying on a lime hook. If you run `openfl build -release`
+directly on a tree with no `.dat`, the build fails loudly (a named guard asset)
+rather than shipping an empty game — use the wrapper.
 
-`Tests/seal.hxml` cross-checks the Haxe reader against every sealed file; run
-it from the repo root after touching either half of the format.
+`Tests/seal.hxml` cross-checks the Haxe reader against every sealed file; run it
+from the repo root (after a `node tools/seal.js`) whenever you touch either half
+of the format.
 
 ## Writing a level
 

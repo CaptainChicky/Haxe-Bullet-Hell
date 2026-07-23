@@ -20,7 +20,6 @@
 
 const fs = require("fs");
 const path = require("path");
-const { execFileSync } = require("child_process");
 const { validateLevel, validatePattern } = require("./bh/validate");
 
 const ROOT = path.resolve(__dirname, "..");
@@ -115,17 +114,9 @@ if (errors === 0 && !DRY) {
 	console.log("  (nothing written: fix errors first)");
 }
 
-// Re-seal after writing: the .dat files are what release builds package, so
-// leaving them stale would ship the previous content.
-if (errors === 0 && !DRY) {
-	console.log("");
-	try {
-		execFileSync(process.execPath, [path.join(__dirname, "seal.js")], { stdio: "inherit" });
-	} catch (e) {
-		console.log("  ERROR  sealing failed");
-		errors++;
-	}
-}
+// Sealing is a build-time concern, not an authoring one: `tools/release.js`
+// seals right before a release build and cleans up after, so the working tree
+// only ever holds the editable JSON. compile.js just writes that JSON.
 
 // ---------------------------------------------------------------- --check
 if (CHECK_EXISTING) {
@@ -149,14 +140,6 @@ if (CHECK_EXISTING) {
 			}
 			report(kind === "levels" ? validateLevel(doc, rel, ASSETS) : validatePattern(doc, rel));
 		}
-	}
-
-	// A stale .dat is invisible in the JSON but is what actually ships.
-	console.log("\nVerifying sealed assets ...");
-	try {
-		execFileSync(process.execPath, [path.join(__dirname, "seal.js"), "--verify"], { stdio: "inherit" });
-	} catch (e) {
-		errors++;
 	}
 }
 
