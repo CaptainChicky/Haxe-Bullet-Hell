@@ -26,6 +26,11 @@ import openfl.display.Sprite;
  */
 class AnimatedBitmap extends Sprite {
 	public var frameIndex(default, null):Int = 0;
+	public var frameCount(get, never):Int;
+
+	inline function get_frameCount():Int {
+		return frames.length;
+	}
 
 	private var frames:Array<BitmapData>;
 	private var bitmap:Bitmap;

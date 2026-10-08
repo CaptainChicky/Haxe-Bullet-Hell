@@ -1,0 +1,15 @@
+{
+  "_readme": "SFX manifest: id -> path under assets/sfx/. Missing files use synthesized blips.",
+  "sounds": {
+    "fire": "assets/sfx/shoot.wav",
+    "player_death": "assets/sfx/player_death.wav",
+    "bomb": "assets/sfx/bomb.wav",
+    "item_pickup": "assets/sfx/item_pickup.wav",
+    "graze": "assets/sfx/graze.wav",
+    "spell_declare": "assets/sfx/spell_declare.wav",
+    "spell_capture": "assets/sfx/spell_capture.wav",
+    "spell_fail": "assets/sfx/spell_fail.wav",
+    "enemy_hit": "assets/sfx/enemy_hit.wav",
+    "enemy_death": "assets/sfx/enemy_death.wav"
+  }
+}

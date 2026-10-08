@@ -17,11 +17,8 @@ class CollisionManager extends Sprite {
 	/** Continuous laser graze: score every this many frames while overlapping. */
 	private static inline final LASER_GRAZE_INTERVAL:Int = 4;
 
-	// Player hitbox size (the small black dot)
-	private static inline final PLAYER_HITBOX_RADIUS:Float = 3.0;
-
-	// Extra distance beyond a hit that still counts as a graze
-	private static inline final GRAZE_RADIUS:Float = 18.0;
+	private static inline final DEFAULT_HITBOX_RADIUS:Float = 3.0;
+	private static inline final DEFAULT_GRAZE_EXTRA:Float = 18.0;
 
 	// Scoring callbacks (set by Main)
 	public var onEnemyKilled:Enemy->Void = null;
@@ -130,6 +127,7 @@ class CollisionManager extends Sprite {
 						if (!bullet.hasPierced(enemy)) {
 							bullet.markPierced(enemy);
 							enemy.takeDamage(bullet.damage);
+							manager.AudioManager.sfxEnemyHit();
 							if (!enemy.isAlive() && onEnemyKilled != null) {
 								onEnemyKilled(enemy);
 							}
@@ -138,6 +136,7 @@ class CollisionManager extends Sprite {
 					}
 
 					enemy.takeDamage(bullet.damage);
+					manager.AudioManager.sfxEnemyHit();
 					if (!enemy.isAlive() && onEnemyKilled != null) {
 						onEnemyKilled(enemy);
 					}
@@ -164,7 +163,7 @@ class CollisionManager extends Sprite {
 
 			// Check if bullet sprite overlaps with player hitbox circle,
 			// using the radius cached at bullet construction
-			var collisionDistance:Float = PLAYER_HITBOX_RADIUS + bullet.collisionRadius;
+			var collisionDistance:Float = playerHitRadius() + bullet.collisionRadius;
 
 			var dx:Float = bullet.x - playerCenterX;
 			var dy:Float = bullet.y - playerCenterY;
@@ -184,13 +183,25 @@ class CollisionManager extends Sprite {
 
 			// Graze: bullet passes close by without hitting (scored once per bullet)
 			if (!bullet.grazed) {
-				var grazeDistance:Float = collisionDistance + GRAZE_RADIUS;
+				var grazeDistance:Float = playerGrazeRadius() + bullet.collisionRadius;
 				if (distanceSquared < grazeDistance * grazeDistance) {
 					bullet.grazed = true;
 					if (onGraze != null) onGraze();
+					manager.AudioManager.sfxGraze();
 				}
 			}
 		}
+	}
+
+	private function playerHitRadius():Float {
+		if (player != null) return player.getHitboxRadius();
+		return DEFAULT_HITBOX_RADIUS;
+	}
+
+	/** Graze ring radius from player center (character def). */
+	private function playerGrazeRadius():Float {
+		if (player != null) return player.getGrazeRadius();
+		return DEFAULT_HITBOX_RADIUS + DEFAULT_GRAZE_EXTRA;
 	}
 
 	private function checkEnemyLasersVsPlayer():Void {
@@ -206,7 +217,7 @@ class CollisionManager extends Sprite {
 			var halfW = laser.collisionHalfWidth();
 			if (halfW <= 0) continue;
 
-			var hitDist = halfW + PLAYER_HITBOX_RADIUS;
+			var hitDist = halfW + playerHitRadius();
 			var dist = shot.LaserGeometry.distancePointToSegment(playerCenterX, playerCenterY, seg.x1, seg.y1, seg.x2, seg.y2);
 
 			if (dist < hitDist && !player.isInvincible()) {
@@ -215,12 +226,13 @@ class CollisionManager extends Sprite {
 			}
 
 			if (laser.collides()) {
-				var grazeDist = hitDist + GRAZE_RADIUS;
+				var grazeDist = playerGrazeRadius() + halfW;
 				if (dist < grazeDist) {
 					laser.grazeCooldown++;
 					if (laser.grazeCooldown >= LASER_GRAZE_INTERVAL) {
 						laser.grazeCooldown = 0;
 						if (onGraze != null) onGraze();
+						manager.AudioManager.sfxGraze();
 					}
 				} else {
 					laser.grazeCooldown = 0;

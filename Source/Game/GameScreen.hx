@@ -1,5 +1,7 @@
 package game;
 
+import manager.AudioManager;
+import manager.CharacterLibrary;
 import manager.GameSettings;
 import openfl.ui.Keyboard;
 import player.PlayerShootingPattern;
@@ -26,11 +28,19 @@ class GameScreen implements Screen {
 		Main.gamePaused = false;
 		main.pausedPrevMessage = null;
 
+		main.applyCharacterForRun();
+
 		if (main.spellCeremony != null) {
 			main.spellCeremony.reset();
-			main.enemyManager.onBossPhaseStarted = main.spellCeremony.onBossPhaseStarted;
-			main.enemyManager.onBossPhaseEnded = main.spellCeremony.onBossPhaseEnded;
-			main.enemyManager.onBossDefeated = main.spellCeremony.onBossDefeated;
+			var ceremony = main.spellCeremony;
+			main.enemyManager.onBossPhaseStarted = function(boss, phaseIndex) {
+				if (phaseIndex == 0) {
+					AudioManager.playBossTrack(main.stageManager.getStageNumber());
+				}
+				ceremony.onBossPhaseStarted(boss, phaseIndex);
+			};
+			main.enemyManager.onBossPhaseEnded = ceremony.onBossPhaseEnded;
+			main.enemyManager.onBossDefeated = ceremony.onBossDefeated;
 		}
 
 		main.messagePanel.alpha = 0;

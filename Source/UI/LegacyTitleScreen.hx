@@ -39,13 +39,16 @@ class LegacyTitleScreen implements Screen {
 	public function keyDown(code:Int):Bool {
 		switch (code) {
 			case 49:
-				main.selectShotType(Spread); // "1"
+				main.selectCharacterShot(0); // "1"
 				return true;
 			case 50:
-				main.selectShotType(Pierce); // "2"
+				main.selectCharacterShot(1); // "2"
 				return true;
 			case 51:
-				main.selectShotType(Homing); // "3"
+				main.selectCharacterShot(2); // "3"
+				return true;
+			case 67: // "c"
+				main.cycleCharacter();
 				return true;
 			case 68: // "d"
 				GameSettings.cycleDifficulty();

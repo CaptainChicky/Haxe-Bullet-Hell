@@ -1,0 +1,45 @@
+{
+  "characters": [
+    {
+      "id": "aviator",
+      "name": "The Aviator",
+      "sheet": "assets/art/characters/aviator/player.png",
+      "frameW": 48,
+      "frameH": 64,
+      "idleFrames": 4,
+      "leanFrames": 4,
+      "fps": 8,
+      "portraits": {
+        "neutral": "assets/Player.png",
+        "happy": "assets/Player.png",
+        "angry": "assets/Player.png"
+      },
+      "select": "assets/Player.png",
+      "shotTypes": ["Spread", "Homing"],
+      "speed": { "normal": 5.2, "focused": 2.2 },
+      "hitboxRadius": 3,
+      "grazeRadius": 24,
+      "description": "Balanced spread and homing shots. The default sky patroller."
+    },
+    {
+      "id": "striker",
+      "name": "The Striker",
+      "sheet": "assets/art/characters/striker/player.png",
+      "frameW": 48,
+      "frameH": 64,
+      "idleFrames": 4,
+      "leanFrames": 4,
+      "fps": 8,
+      "portraits": {
+        "neutral": "assets/Enemy.png",
+        "angry": "assets/Enemy.png"
+      },
+      "select": "assets/Enemy.png",
+      "shotTypes": ["Pierce", "Spread"],
+      "speed": { "normal": 6.5, "focused": 2.8 },
+      "hitboxRadius": 3,
+      "grazeRadius": 22,
+      "description": "Fast pierce primary with a wide spread sub-shot. Fragile but mobile."
+    }
+  ]
+}

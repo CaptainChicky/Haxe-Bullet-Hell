@@ -331,7 +331,7 @@ function checkDialogue(ctx, p, dialogue, assetRoot) {
 				ctx.error(ep, `side must be "left" or "right"`);
 			}
 			for (const key of Object.keys(e)) {
-				if (!["speaker", "text", "portrait", "side"].includes(key)) {
+				if (!["speaker", "text", "portrait", "side", "expression"].includes(key)) {
 					ctx.warn(ep, `dialogue entry does not use field "${key}"`);
 				}
 			}
@@ -611,4 +611,113 @@ function validateSprites(doc, file, assetRoot) {
 	return ctx.issues;
 }
 
-module.exports = { validateLevel, validatePattern, validateSprites };
+function checkCharacter(ctx, p, c, assetRoot) {
+	const fields = ["id", "name", "sheet", "frameW", "frameH", "idleFrames", "leanFrames", "fps",
+		"portraits", "select", "shotTypes", "speed", "hitboxRadius", "grazeRadius", "description"];
+	for (const key of Object.keys(c)) {
+		if (!fields.includes(key)) ctx.warn(p, `character does not use field "${key}"`);
+	}
+	if (typeof c.id !== "string") ctx.error(p, "character needs id string");
+	if (typeof c.name !== "string") ctx.error(p, "character needs name string");
+	if (typeof c.sheet !== "string") ctx.error(p, "character needs sheet path");
+	if (!Array.isArray(c.shotTypes) || c.shotTypes.length === 0) {
+		ctx.error(p, "shotTypes must be a non-empty array");
+	}
+	if (c.speed == null || typeof c.speed.normal !== "number" || typeof c.speed.focused !== "number") {
+		ctx.error(p, "speed needs numeric normal and focused");
+	}
+	if (typeof c.hitboxRadius !== "number" || c.hitboxRadius <= 0) {
+		ctx.error(p, "hitboxRadius must be a positive number");
+	}
+	if (typeof c.grazeRadius !== "number" || c.grazeRadius <= 0) {
+		ctx.error(p, "grazeRadius must be a positive number");
+	}
+	if (assetRoot && typeof c.sheet === "string") {
+		const rel = c.sheet.replace(/^assets\//, "");
+		if (!fs.existsSync(path.join(assetRoot, rel))) {
+			ctx.warn(p, `sheet not found (runtime falls back to Player.png): ${c.sheet}`);
+		}
+	}
+}
+
+function validateCharacters(doc, file, assetRoot) {
+	const ctx = new Ctx(file);
+	if (!doc || typeof doc !== "object" || Array.isArray(doc)) {
+		ctx.error("$", "characters file must be a JSON object");
+		return ctx.issues;
+	}
+	for (const key of Object.keys(doc)) {
+		if (!["_readme", "characters"].includes(key)) ctx.warn("$", `characters file does not use field "${key}"`);
+	}
+	if (!Array.isArray(doc.characters) || doc.characters.length === 0) {
+		ctx.error("characters", "needs a non-empty characters array");
+		return ctx.issues;
+	}
+	doc.characters.forEach((c, i) => checkCharacter(ctx, `characters[${i}]`, c, assetRoot));
+	return ctx.issues;
+}
+
+function checkBgmTrack(ctx, p, t, assetRoot) {
+	const fields = ["id", "file", "intro", "title", "composer", "comment", "loopStart", "loopEnd", "stage", "boss"];
+	for (const key of Object.keys(t)) {
+		if (!fields.includes(key)) ctx.warn(p, `bgm track does not use field "${key}"`);
+	}
+	if (typeof t.id !== "string") ctx.error(p, "track needs id string");
+	if (typeof t.title !== "string") ctx.error(p, "track needs title string");
+	for (const key of ["file", "intro"]) {
+		if (typeof t[key] === "string" && assetRoot) {
+			const rel = t[key].replace(/^assets\//, "");
+			if (!fs.existsSync(path.join(assetRoot, rel))) {
+				ctx.warn(p, `${key} not found (runtime uses synth fallback): ${t[key]}`);
+			}
+		}
+	}
+}
+
+function validateBgm(doc, file, assetRoot) {
+	const ctx = new Ctx(file);
+	if (!doc || typeof doc !== "object" || Array.isArray(doc)) {
+		ctx.error("$", "bgm file must be a JSON object");
+		return ctx.issues;
+	}
+	for (const key of Object.keys(doc)) {
+		if (!["_readme", "tracks"].includes(key)) ctx.warn("$", `bgm file does not use field "${key}"`);
+	}
+	if (!Array.isArray(doc.tracks)) {
+		ctx.error("tracks", "must be an array");
+		return ctx.issues;
+	}
+	doc.tracks.forEach((t, i) => checkBgmTrack(ctx, `tracks[${i}]`, t, assetRoot));
+	return ctx.issues;
+}
+
+function validateSfx(doc, file, assetRoot) {
+	const ctx = new Ctx(file);
+	if (!doc || typeof doc !== "object" || Array.isArray(doc)) {
+		ctx.error("$", "sfx file must be a JSON object");
+		return ctx.issues;
+	}
+	for (const key of Object.keys(doc)) {
+		if (!["_readme", "sounds"].includes(key)) ctx.warn("$", `sfx file does not use field "${key}"`);
+	}
+	if (doc.sounds == null || typeof doc.sounds !== "object") {
+		ctx.error("sounds", "needs a sounds object");
+		return ctx.issues;
+	}
+	for (const [name, filePath] of Object.entries(doc.sounds)) {
+		const p = `sounds.${name}`;
+		if (typeof filePath !== "string") {
+			ctx.error(p, "must be a path string");
+			continue;
+		}
+		if (assetRoot) {
+			const rel = filePath.replace(/^assets\//, "");
+			if (!fs.existsSync(path.join(assetRoot, rel))) {
+				ctx.warn(p, `sfx file not found (runtime uses synth): ${filePath}`);
+			}
+		}
+	}
+	return ctx.issues;
+}
+
+module.exports = { validateLevel, validatePattern, validateSprites, validateCharacters, validateBgm, validateSfx };

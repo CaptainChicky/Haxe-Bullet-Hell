@@ -83,6 +83,7 @@ class SpellCeremony {
 	}
 
 	public function onBossDefeated(_boss:BossEnemy):Void {
+		AudioManager.playMusic(stageManager.getStageNumber());
 		reset();
 	}
 

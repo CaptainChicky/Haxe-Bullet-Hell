@@ -267,11 +267,15 @@ function wave(startTime, enemies) {
 	return { startTime, enemies: flat([enemies]) };
 }
 
-/** One dialogue line. side defaults to "left". */
-function say(speaker, text, portrait, side) {
+/**
+ * One dialogue line. side defaults to "left".
+ * Optional 5th arg `expression` picks a character portrait when portrait is omitted.
+ */
+function say(speaker, text, portrait, side, expression) {
 	const d = { speaker, text };
 	if (portrait) d.portrait = portrait;
 	if (side) d.side = side;
+	if (expression) d.expression = expression;
 	return d;
 }
 

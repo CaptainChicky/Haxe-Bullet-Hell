@@ -1,6 +1,7 @@
 package;
 
 import manager.*;
+import manager.CharacterLibrary;
 import enemy.*;
 import item.Item.ItemType;
 import player.PlayerShootingPattern;
@@ -143,6 +144,7 @@ class Main extends Sprite {
 
 	// Selected player shot type (1/2/3 on the title screen)
 	private var shotType:PlayerShotType = Spread;
+	private var selectedCharacterId:String = "aviator";
 
 	// Embedded UI font (bundled TTF: system fonts like Verdana don't exist on
 	// native targets, so every TextField must use this).
@@ -204,7 +206,7 @@ class Main extends Sprite {
 		world.addChild(itemManager);
 
 		// Create player with playfield dimensions
-		player = new Player(fieldWidth, fieldHeight);
+		player = new Player(fieldWidth, fieldHeight, selectedCharacterId);
 		player.x = fieldWidth / 2;
 		player.y = fieldHeight - player.height / 2 - 10;
 		player.setSpawnPosition(player.x, player.y);
@@ -572,6 +574,7 @@ class Main extends Sprite {
 		return "BULLET HELL"
 			+ "\nPress SPACE to start"
 			+ "\nARROW KEYS move · Z shoot · X bomb · SHIFT focus · ESC pause"
+			+ "\nCharacter [C]: " + getSelectedCharacterName()
 			+ "\nShot type [1/2/3]: " + shotTypeName(shotType)
 			+ "\nD difficulty: " + GameSettings.difficultyName()
 			+ " · P practice: " + practice
@@ -583,12 +586,44 @@ class Main extends Sprite {
 	/** Movement speeds per shot type (unfocused / focused): homing trades
 	 *  speed for auto-aim, spread is the baseline, pierce is fastest to
 	 *  compensate for having to line its narrow shot up manually. */
-	private function applySpeedProfile(type:PlayerShotType):Void {
-		switch (type) {
-			case Homing: player.setSpeedProfile(4.2, 1.8);
-			case Spread: player.setSpeedProfile(5.2, 2.2);
-			case Pierce: player.setSpeedProfile(6.5, 2.8);
+	private function applySpeedProfile(_type:PlayerShotType):Void {
+		var c = CharacterLibrary.get(selectedCharacterId);
+		player.setSpeedProfile(c.speed.normal, c.speed.focused);
+	}
+
+	/** Re-apply the selected character before a run (speeds, hitbox, sprite). */
+	public function applyCharacterForRun():Void {
+		player.applyCharacter(selectedCharacterId);
+		applySpeedProfile(shotType);
+	}
+
+	public function cycleCharacter():Void {
+		var ids = CharacterLibrary.ids();
+		if (ids.length == 0) return;
+		var idx = ids.indexOf(selectedCharacterId);
+		if (idx < 0) idx = 0;
+		selectedCharacterId = ids[(idx + 1) % ids.length];
+		applyCharacterForRun();
+		selectCharacterShot(0);
+		refreshTitleMessage();
+	}
+
+	public function selectCharacterShot(index:Int):Void {
+		var c = CharacterLibrary.get(selectedCharacterId);
+		if (index < 0 || index >= c.shotTypes.length) return;
+		selectShotType(shotTypeFromName(c.shotTypes[index]));
+	}
+
+	private function shotTypeFromName(name:String):PlayerShotType {
+		return switch (name) {
+			case "Pierce": Pierce;
+			case "Homing": Homing;
+			default: Spread;
 		}
+	}
+
+	public function getSelectedCharacterName():String {
+		return CharacterLibrary.get(selectedCharacterId).name;
 	}
 
 	/** Select a shot type (title / game-over screen only). */

@@ -1,0 +1,55 @@
+{
+  "_readme": "BGM manifest. file = single track or loop segment after intro. intro + file = intro once then loop file. loopStart/loopEnd in seconds for seamless-ish loops on a single file. Missing .ogg files fall back to synthesized stage music.",
+  "tracks": [
+    {
+      "id": "title",
+      "file": "assets/bgm/title.ogg",
+      "title": "Bullet Hell",
+      "composer": "CCP",
+      "comment": "Title screen (placeholder path — synth until authored)"
+    },
+    {
+      "id": "st01",
+      "stage": 1,
+      "file": "assets/bgm/st01.ogg",
+      "title": "Forest Border",
+      "composer": "CCP",
+      "loopStart": 0,
+      "comment": "Stage 1"
+    },
+    {
+      "id": "st02",
+      "stage": 2,
+      "file": "assets/bgm/st02.ogg",
+      "title": "Swarm Front",
+      "composer": "CCP",
+      "loopStart": 0
+    },
+    {
+      "id": "st03",
+      "stage": 3,
+      "file": "assets/bgm/st03.ogg",
+      "title": "Firedancer",
+      "composer": "CCP",
+      "loopStart": 0
+    },
+    {
+      "id": "st04",
+      "stage": 4,
+      "file": "assets/bgm/st04.ogg",
+      "title": "Aviary Court",
+      "composer": "CCP",
+      "loopStart": 0
+    },
+    {
+      "id": "st04_boss",
+      "stage": 4,
+      "boss": true,
+      "intro": "assets/bgm/st04_boss_intro.ogg",
+      "file": "assets/bgm/st04_boss_loop.ogg",
+      "title": "Queen of the Aviary",
+      "composer": "CCP",
+      "loopStart": 0
+    }
+  ]
+}

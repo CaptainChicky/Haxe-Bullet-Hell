@@ -347,6 +347,7 @@ class TestShot {
 	public static function main() {
 		failures += TestFoundation.run();
 		failures += TestSpell.run();
+		failures += TestCharacter.run();
 
 		// --- Expression evaluator ---------------------------------------------
 		var p:Map<String, Dynamic> = ["base" => 90.0, "spread" => 15.0, "n" => 3.0];

@@ -1,5 +1,6 @@
 package ui;
 
+import manager.CharacterLibrary;
 import manager.LevelData.DialogueEntryData;
 import openfl.Assets;
 import openfl.display.Bitmap;
@@ -165,8 +166,13 @@ class DialogueManager extends Sprite {
 		while (portraitHolder.numChildren > 0)
 			portraitHolder.removeChildAt(0);
 		var hasPortrait = false;
-		if (entry.portrait != null && Assets.exists(entry.portrait)) {
-			var bmd = Assets.getBitmapData(entry.portrait);
+		var portraitPath = entry.portrait;
+		if (portraitPath == null || !Assets.exists(portraitPath)) {
+			var resolved = CharacterLibrary.resolvePortrait(entry.speaker, entry.expression, entry.portrait);
+			if (resolved != null) portraitPath = resolved;
+		}
+		if (portraitPath != null && Assets.exists(portraitPath)) {
+			var bmd = Assets.getBitmapData(portraitPath);
 			if (bmd != null) {
 				var bmp = new Bitmap(bmd);
 				bmp.smoothing = true;

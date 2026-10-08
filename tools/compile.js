@@ -20,7 +20,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { validateLevel, validatePattern, validateSprites } = require("./bh/validate");
+const { validateLevel, validatePattern, validateSprites, validateCharacters, validateBgm, validateSfx } = require("./bh/validate");
 
 const ROOT = path.resolve(__dirname, "..");
 const SRC_DIR = path.join(__dirname, "src");
@@ -149,6 +149,22 @@ if (CHECK_EXISTING) {
 			report(validateSprites(JSON.parse(fs.readFileSync(spritesPath, "utf8")), spritesRel, ASSETS));
 		} catch (e) {
 			console.log(`  ERROR  ${spritesRel} — invalid JSON: ${e.message}`);
+			errors++;
+		}
+	}
+
+	for (const [file, fn] of [
+		["characters.json", validateCharacters],
+		[path.join("bgm", "bgm.json"), validateBgm],
+		[path.join("sfx", "sfx.json"), validateSfx],
+	]) {
+		const full = path.join(ASSETS, file);
+		const rel = path.relative(ROOT, full);
+		if (!fs.existsSync(full)) continue;
+		try {
+			report(fn(JSON.parse(fs.readFileSync(full, "utf8")), rel, ASSETS));
+		} catch (e) {
+			console.log(`  ERROR  ${rel} — invalid JSON: ${e.message}`);
 			errors++;
 		}
 	}
