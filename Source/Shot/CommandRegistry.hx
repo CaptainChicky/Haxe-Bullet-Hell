@@ -107,6 +107,18 @@ class CommandRegistry {
 
 		// --- Firing -----------------------------------------------------------
 		parsers.set("Fire", (d, c) -> new FireCommand(c.val(d.angle), c.val(d.speed)));
+		// {"control": "FireLaser", "length": 700, "width": 18, "telegraphFrames": 40,
+		//  "activeFrames": 90, "shutdownFrames": 15, "extendFrames": 12, "sweep": 0.4}
+		parsers.set("FireLaser", (d, c) -> new FireLaserCommand(
+			c.val(d.angle != null ? d.angle : 0),
+			c.val(d.length),
+			c.val(d.width != null ? d.width : 16),
+			c.int(d.telegraphFrames != null ? d.telegraphFrames : 40),
+			c.int(d.activeFrames != null ? d.activeFrames : 60),
+			c.int(d.shutdownFrames != null ? d.shutdownFrames : 15),
+			c.int(d.extendFrames != null ? d.extendFrames : 0),
+			d.sweep != null ? c.val(d.sweep) : null
+		));
 		parsers.set("Radial", (d, c) -> new RadialCommand(c.int(d.count), c.val(d.speed)));
 		parsers.set("NWay", (d, c) -> new NWayCommand(c.int(d.count), c.val(d.angle), c.val(d.speed)));
 		// {"control": "Line", "count": 5, "prop": "speed", "from": 1, "to": 5}
@@ -176,6 +188,10 @@ class CommandRegistry {
 
 		// --- Aiming -----------------------------------------------------------
 		parsers.set("AimAtPlayer", (d, c) -> new AimAtTargetCommand());
+
+		// --- Bullet skin (per-fire art override) ------------------------------
+		// {"control": "Sprite", "skin": "rice_red"}
+		parsers.set("Sprite", (d, c) -> new SetBulletSkinCommand(c.str(d.skin, "")));
 
 	}
 }

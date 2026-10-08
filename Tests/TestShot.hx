@@ -6,6 +6,9 @@ import shot.ScriptRunner;
 import shot.ShotEmitter;
 import shot.CommandRegistry;
 import shot.Expression;
+import shot.LaserSpawnParams;
+import shot.LaserGeometry;
+import shot.LaserGeometry.LaserPhase;
 import enemy.MovementScript;
 import enemy.MovementScript.MovementAction;
 import haxe.Json;
@@ -49,6 +52,12 @@ class FakeEmitter implements IShotEmitter implements IGhostAnchor {
 
 	public function spawn(prototype:ShotPrototype, x:Float, y:Float):Void {
 		spawns.push({proto: prototype, x: x, y: y, frame: frame});
+	}
+
+	public var laserSpawns:Array<{params:LaserSpawnParams, x:Float, y:Float, frame:Int}> = [];
+
+	public function spawnLaser(params:LaserSpawnParams, x:Float, y:Float):Void {
+		laserSpawns.push({params: params, x: x, y: y, frame: frame});
 	}
 
 	public function isAlive():Bool return alive;
@@ -234,9 +243,58 @@ class FakeBulletEmitter implements IShotEmitter {
 		spawns.push({proto: prototype, x: x, y: y});
 	}
 
+	public function spawnLaser(params:LaserSpawnParams, x:Float, y:Float):Void {
+		// Nested laser patterns are not used in tests yet.
+	}
+
 	public function isAlive():Bool return bullet.alive;
 
 	public function vanish():Void bullet.alive = false;
+}
+
+/** Mirrors BulletLaser state timing without OpenFL (interp tests). */
+class HeadlessTestLaser {
+	public var x:Float = 0;
+	public var y:Float = 0;
+	public var alive:Bool = true;
+	public var beamAngle:Float;
+	public var fullLength:Float;
+	public var fullWidth:Float;
+	public var telegraphFrames:Int;
+	public var activeFrames:Int;
+	public var shutdownFrames:Int;
+	public var extendFrames:Int;
+	public var angularVelocity:Float;
+	public var age:Int = 0;
+	public var state:LaserPhase = Telegraph;
+
+	public function new(params:LaserSpawnParams) {
+		beamAngle = params.angle;
+		fullLength = params.length;
+		fullWidth = params.width;
+		telegraphFrames = params.telegraphFrames;
+		activeFrames = params.activeFrames;
+		shutdownFrames = params.shutdownFrames;
+		extendFrames = params.extendFrames < 0 ? 0 : params.extendFrames;
+		angularVelocity = params.angularVelocity;
+	}
+
+	public function collides():Bool return state == Active;
+
+	public function currentLength():Float {
+		return LaserGeometry.activeLength(age, fullLength, telegraphFrames, activeFrames, shutdownFrames, extendFrames, state);
+	}
+
+	public function everyFrame():Void {
+		if (!alive) return;
+		beamAngle += angularVelocity;
+		state = LaserGeometry.phaseAtAge(age, telegraphFrames, activeFrames);
+		age++;
+		if (state == Shutdown) {
+			var shutAge = age - telegraphFrames - activeFrames;
+			if (shutAge >= shutdownFrames) alive = false;
+		}
+	}
 }
 
 class TestShot {
@@ -287,6 +345,8 @@ class TestShot {
 	}
 
 	public static function main() {
+		failures += TestFoundation.run();
+
 		// --- Expression evaluator ---------------------------------------------
 		var p:Map<String, Dynamic> = ["base" => 90.0, "spread" => 15.0, "n" => 3.0];
 		check(Expression.evaluate("$base - $spread", p) == 75, "expr: $base - $spread = 75");
@@ -295,6 +355,38 @@ class TestShot {
 		check(Expression.evaluate("10 - 2 - 3", p) == 5, "expr: left assoc 10 - 2 - 3 = 5 (old evaluator broke on repeated values)");
 		check(Expression.evaluate("$n + $n", p) == 6, "expr: repeated param $n + $n = 6");
 		check(Expression.evaluate("12 / $n / 2", p) == 2, "expr: 12 / $n / 2 = 2");
+
+		// --- FireLaser: compile + state machine --------------------------------
+		var laserCmd = compile('[{"control": "FireLaser", "length": 500, "width": 20, "telegraphFrames": 10, "activeFrames": 20, "shutdownFrames": 5, "extendFrames": 10, "sweep": 0.5}]');
+		var em = run(laserCmd, 1);
+		check(em.laserSpawns.length == 1, "laser: FireLaser spawns one beam");
+		var lp = em.laserSpawns[0].params;
+		check(lp.length == 500 && lp.width == 20 && lp.telegraphFrames == 10 && lp.activeFrames == 20,
+			"laser: params parsed from JSON");
+		check(Math.abs(lp.angularVelocity - 0.5) < 1e-9, "laser: sweep sets angular velocity");
+
+		var beam = new HeadlessTestLaser(lp);
+		check(beam.state == Telegraph && beam.age == 0, "laser: starts in telegraph");
+		for (f in 0...10) beam.everyFrame();
+		check(beam.state == Telegraph && beam.age == 10, "laser: telegraph for telegraphFrames updates");
+		beam.everyFrame();
+		check(beam.state == Active && beam.collides(), "laser: first active frame after telegraph");
+		for (f in 0...19) beam.everyFrame();
+		check(beam.state == Active && beam.age == 30, "laser: still active on last active frame (age 30)");
+		beam.everyFrame();
+		check(beam.state == Shutdown && !beam.collides(), "laser: enters shutdown after active");
+		for (f in 0...3) beam.everyFrame();
+		check(beam.alive && beam.state == Shutdown, "laser: alive during shutdown");
+		beam.everyFrame();
+		check(!beam.alive && beam.age == 35, "laser: despawn after shutdownFrames");
+
+		beam = new HeadlessTestLaser(lp);
+		for (f in 0...15) beam.everyFrame();
+		check(Math.abs(beam.currentLength() - 250) < 1e-6, "laser: extendFrames halfway through extension");
+
+		var dMid = LaserGeometry.distancePointToSegment(0, 5, 0, 0, 100, 0);
+		var dEnd = LaserGeometry.distancePointToSegment(150, 0, 0, 0, 100, 0);
+		check(Math.abs(dMid - 5) < 1e-6 && dEnd > 40, "laser: point-to-segment distance (perp + past end)");
 
 		// --- Spiral: fire every frame, +12 degrees each shot --------------------
 		var spiral = compile('[
@@ -770,6 +862,16 @@ class TestShot {
 		var bclone = bproto.clone();
 		check(bclone.bindMode == ShotPrototype.BIND_FULL && bclone.bindSource == null,
 			"bind: clone copies bindMode but never bindSource");
+
+		var skinProto = new ShotPrototype();
+		skinProto.bulletSkin = "rice_red";
+		var skinClone = skinProto.clone();
+		check(skinClone.bulletSkin == "rice_red", "sprite: clone copies bulletSkin");
+		var skinEm = run(compile('[{"control": "Sprite", "skin": "kunai_blue"}, {"control": "Fire"}]'), 1);
+		check(skinEm.spawns.length == 1, "sprite: Sprite command fires");
+		// Fired clone carries the skin override (materialized on the bullet at spawn).
+		check(skinEm.spawns[0].proto.bulletSkin == "kunai_blue",
+			"sprite: fired prototype keeps bulletSkin from the script");
 
 		// Position bind: bullet moves in the parent's frame of reference.
 		var posBind = compile('[

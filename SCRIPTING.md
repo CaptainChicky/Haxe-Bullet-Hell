@@ -221,6 +221,15 @@ The shot-script language above is unchanged, but levels grew some blocks (all op
 
 - **`dialogue: {intro: [...], outro: [...]}`** — conversations of `{speaker, text, portrait?, side?}` played before the waves / after the field clears (`Source/UI/DialogueManager.hx`).
 - **`boss: {name?, phases: [...]}`** on a spawn — multi-phase boss. Each phase: `{name?, health, pattern? | script?, patternConfig?, movementScript?}`. Phase clears wipe the bullet field, swap the pattern (and movement), and grant brief invulnerability; the last phase kills the boss (`Source/Enemy/BossEnemy.hx`, orchestration in `EnemyManager`).
-- **`sprite`** on a spawn — a skin name from `assets/sprites.json` (enemy + bullet art, optional spritesheet `rect` cell, `scale`) or a direct `.png` path drop-in (`Source/Manager/SpriteLibrary.hx`).
+- **`sprite`** on a spawn — a skin name from `assets/sprites.json` (enemy + bullet art, optional spritesheet `rect` cell, `scale`) or a direct `.png` path drop-in (`Source/Manager/SpriteLibrary.hx`). A part may also animate: `{frames, fps?, frameW?, frameH?, mode?}`. Frames are one horizontal strip with no gaps. Frame `i` is the cell `(originX + i*frameW, originY, frameW, frameH)`. `rect` is the first cell (its x/y is the origin, its w/h is the cell size unless `frameW`/`frameH` are set), not the box around the whole strip. With no `rect` and no cell size, the image is split evenly left to right. `mode` is `loop` (default), `once`, or `pingpong`. `fps` defaults to 8. Omit `frames` and the skin stays the single static bitmap. Bullet parts also accept **`facing`**: `spin` (default cosmetic spin), `velocity` (sprite points along travel — art authored facing +x/0°), `player` (faces the player each frame), or `fixed`; plus optional **`angleOffset`**, **`hitScale`** (multiplier on the narrow-axis circle hit radius), and **`spawnFx`**: `true` for a brief scale/alpha pop-in on spawn.
+
+Per-fire bullet skin switching inside a pattern (before the skin exists in the manifest, the engine falls back to default art at resolve time):
+
+```jsonc
+{"control": "Sprite", "skin": "rice_red"},
+{"control": "Fire", "angle": 0, "speed": 4}
+```
+
+DSL: `S.sprite("rice_red")`.
 
 Instead of hand-writing level JSON, prefer the **authoring DSL**: JavaScript sources in `tools/src/` compiled by `node tools/compile.js` into the exact JSON formats above, with high-level movement helpers (`enterFrom`, `easeTo`, `weave`) and a static validator that also checks all hand-written JSON via `--check`. Full reference: `tools/README.md`.

@@ -159,6 +159,13 @@ class ScriptRunner {
 		emitter.spawn(proto, pos.x, pos.y);
 	}
 
+	/** Spawn a laser at the context prototype's spawn position; wires binding. */
+	public function fireLaser(ctx:ShotContext, params:LaserSpawnParams):Void {
+		if (params.bindMode != ShotPrototype.BIND_NONE) params.bindSource = rootPrototype;
+		var pos = spawnPosition(ctx.prototype);
+		emitter.spawnLaser(params, pos.x, pos.y);
+	}
+
 	/** World-space spawn position for the current prototype
 	 *  (origin + polar offset + Cartesian offset). */
 	public function spawnPosition(proto:ShotPrototype):{x:Float, y:Float} {

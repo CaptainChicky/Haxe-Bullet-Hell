@@ -10,6 +10,10 @@ import ui.HUD;
 import ui.DialogueManager;
 import ui.BossHealthBar;
 import ui.StageBackground;
+import ui.ScreenManager;
+import ui.LegacyTitleScreen;
+import ui.MenuList;
+import game.GameScreen;
 import openfl.ui.Keyboard;
 import openfl.events.KeyboardEvent;
 import openfl.text.Font;
@@ -23,11 +27,8 @@ import openfl.events.Event;
 import openfl.Assets;
 import openfl.Lib;
 
-enum GameState {
-	Paused;
-	Playing;
-}
-
+@:allow(game.GameScreen)
+@:allow(ui.LegacyTitleScreen)
 class Main extends Sprite {
 	var inited:Bool;
 
@@ -49,14 +50,19 @@ class Main extends Sprite {
 	private static inline final MESSAGE_PANEL_H:Int = 240;
 
 	private var player:Player;
-	private var currentGameState:GameState;
 
-	// In-run pause (ESC). Deliberately NOT a GameState: Paused there means the
-	// title / game-over screen, where bullets keep flying. Every per-frame
-	// listener in the game (CollisionManager, LevelManager, Player,
-	// DialogueManager, PlayerShootingPattern) checks this flag, so the whole
-	// simulation freezes in place. Static so those handlers can read it
-	// without plumbing. Pause menu options can hang off this later.
+	// Title panel and the run. Game over and all-clear return to the title
+	// screen (the panel stays up, enemies keep simulating). ESC pause is NOT
+	// a screen: it sets gamePaused while the run stays on top of the stack.
+	private var screens:ScreenManager;
+	private var titleScreen:LegacyTitleScreen;
+	private var gameScreen:GameScreen;
+
+	// In-run pause (ESC). Every per-frame listener in the game
+	// (CollisionManager, LevelManager, Player, DialogueManager,
+	// PlayerShootingPattern) checks this flag, so the whole simulation
+	// freezes in place — including AnimatedBitmap, which only advances from
+	// those updates. Static so those handlers can read it without plumbing.
 	public static var gamePaused:Bool = false;
 
 	// Message that was on screen when pause hit (e.g. a "Stage N" banner),
@@ -199,6 +205,8 @@ class Main extends Sprite {
 		player.y = fieldHeight - player.height / 2 - 10;
 		player.setSpawnPosition(player.x, player.y);
 		world.addChild(player);
+		Player.playerX = player.x;
+		Player.playerY = player.y;
 
 		// Create level manager
 		levelManager = new LevelManager(enemyManager);
@@ -207,6 +215,8 @@ class Main extends Sprite {
 		// Create collision manager
 		collisionManager = new CollisionManager(player, enemyManager);
 		world.addChild(collisionManager);
+
+		world.addChild(new fx.CancelSparkLayer());
 
 		// Set collision manager for enemy patterns
 		EnemyShootingPattern.setCollisionManager(collisionManager);
@@ -276,7 +286,6 @@ class Main extends Sprite {
 		messageField.selectable = false;
 		messageField.multiline = true;
 		messageField.wordWrap = true;
-		showMessage(titleText());
 
 		// HUD (score / lives / bombs / power, top-right)
 		hud = new HUD(stageWidth, uiFont.fontName);
@@ -310,15 +319,13 @@ class Main extends Sprite {
 		fpsCounter.setTextFormat(fpsCounter.defaultTextFormat);
 		addChild(fpsCounter);
 
-		setGameState(Paused);
-
 		stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 
 		// Losing window focus (alt-tab, Win+Shift+S snip overlay) auto-pauses
 		// mid-run so the player doesn't die off-screen.
 		stage.addEventListener(Event.DEACTIVATE, function(_) {
-			if (currentGameState == Playing && !gamePaused) {
+			if (inRun() && !gamePaused) {
 				togglePause();
 			}
 		});
@@ -328,59 +335,45 @@ class Main extends Sprite {
 		applySpeedProfile(shotType);
 		hud.setShotType(shotTypeName(shotType));
 
+		screens = new ScreenManager();
+		titleScreen = new LegacyTitleScreen(this);
+		gameScreen = new GameScreen(this);
+		optionsList = new MenuList(OPTION_ROWS.length);
+		titleScreen.arm(titleText());
+		screens.push(titleScreen);
+
 		this.addEventListener(Event.ENTER_FRAME, everyFrame);
 	}
 
-	private function setGameState(state:GameState):Void {
-		currentGameState = state;
-		gamePaused = false;
-		pausedPrevMessage = null;
+	/** True while the run is the top screen. Game over and the title panel are not. */
+	private function inRun():Bool {
+		return screens != null && screens.current() == gameScreen;
+	}
 
-		if (state == Paused) {
-			messagePanel.alpha = 1;
-		} else {
-			messagePanel.alpha = 0;
+	/** Leave the title panel and start a run. GameScreen.enter does the reset. */
+	private function startRun():Void {
+		screens.replace(gameScreen);
+	}
 
-			// Respawn player if they were dead
-			if (!player.isAlive()) {
-				player.respawn();
-			}
-
-			// Fresh run: reset score, lives, bombs, power (per difficulty).
-			// God mode toggled on the title screen carries into the run, so
-			// keep its max-power grant instead of zeroing it.
-			score = 0;
-			lives = GameSettings.startingLives();
-			bombs = GameSettings.startingBombs();
-			power = player.isGodMode() ? PlayerShootingPattern.MAX_POWER : 0;
-			hud.setScore(score);
-			hud.setLives(lives);
-			hud.setBombs(bombs);
-			hud.setPower(power, PlayerShootingPattern.MAX_POWER);
-			if (playerShootingPattern != null) {
-				playerShootingPattern.setPower(power);
-			}
-
-			// Clear everything when restarting
-			collisionManager.clearAllBullets();
-			enemyManager.clearAllEnemies();
-			itemManager.clear();
-			dialogueManager.cancel();
-
-			// Full campaign, or a single stage in practice mode
-			if (GameSettings.practiceStage > 0) {
-				stageManager.startRun(GameSettings.practiceStage - 1, true);
-			} else {
-				stageManager.startRun();
-			}
+	/**
+	 * Leave the run (if one is current) and show `message` on the title
+	 * panel. Game over and all-clear use this; the field is not cleared
+	 * here — GameScreen.exit only unpauses and reveals the panel.
+	 */
+	private function showPanelScreen(message:String):Void {
+		if (screens.current() == titleScreen) {
+			showMessage(message);
+			return;
 		}
+		titleScreen.arm(message);
+		screens.replace(titleScreen);
 	}
 
 	/** ESC during a run: freeze the whole simulation and show the pause
 	 *  panel. ESC again resumes, restoring whatever message (stage banner,
 	 *  ...) was on screen when pause hit. */
 	private function togglePause():Void {
-		if (currentGameState != Playing) {
+		if (!inRun()) {
 			return;
 		}
 
@@ -404,12 +397,15 @@ class Main extends Sprite {
 	 *
 	 * Reuses the message panel rather than introducing a second UI system:
 	 * it's the same text-in-a-panel idiom as the title and pause screens.
-	 * Reachable with O from either, and closes back to whichever opened it. */
+	 * Reachable with O from either, and closes back to whichever opened it.
+	 * UP/DOWN go through MenuList so the wrap matches every other menu.
+	 * LEFT/RIGHT still edit the row, and ESC / O still close it — Z and X
+	 * stay swallowed, so a bomb or a confirm can't fire through the panel. */
 
 	private static final OPTION_ROWS:Array<String> = ["Display", "Window size", "Music", "Volume"];
 
 	private var optionsOpen:Bool = false;
-	private var optionsCursor:Int = 0;
+	private var optionsList:MenuList;
 
 	/** Panel text to restore when options closes (title or pause screen). */
 	private var optionsReturnText:String = null;
@@ -423,14 +419,14 @@ class Main extends Sprite {
 				case 2: AudioManager.musicMuted ? "Off" : "On";
 				default: Math.round(AudioManager.musicVolume * 100) + "%";
 			}
-			lines += "\n" + (i == optionsCursor ? "> " : "  ") + OPTION_ROWS[i] + ":  " + value;
+			lines += "\n" + (i == optionsList.index ? "> " : "  ") + OPTION_ROWS[i] + ":  " + value;
 		}
 		return lines + "\n\nUP/DOWN select · LEFT/RIGHT change · F11 fullscreen · ESC back";
 	}
 
 	private function openOptions():Void {
 		optionsOpen = true;
-		optionsCursor = 0;
+		optionsList.reset();
 		optionsReturnText = (messagePanel.alpha > 0) ? messageField.text : null;
 		showMessage(optionsText());
 	}
@@ -449,7 +445,7 @@ class Main extends Sprite {
 
 	/** Adjust the highlighted option. `step` is -1 or +1. */
 	private function changeOption(step:Int):Void {
-		switch (optionsCursor) {
+		switch (optionsList.index) {
 			case 0:
 				DisplaySettings.cycleMode();
 				DisplaySettings.apply();
@@ -476,11 +472,8 @@ class Main extends Sprite {
 		switch (keyCode) {
 			case Keyboard.ESCAPE, 79: // ESC / "o"
 				closeOptions();
-			case Keyboard.UP:
-				optionsCursor = (optionsCursor + OPTION_ROWS.length - 1) % OPTION_ROWS.length;
-				showMessage(optionsText());
-			case Keyboard.DOWN:
-				optionsCursor = (optionsCursor + 1) % OPTION_ROWS.length;
+			case Keyboard.UP, Keyboard.DOWN:
+				optionsList.keyDown(keyCode);
 				showMessage(optionsText());
 			case Keyboard.LEFT:
 				changeOption(-1);
@@ -528,8 +521,7 @@ class Main extends Sprite {
 		enemyManager.clearAllEnemies();
 		itemManager.clear();
 
-		currentGameState = Paused;
-		showMessage(titleText());
+		showPanelScreen(titleText());
 	}
 
 	/** Music controls (work on any screen, paused included). Returns true if
@@ -601,7 +593,7 @@ class Main extends Sprite {
 
 	/** Re-render the title panel if it is currently on screen. */
 	private function refreshTitleMessage():Void {
-		if (currentGameState == Paused && StringTools.startsWith(messageField.text, "BULLET HELL")) {
+		if (screens.current() == titleScreen && StringTools.startsWith(messageField.text, "BULLET HELL")) {
 			showMessage(titleText());
 		}
 	}
@@ -622,7 +614,7 @@ class Main extends Sprite {
 	}
 
 	private function hideMessage():Void {
-		if (currentGameState == Playing) {
+		if (inRun()) {
 			messagePanel.alpha = 0;
 		}
 	}
@@ -660,7 +652,7 @@ class Main extends Sprite {
 	}
 
 	private function useBomb():Void {
-		if (currentGameState != Playing || !player.isAlive() || bombs <= 0) {
+		if (!inRun() || !player.isAlive() || bombs <= 0) {
 			return;
 		}
 
@@ -679,11 +671,10 @@ class Main extends Sprite {
 	}
 
 	private function onAllStagesCleared():Void {
-		currentGameState = Paused;
 		AudioManager.stopMusic();
 		playerShootingPattern.stopShooting();
 		var headline = (GameSettings.practiceStage > 0) ? "PRACTICE COMPLETE!" : "ALL STAGES CLEAR!";
-		showMessage(headline + "\nFinal Score: " + score + "\n\nPress SPACE to play again");
+		showPanelScreen(headline + "\nFinal Score: " + score + "\n\nPress SPACE to play again");
 	}
 
 	private function keyDown(event:KeyboardEvent):Void {
@@ -705,7 +696,7 @@ class Main extends Sprite {
 		}
 
 		// "o" opens options from the title screen or the pause panel
-		if (event.keyCode == 79 && (gamePaused || currentGameState == Paused)) {
+		if (event.keyCode == 79 && (gamePaused || screens.current() == titleScreen)) {
 			openOptions();
 			return;
 		}
@@ -745,33 +736,15 @@ class Main extends Sprite {
 			}
 		}
 
-		// A running conversation consumes the action keys (Z / X / SPACE advance)
-		if (currentGameState == Playing && dialogueManager.isActive()) {
-			if (event.keyCode == Keyboard.SPACE || event.keyCode == 90 || event.keyCode == 88) {
-				dialogueManager.advance();
-				return;
-			}
+		// The current screen owns its own keys (title: shot type, difficulty,
+		// practice, SPACE to start; run: dialogue advance). Anything it does
+		// not consume falls through, so an arrow held on the title panel
+		// still sets a movement flag the way the old chain did.
+		if (screens.keyDown(event.keyCode)) {
+			return;
 		}
 
-		// Title / game-over screen settings: shot type, difficulty, practice
-		if (currentGameState == Paused) {
-			switch (event.keyCode) {
-				case 49: selectShotType(Spread); // "1"
-				case 50: selectShotType(Pierce); // "2"
-				case 51: selectShotType(Homing); // "3"
-				case 68: // "d"
-					GameSettings.cycleDifficulty();
-					refreshTitleMessage();
-				case 80: // "p"
-					GameSettings.cyclePractice(stageManager.getStageCount());
-					refreshTitleMessage();
-				default:
-			}
-		}
-
-		if (currentGameState == Paused && event.keyCode == Keyboard.SPACE) {
-			setGameState(Playing);
-		} else if (event.keyCode == Keyboard.UP) {
+		if (event.keyCode == Keyboard.UP) {
 			player.setMoveUp(true);
 		} else if (event.keyCode == Keyboard.DOWN) {
 			player.setMoveDown(true);
@@ -780,7 +753,7 @@ class Main extends Sprite {
 		} else if (event.keyCode == Keyboard.RIGHT) {
 			player.setMoveRight(true);
 		} else if (event.keyCode == 90) { // "z" key
-			if (currentGameState == Playing) {
+			if (inRun()) {
 				playerShootingPattern.startShooting();
 			}
 		} else if (event.keyCode == 88) { // "x" key
@@ -804,6 +777,7 @@ class Main extends Sprite {
 		} else if (event.keyCode == Keyboard.SHIFT) {
 			player.setFocused(false);
 		}
+		if (screens != null) screens.keyUp(event.keyCode);
 	}
 
 	private function onPlayerDeath():Void {
@@ -827,11 +801,10 @@ class Main extends Sprite {
 
 		// Out of lives: game over
 		trace("GAME OVER!");
-		currentGameState = Paused;
 		AudioManager.stopMusic();
 		stageManager.stop();
 		dialogueManager.cancel();
-		showMessage("GAME OVER\nFinal Score: " + score + "\n\nPress SPACE to restart");
+		showPanelScreen("GAME OVER\nFinal Score: " + score + "\n\nPress SPACE to restart");
 
 		// Stop all enemy shooting but keep them visible
 		enemyManager.stopAllShooting();
@@ -857,22 +830,15 @@ class Main extends Sprite {
 		background.update();
 		AudioManager.tick();
 
-		if (currentGameState == Playing) {
-			// Player handles its own movement and boundaries
-			// (frozen while a conversation is on screen)
-			if (!dialogueManager.isActive()) {
-				player.updateMovement();
-				// Items fall / magnet / collect against the live player
-				itemManager.update(player);
-			}
+		// Run-only work (player, items, stage clock) lives on GameScreen.
+		// The title / game-over panel is a different screen, so this is a
+		// no-op there. ESC pause returned above, which also freezes any
+		// AnimatedBitmap those updates would have advanced.
+		screens.update();
 
-			// Stage progression (pauses automatically outside Playing)
-			stageManager.update();
-		}
-
-		// Enemies + patterns advance even outside Playing (bullets stay in
-		// flight on the game-over screen), exactly as their per-object
-		// ENTER_FRAME listeners did before updates were centralized.
+		// Enemies + patterns advance even on the game-over panel (bullets
+		// stay in flight), exactly as their per-object ENTER_FRAME listeners
+		// did before updates were centralized.
 		enemyManager.update();
 
 		// Boss bar follows whichever boss (if any) is alive

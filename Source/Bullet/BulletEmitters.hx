@@ -4,6 +4,7 @@ import enemy.Enemy;
 import manager.CollisionManager;
 import shot.GhostOrigin;
 import shot.GhostOrigin.IGhostAnchor;
+import shot.LaserSpawnParams;
 import shot.ShotPrototype;
 import shot.ScriptRunner;
 import shot.ShotEmitter;
@@ -65,8 +66,27 @@ private class EmitterBase implements IGhostAnchor {
 		return {x: player.x, y: player.y};
 	}
 
+	public function spawnLaser(params:LaserSpawnParams, x:Float, y:Float):Void {
+		var laser = new BulletLaser(params);
+		laser.x = x;
+		laser.y = y;
+
+		var container:DisplayObjectContainer = (Main.world != null) ? Main.world : Lib.current;
+		container.addChild(laser);
+
+		if (collisionManager != null) {
+			collisionManager.registerEnemyLaser(laser);
+		}
+
+		if (params.bindMode != ShotPrototype.BIND_NONE) {
+			var self:IShotEmitter = cast this;
+			laser.bindTo(self, params.bindMode, params.bindSource);
+		}
+	}
+
 	public function spawn(prototype:ShotPrototype, x:Float, y:Float):Void {
-		var bullet = new BulletEnemy(prototype, bulletSprite);
+		var skin = resolveSkin(prototype);
+		var bullet = new BulletEnemy(prototype, skin);
 		bullet.x = x;
 		bullet.y = y;
 
@@ -100,9 +120,13 @@ private class EmitterBase implements IGhostAnchor {
 			// A bound bullet's own children do not implicitly bind to it;
 			// a chain must opt in with an explicit Bind in the sub-script.
 			subProto.bindMode = ShotPrototype.BIND_NONE;
-			var runner = new ScriptRunner(new BulletSubEmitter(bullet, collisionManager, bulletSprite), prototype.subCommands, subProto);
+			var runner = new ScriptRunner(new BulletSubEmitter(bullet, collisionManager, skin), prototype.subCommands, subProto);
 			bullet.attachScript(runner);
 		}
+	}
+
+	private function resolveSkin(prototype:ShotPrototype):String {
+		return (prototype.bulletSkin != null && prototype.bulletSkin.length > 0) ? prototype.bulletSkin : bulletSprite;
 	}
 }
 

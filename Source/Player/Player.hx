@@ -9,6 +9,10 @@ import openfl.Assets;
 class Player extends Sprite {
 	public static inline final ROTATION_SPEED:Float = 40.0; // Rotation speed in degrees per second
 
+	/** Playfield position for bullet art that faces the player (updated each frame). */
+	public static var playerX:Float = 0;
+	public static var playerY:Float = 0;
+
 	// Frames since spawn (drives cosmetic spin; freezes cleanly with pause)
 	private var ageFrames:Int = 0;
 
@@ -234,6 +238,9 @@ class Player extends Sprite {
 		if (x > stageWidth - width / 2 - 10) {
 			x = stageWidth - width / 2 - 10;
 		}
+
+		playerX = x;
+		playerY = y;
 	}
 
 	private function everyFrame(event:Event):Void {

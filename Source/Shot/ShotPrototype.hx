@@ -50,6 +50,9 @@ class ShotPrototype {
 	 *  from the Scale command, which shapes spawn PLACEMENT, not the bullet. */
 	public var size:Float = 1;
 
+	/** Optional bullet skin override for subsequent fires (see Sprite command). */
+	public var bulletSkin:String = null;
+
 	// --- Binding --------------------------------------------------------------
 	public static inline final BIND_NONE:Int = 0;
 	public static inline final BIND_POSITION:Int = 1;
@@ -107,6 +110,7 @@ class ShotPrototype {
 		p.maxSpeed = maxSpeed;
 		p.lifetime = lifetime;
 		p.size = size;
+		p.bulletSkin = bulletSkin;
 		p.bindMode = bindMode; // config travels; bindSource (runtime wiring) does not
 		p.subCommands = subCommands;
 		for (k in vars.keys()) p.vars.set(k, vars.get(k));

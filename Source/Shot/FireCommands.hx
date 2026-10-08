@@ -4,6 +4,55 @@ import shot.ShotCommand.IShotCommand;
 import shot.Expression.NumValue;
 
 /**
+ * Spawns one laser beam using the emitter origin plus the context prototype's
+ * spawn offsets. Angle 0 uses the prototype direction; sweep defaults to the
+ * prototype's angularVelocity unless `sweep` is set in JSON.
+ */
+class FireLaserCommand implements IShotCommand {
+	private var angle:NumValue;
+	private var length:NumValue;
+	private var width:NumValue;
+	private var telegraphFrames:Int;
+	private var activeFrames:Int;
+	private var shutdownFrames:Int;
+	private var extendFrames:Int;
+	private var sweep:NumValue;
+	private var hasSweep:Bool;
+
+	public function new(angle:NumValue, length:NumValue, width:NumValue, telegraphFrames:Int, activeFrames:Int,
+			shutdownFrames:Int, extendFrames:Int, ?sweep:NumValue) {
+		this.angle = angle;
+		this.length = length;
+		this.width = width;
+		this.telegraphFrames = telegraphFrames;
+		this.activeFrames = activeFrames;
+		this.shutdownFrames = shutdownFrames;
+		this.extendFrames = extendFrames;
+		this.sweep = sweep;
+		this.hasSweep = sweep != null;
+	}
+
+	public function run(ctx:ShotContext, runner:ScriptRunner):Void {
+		var a = angle.get();
+		var beamAngle = (a == 0) ? ctx.prototype.direction : a;
+		var turn = hasSweep ? sweep.get() : ctx.prototype.angularVelocity;
+		var params:LaserSpawnParams = {
+			angle: beamAngle,
+			length: length.get(),
+			width: width.get(),
+			telegraphFrames: telegraphFrames,
+			activeFrames: activeFrames,
+			shutdownFrames: shutdownFrames,
+			extendFrames: extendFrames,
+			angularVelocity: turn,
+			bindMode: ctx.prototype.bindMode,
+			bindSource: null,
+		};
+		runner.fireLaser(ctx, params);
+	}
+}
+
+/**
  * Fires one bullet by cloning the prototype.
  *
  * Legacy JSON compatibility: a literal 0 for angle/speed means "use the

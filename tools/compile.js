@@ -20,7 +20,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { validateLevel, validatePattern } = require("./bh/validate");
+const { validateLevel, validatePattern, validateSprites } = require("./bh/validate");
 
 const ROOT = path.resolve(__dirname, "..");
 const SRC_DIR = path.join(__dirname, "src");
@@ -139,6 +139,17 @@ if (CHECK_EXISTING) {
 				continue;
 			}
 			report(kind === "levels" ? validateLevel(doc, rel, ASSETS) : validatePattern(doc, rel));
+		}
+	}
+
+	const spritesPath = path.join(ASSETS, "sprites.json");
+	const spritesRel = path.relative(ROOT, spritesPath);
+	if (fs.existsSync(spritesPath)) {
+		try {
+			report(validateSprites(JSON.parse(fs.readFileSync(spritesPath, "utf8")), spritesRel, ASSETS));
+		} catch (e) {
+			console.log(`  ERROR  ${spritesRel} — invalid JSON: ${e.message}`);
+			errors++;
 		}
 	}
 }

@@ -223,6 +223,19 @@ private class TweenStepCommand implements IShotCommand {
 	}
 }
 
+/** prototype.bulletSkin = skin (per-fire bullet art; unknown skins fall back at resolve time). */
+class SetBulletSkinCommand implements IShotCommand {
+	private var skin:String;
+
+	public function new(skin:String) {
+		this.skin = skin;
+	}
+
+	public function run(ctx:ShotContext, runner:ScriptRunner):Void {
+		ctx.prototype.bulletSkin = skin;
+	}
+}
+
 /** Points the prototype's direction from the (offset) spawn position at the emitter's target. */
 class AimAtTargetCommand implements IShotCommand {
 	public function new() {}

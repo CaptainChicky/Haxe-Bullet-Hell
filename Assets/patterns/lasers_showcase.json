@@ -1,0 +1,72 @@
+{
+  "name": "lasers_showcase",
+  "description": "Static cross + sweeping boss laser (Phase 2 acceptance)",
+  "parameters": {
+    "crossDelay": {
+      "type": "int",
+      "default": 150,
+      "description": "Frames between cross volleys"
+    },
+    "sweepTurn": {
+      "type": "float",
+      "default": 0.35,
+      "description": "Boss laser sweep deg/frame"
+    }
+  },
+  "script": [
+    {
+      "control": "Bind",
+      "mode": "position"
+    },
+    {
+      "control": "Loop",
+      "actions": [
+        {
+          "control": "Rep",
+          "count": 4,
+          "actions": [
+            {
+              "control": "FireLaser",
+              "angle": 0,
+              "length": 720,
+              "width": 22,
+              "telegraphFrames": 45,
+              "activeFrames": 90,
+              "shutdownFrames": 18,
+              "extendFrames": 12
+            },
+            {
+              "control": "Add",
+              "prop": "direction",
+              "delta": 90
+            }
+          ]
+        },
+        {
+          "control": "Wait",
+          "frames": "$crossDelay"
+        },
+        {
+          "control": "Set",
+          "prop": "direction",
+          "value": 0
+        },
+        {
+          "control": "FireLaser",
+          "angle": 0,
+          "length": 800,
+          "width": 28,
+          "telegraphFrames": 45,
+          "activeFrames": 120,
+          "shutdownFrames": 18,
+          "extendFrames": 12,
+          "sweep": "$sweepTurn"
+        },
+        {
+          "control": "Wait",
+          "frames": 180
+        }
+      ]
+    }
+  ]
+}

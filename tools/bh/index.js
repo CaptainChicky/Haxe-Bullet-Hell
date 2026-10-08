@@ -56,6 +56,34 @@ const S = {
 	// --- firing -----------------------------------------------------------
 	/** fire() uses the prototype's current direction/speed (engine 0-convention). */
 	fire: (angle = 0, speed = 0) => ({ control: "Fire", angle, speed }),
+	/**
+	 * laser({ length, width?, telegraphFrames?, activeFrames?, shutdownFrames?,
+	 *         extendFrames?, angle?, sweep? })
+	 * Vector beam: telegraph → active (segment hit) → shutdown. angle 0 uses prototype direction.
+	 */
+	laser: ({
+		angle = 0,
+		length,
+		width = 16,
+		telegraphFrames = 40,
+		activeFrames = 60,
+		shutdownFrames = 15,
+		extendFrames = 0,
+		sweep,
+	}) => {
+		const o = {
+			control: "FireLaser",
+			angle,
+			length,
+			width,
+			telegraphFrames,
+			activeFrames,
+			shutdownFrames,
+			extendFrames,
+		};
+		if (sweep !== undefined) o.sweep = sweep;
+		return o;
+	},
 	radial: (count, speed = 0) => ({ control: "Radial", count, speed }),
 	nway: (count, angle, speed = 0) => ({ control: "NWay", count, angle, speed }),
 	line: (count, prop, from, to) => ({ control: "Line", count, prop, from, to }),
@@ -66,6 +94,8 @@ const S = {
 	set: (prop, value) => ({ control: "Set", prop, value }),
 	/** Bullet visual + hitbox scale (engine "size" property; bosses default 1.5). */
 	size: (value) => ({ control: "Set", prop: "size", value }),
+	/** Per-fire bullet skin name (sprites.json); unknown skins fall back at runtime. */
+	sprite: (skin) => ({ control: "Sprite", skin }),
 	add: (prop, delta) => ({ control: "Add", prop, delta }),
 	random: (prop, min, max) => ({ control: "Random", prop, min, max }),
 	copy: (from, to, scale) => scale === undefined

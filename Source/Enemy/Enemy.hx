@@ -4,6 +4,7 @@ import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
 import manager.SpriteLibrary;
+import ui.AnimatedBitmap;
 import enemy.MovementScript;
 import shot.GhostOrigin.IMovable;
 
@@ -27,6 +28,9 @@ class Enemy extends Sprite implements IMovable {
 	// Reference to shooting pattern
 	private var shootingPattern:EnemyShootingPattern;
 
+	/** Set only for a multi-frame skin. Advanced from update(), not its own listener. */
+	private var anim:AnimatedBitmap = null;
+
 	// Movement system
 	private var velocityX:Float = 0;
 	private var velocityY:Float = 0;
@@ -41,18 +45,19 @@ class Enemy extends Sprite implements IMovable {
 		// Skin lookup: spriteName selects from the sprite manifest
 		// (assets/sprites.json), or is a direct .png path drop-in.
 		var resolved = SpriteLibrary.enemySprite(spriteName);
-		var bitmapData:BitmapData = resolved.bitmapData;
-
-		// Create a Bitmap using the loaded image
-		var bitmap:Bitmap = new Bitmap(bitmapData);
-
-		// Set the position of the sprite to its center
-		bitmap.x = -bitmap.width / 2;
-		bitmap.y = -bitmap.height / 2;
-
-		// Add the Bitmap to the sprite
-		addChild(bitmap);
-		collisionRadius = Math.max(bitmapData.width, bitmapData.height) / 2;
+		if (resolved.frames != null && resolved.frames.length > 1) {
+			anim = new AnimatedBitmap(resolved.frames, resolved.fps == null ? manager.SpriteFrames.DEFAULT_FPS : resolved.fps, resolved.mode);
+			addChild(anim);
+			collisionRadius = Math.max(resolved.frames[0].width, resolved.frames[0].height) / 2;
+		} else {
+			// Static skin: one centered Bitmap. Same path as before frames existed.
+			var bitmapData:BitmapData = resolved.bitmapData;
+			var bitmap:Bitmap = new Bitmap(bitmapData);
+			bitmap.x = -bitmap.width / 2;
+			bitmap.y = -bitmap.height / 2;
+			addChild(bitmap);
+			collisionRadius = Math.max(bitmapData.width, bitmapData.height) / 2;
+		}
 		if (resolved.scale != 1) {
 			setVisualScale(resolved.scale);
 		}
@@ -167,5 +172,9 @@ class Enemy extends Sprite implements IMovable {
 		// Cosmetic spin from frames alive (salt staggers enemies apart)
 		ageFrames++;
 		rotation = salt + (ROTATION_SPEED * ageFrames / 60.0);
+
+		// Same gate as the spin: EnemyManager.update is not called while
+		// Main.gamePaused, so the strip freezes with the rest of the sim.
+		if (anim != null) anim.advance();
 	}
 }

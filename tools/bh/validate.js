@@ -10,6 +10,7 @@
  *   - malformed Concurrent/Rep/Dup structures
  *   - expression syntax errors and undefined $parameter references
  *   - malformed movement scripts, waves and dialogue
+ *   - Assets/sprites.json (unknown fields, bad animation values, missing files)
  *
  * Returns a list of {level: "error"|"warning", file, path, message}.
  */
@@ -28,6 +29,10 @@ const CONTROLS = {
 	Scope: { req: ["actions"], opt: [] },
 	Vanish: { req: [], opt: [] },
 	Fire: { req: [], opt: ["angle", "speed"] },
+	FireLaser: {
+		req: ["length"],
+		opt: ["angle", "width", "telegraphFrames", "activeFrames", "shutdownFrames", "extendFrames", "sweep"],
+	},
 	Radial: { req: ["count"], opt: ["speed"] },
 	NWay: { req: ["count", "angle"], opt: ["speed"] },
 	Line: { req: ["count", "prop", "from", "to"], opt: [] },
@@ -41,6 +46,7 @@ const CONTROLS = {
 	Scale: { req: [], opt: ["factor", "x", "y"] },
 	Bind: { req: ["mode"], opt: [] },
 	AimAtPlayer: { req: [], opt: [] },
+	Sprite: { req: ["skin"], opt: [] },
 	SetOffset: { req: ["distance", "angle"], opt: [] },
 	AddOffset: { req: ["distanceDelta", "angleDelta"], opt: [] },
 	// NOTE: the legacy aliases (SetAngle, SetSpeed, RandomAngle, ...) were
@@ -205,6 +211,8 @@ function checkScript(ctx, p, actions, paramSet) {
 				if (typeof v !== "boolean") ctx.error(`${ap}.${key}`, "must be a boolean");
 			} else if (a.control === "Copy" && (key === "from" || key === "to")) {
 				if (typeof v !== "string") ctx.error(`${ap}.${key}`, "Copy from/to are property names (strings)");
+			} else if (a.control === "Sprite" && key === "skin") {
+				if (typeof v !== "string") ctx.error(`${ap}.${key}`, "Sprite skin must be a string");
 			} else {
 				checkNum(ctx, `${ap}.${key}`, v, paramSet);
 			}
@@ -498,4 +506,109 @@ function validatePattern(doc, file) {
 	return ctx.issues;
 }
 
-module.exports = { validateLevel, validatePattern };
+// ---------------------------------------------------------------------------
+// Assets/sprites.json
+//
+// Frame geometry matches Source/Manager/SpriteFrames.hx: a horizontal strip,
+// rect is the first cell (not the whole strip), frameW/frameH override that
+// cell's size. This pass does not decode images, so it cannot check that the
+// strip actually fits — the engine drops cells that hang off the sheet.
+// ---------------------------------------------------------------------------
+
+const SPRITE_PART_FIELDS = ["source", "rect", "scale", "frames", "fps", "frameW", "frameH", "mode",
+	"facing", "angleOffset", "hitScale", "spawnFx"];
+const SPRITE_MODES = new Set(["loop", "once", "pingpong"]);
+const FACING_MODES = new Set(["spin", "velocity", "player", "fixed"]);
+
+function checkSpriteAsset(ctx, p, source, assetRoot) {
+	if (!assetRoot || typeof source !== "string") return;
+	const rel = source.replace(/^assets\//, "");
+	if (!fs.existsSync(path.join(assetRoot, rel))) {
+		ctx.warn(p, `sprite asset not found: ${source}`);
+	}
+}
+
+function checkSpritePart(ctx, p, part, assetRoot) {
+	if (typeof part === "string") {
+		checkSpriteAsset(ctx, p, part, assetRoot);
+		return;
+	}
+	if (part == null || typeof part !== "object" || Array.isArray(part)) {
+		ctx.error(p, "sprite part must be an asset path or an object");
+		return;
+	}
+	for (const key of Object.keys(part)) {
+		if (!SPRITE_PART_FIELDS.includes(key)) ctx.warn(p, `sprite part does not use field "${key}"`);
+	}
+	if (typeof part.source !== "string") ctx.error(p, "sprite part needs a source path");
+	else checkSpriteAsset(ctx, p, part.source, assetRoot);
+
+	if (part.rect !== undefined) {
+		const rectOk = Array.isArray(part.rect) && part.rect.length === 4 && part.rect.every((n) => typeof n === "number");
+		if (!rectOk) ctx.error(`${p}.rect`, "rect must be [x, y, w, h]");
+	}
+	if (part.scale !== undefined && (typeof part.scale !== "number" || part.scale <= 0)) {
+		ctx.error(`${p}.scale`, "scale must be a positive number");
+	}
+	if (part.frames !== undefined && (!Number.isInteger(part.frames) || part.frames < 2)) {
+		ctx.error(`${p}.frames`, "frames must be an integer >= 2 (omit it for a static sprite)");
+	}
+	if (part.fps !== undefined && (typeof part.fps !== "number" || part.fps <= 0)) {
+		ctx.error(`${p}.fps`, "fps must be a positive number");
+	}
+	if (part.frameW !== undefined && (!Number.isInteger(part.frameW) || part.frameW <= 0)) {
+		ctx.error(`${p}.frameW`, "frameW must be a positive integer");
+	}
+	if (part.frameH !== undefined && (!Number.isInteger(part.frameH) || part.frameH <= 0)) {
+		ctx.error(`${p}.frameH`, "frameH must be a positive integer");
+	}
+	if (part.mode !== undefined && !SPRITE_MODES.has(part.mode)) {
+		ctx.error(`${p}.mode`, 'mode must be "loop", "once", or "pingpong"');
+	}
+	if (part.facing !== undefined && !FACING_MODES.has(part.facing)) {
+		ctx.error(`${p}.facing`, 'facing must be "spin", "velocity", "player", or "fixed"');
+	}
+	if (part.angleOffset !== undefined && typeof part.angleOffset !== "number") {
+		ctx.error(`${p}.angleOffset`, "angleOffset must be a number");
+	}
+	if (part.hitScale !== undefined && (typeof part.hitScale !== "number" || part.hitScale <= 0)) {
+		ctx.error(`${p}.hitScale`, "hitScale must be a positive number");
+	}
+	if (part.spawnFx !== undefined && typeof part.spawnFx !== "boolean") {
+		ctx.error(`${p}.spawnFx`, "spawnFx must be a boolean");
+	}
+}
+
+/** Validate Assets/sprites.json. assetRoot = absolute path of Assets/. */
+function validateSprites(doc, file, assetRoot) {
+	const ctx = new Ctx(file);
+	if (!doc || typeof doc !== "object" || Array.isArray(doc)) {
+		ctx.error("$", "sprites file must be a JSON object");
+		return ctx.issues;
+	}
+	for (const key of Object.keys(doc)) {
+		if (!["_readme", "skins"].includes(key)) ctx.warn("$", `sprites file does not use field "${key}"`);
+	}
+	if (doc.skins == null || typeof doc.skins !== "object" || Array.isArray(doc.skins)) {
+		ctx.error("skins", "needs a skins object");
+		return ctx.issues;
+	}
+	for (const [name, skin] of Object.entries(doc.skins)) {
+		const p = `skins.${name}`;
+		if (skin == null || typeof skin !== "object" || Array.isArray(skin)) {
+			ctx.error(p, "skin must be an object");
+			continue;
+		}
+		for (const key of Object.keys(skin)) {
+			if (!["enemy", "bullet"].includes(key)) ctx.warn(p, `skin does not use field "${key}"`);
+		}
+		if (skin.enemy === undefined && skin.bullet === undefined) {
+			ctx.warn(p, "skin has neither enemy nor bullet art");
+		}
+		if (skin.enemy !== undefined) checkSpritePart(ctx, `${p}.enemy`, skin.enemy, assetRoot);
+		if (skin.bullet !== undefined) checkSpritePart(ctx, `${p}.bullet`, skin.bullet, assetRoot);
+	}
+	return ctx.issues;
+}
+
+module.exports = { validateLevel, validatePattern, validateSprites };

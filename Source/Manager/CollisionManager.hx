@@ -2,6 +2,7 @@ package manager;
 
 import bullet.*;
 import enemy.Enemy;
+import fx.CancelSparkLayer;
 import player.Player;
 import openfl.display.Sprite;
 import openfl.events.Event;
@@ -11,6 +12,10 @@ class CollisionManager extends Sprite {
 	private var enemyManager:EnemyManager;
 	private var playerBullets:Array<BulletPlayer>;
 	private var enemyBullets:Array<BulletEnemy>;
+	private var enemyLasers:Array<BulletLaser>;
+
+	/** Continuous laser graze: score every this many frames while overlapping. */
+	private static inline final LASER_GRAZE_INTERVAL:Int = 4;
 
 	// Player hitbox size (the small black dot)
 	private static inline final PLAYER_HITBOX_RADIUS:Float = 3.0;
@@ -28,6 +33,7 @@ class CollisionManager extends Sprite {
 		this.enemyManager = enemyManager;
 		this.playerBullets = new Array<BulletPlayer>();
 		this.enemyBullets = new Array<BulletEnemy>();
+		this.enemyLasers = new Array<BulletLaser>();
 
 		addEventListener(Event.ENTER_FRAME, update);
 
@@ -54,6 +60,15 @@ class CollisionManager extends Sprite {
 		for (bullet in enemyBullets) {
 			bullet.update();
 		}
+		for (laser in enemyLasers) {
+			laser.update();
+		}
+		if (CancelSparkLayer.instance != null) {
+			CancelSparkLayer.instance.update();
+			if (Main.world != null && CancelSparkLayer.instance.parent == Main.world) {
+				Main.world.setChildIndex(CancelSparkLayer.instance, Main.world.numChildren - 1);
+			}
+		}
 	}
 
 	public function registerPlayerBullet(bullet:BulletPlayer):Void {
@@ -62,6 +77,10 @@ class CollisionManager extends Sprite {
 
 	public function registerEnemyBullet(bullet:BulletEnemy):Void {
 		enemyBullets.push(bullet);
+	}
+
+	public function registerEnemyLaser(laser:BulletLaser):Void {
+		enemyLasers.push(laser);
 	}
 
 	public function getPlayer():Player {
@@ -80,6 +99,8 @@ class CollisionManager extends Sprite {
 
 		// Check enemy bullets vs player
 		checkEnemyBulletsVsPlayer();
+
+		checkEnemyLasersVsPlayer();
 
 		// Clean up dead bullets
 		cleanupBullets();
@@ -172,6 +193,42 @@ class CollisionManager extends Sprite {
 		}
 	}
 
+	private function checkEnemyLasersVsPlayer():Void {
+		if (!player.isAlive()) return;
+
+		var playerCenterX:Float = player.x;
+		var playerCenterY:Float = player.y;
+
+		for (laser in enemyLasers) {
+			if (laser.parent == null) continue;
+
+			var seg = laser.segmentEndpoints();
+			var halfW = laser.collisionHalfWidth();
+			if (halfW <= 0) continue;
+
+			var hitDist = halfW + PLAYER_HITBOX_RADIUS;
+			var dist = shot.LaserGeometry.distancePointToSegment(playerCenterX, playerCenterY, seg.x1, seg.y1, seg.x2, seg.y2);
+
+			if (dist < hitDist && !player.isInvincible()) {
+				player.takeDamage(1);
+				break;
+			}
+
+			if (laser.collides()) {
+				var grazeDist = hitDist + GRAZE_RADIUS;
+				if (dist < grazeDist) {
+					laser.grazeCooldown++;
+					if (laser.grazeCooldown >= LASER_GRAZE_INTERVAL) {
+						laser.grazeCooldown = 0;
+						if (onGraze != null) onGraze();
+					}
+				} else {
+					laser.grazeCooldown = 0;
+				}
+			}
+		}
+	}
+
 	private function cleanupBullets():Void {
 		// Remove bullets that are no longer in the display tree
 		var i:Int = playerBullets.length - 1;
@@ -189,11 +246,20 @@ class CollisionManager extends Sprite {
 			}
 			i--;
 		}
+
+		i = enemyLasers.length - 1;
+		while (i >= 0) {
+			if (enemyLasers[i].parent == null) {
+				enemyLasers.splice(i, 1);
+			}
+			i--;
+		}
 	}
 
 	public function reset():Void {
 		playerBullets = new Array<BulletPlayer>();
 		enemyBullets = new Array<BulletEnemy>();
+		enemyLasers = new Array<BulletLaser>();
 	}
 
 	/** Bomb blast damage: hit every live enemy at once. Deaths route through
@@ -211,15 +277,12 @@ class CollisionManager extends Sprite {
 		enemyManager.cleanupDeadEnemies();
 	}
 
-	/** Despawn every live enemy bullet (bomb effect). Uses destroy() so bound
+	/** Despawn every live enemy bullet and laser (bomb effect). Touhou-style
+	 *  bombs clear active beams as well as bullets. Uses destroy() so bound
 	 *  bullets and sub-scripts tear down properly. */
 	public function clearEnemyBullets():Void {
-		for (bullet in enemyBullets) {
-			if (bullet.parent != null) {
-				bullet.destroy();
-			}
-		}
-		enemyBullets = new Array<BulletEnemy>();
+		cancelEnemyBullets(true);
+		cancelEnemyLasers();
 	}
 
 	public function clearAllBullets():Void {
@@ -229,16 +292,32 @@ class CollisionManager extends Sprite {
 				bullet.parent.removeChild(bullet);
 			}
 		}
+		playerBullets = new Array<BulletPlayer>();
 
-		// Remove all enemy bullets from display
+		cancelEnemyBullets(true);
+		cancelEnemyLasers();
+	}
+
+	private function cancelEnemyLasers():Void {
+		for (laser in enemyLasers) {
+			if (laser.parent != null) laser.destroy();
+		}
+		enemyLasers = new Array<BulletLaser>();
+	}
+
+	private function cancelEnemyBullets(withSparks:Bool):Void {
 		for (bullet in enemyBullets) {
 			if (bullet.parent != null) {
-				bullet.parent.removeChild(bullet);
+				if (withSparks) spawnCancelSpark(bullet.x, bullet.y);
+				bullet.destroy();
 			}
 		}
-
-		// Clear arrays
-		playerBullets = new Array<BulletPlayer>();
 		enemyBullets = new Array<BulletEnemy>();
+	}
+
+	private function spawnCancelSpark(x:Float, y:Float):Void {
+		if (CancelSparkLayer.instance != null) {
+			CancelSparkLayer.instance.spawnAt(x, y);
+		}
 	}
 }

@@ -122,6 +122,7 @@ object the engine parses, so anything you can write by hand you can write here.
 | `S.rotate(deg, withDir?)` | Rotate |
 | `S.scale(f)` / `S.scaleXY(x, y)` | Scale |
 | `S.bind(mode)` / `S.aim()` | Bind / AimAtPlayer |
+| `S.sprite(skin)` | Sprite (per-fire bullet skin override) |
 
 Values can be numbers or expression strings (`"$speed * 2"`, `"sin(frame)"`),
 exactly as in hand-written JSON. `S.sub()` with no actions clears an inherited
@@ -192,5 +193,9 @@ module.exports = pattern("burst", "Aimed 3-way burst",
 - unreachable commands after a `Concurrent` with a never-finishing branch
 - movement scripts, dialogue entries (portrait file existence), wave ordering,
   spawn/boss field shapes
+- `Assets/sprites.json`: unknown fields, animation `frames` / `fps` / `mode`,
+  and missing image files. Frame rectangles are not measured against the
+  image here — cells that hang off the sheet are dropped at runtime
+  (`Source/Manager/SpriteFrames.hx`)
 
 Run `node tools/compile.js --check` in CI or before committing content.

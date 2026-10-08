@@ -25,6 +25,9 @@ interface IShotEmitter {
 	/** Materialize a cloned prototype as a live bullet at (x, y). */
 	function spawn(prototype:ShotPrototype, x:Float, y:Float):Void;
 
+	/** Materialize a laser beam at (x, y) (origin of the beam). */
+	function spawnLaser(params:LaserSpawnParams, x:Float, y:Float):Void;
+
 	/** False once the owner is gone (enemy dead / bullet removed); the runner stops. */
 	function isAlive():Bool;
 

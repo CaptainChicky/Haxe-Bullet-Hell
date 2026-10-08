@@ -9,6 +9,7 @@ import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
 import manager.SpriteLibrary;
+import ui.AnimatedBitmap;
 
 /**
  * An enemy bullet, constructed from a cloned ShotPrototype.
@@ -21,6 +22,7 @@ import manager.SpriteLibrary;
  */
 class BulletEnemy extends Sprite {
 	public static inline final ROTATION_SPEED:Float = 90.0; // Sprite spin, degrees per second (visual only)
+	private static inline final SPAWN_FLASH_FRAMES:Int = 8;
 
 	// Kept public for compatibility with any external velocity reads.
 	public var velocityX:Float = 0;
@@ -62,6 +64,14 @@ class BulletEnemy extends Sprite {
 	// Random salt so bullet sprite spin isn't uniform across bullets.
 	private var salt:Float = Math.random() * 20;
 
+	/** Set only for a multi-frame skin. Advanced from update(), not its own listener. */
+	private var anim:AnimatedBitmap = null;
+
+	private var facingMode:String = SpriteLibrary.FACING_SPIN;
+	private var angleOffset:Float = 0;
+	private var useSpawnFx:Bool = false;
+	private var visualBaseScale:Float = 1;
+
 	public function new(?prototype:ShotPrototype, ?bulletSpriteVariant:String) {
 		super();
 
@@ -78,18 +88,31 @@ class BulletEnemy extends Sprite {
 
 		// Skin lookup (SpriteLibrary caches the BitmapData per skin)
 		var resolved = SpriteLibrary.bulletSprite(bulletSpriteVariant);
+		facingMode = (resolved.facing != null) ? resolved.facing : SpriteLibrary.FACING_SPIN;
+		angleOffset = (resolved.angleOffset != null) ? resolved.angleOffset : 0.0;
+		useSpawnFx = resolved.spawnFx == true;
 		var bmd:BitmapData = resolved.bitmapData;
-		var bitmap:Bitmap = new Bitmap(bmd);
-		bitmap.x = -bitmap.width / 2;
-		bitmap.y = -bitmap.height / 2;
-		addChild(bitmap);
-		collisionRadius = Math.max(bmd.width, bmd.height) / 2;
+		if (resolved.frames != null && resolved.frames.length > 1) {
+			anim = new AnimatedBitmap(resolved.frames, resolved.fps == null ? manager.SpriteFrames.DEFAULT_FPS : resolved.fps, resolved.mode);
+			addChild(anim);
+		} else {
+			var bitmap:Bitmap = new Bitmap(bmd);
+			bitmap.x = -bitmap.width / 2;
+			bitmap.y = -bitmap.height / 2;
+			addChild(bitmap);
+		}
+		var narrow = Math.min(bmd.width, bmd.height);
+		var hitScale = (resolved.hitScale != null && resolved.hitScale > 0) ? resolved.hitScale : 1.0;
+		collisionRadius = narrow / 2 * hitScale;
 		// Skin-level scale and the prototype's per-bullet `size` stack
 		var totalScale = resolved.scale * prototype.size;
-		if (totalScale != 1) {
-			scaleX = totalScale;
-			scaleY = totalScale;
-			collisionRadius *= totalScale;
+		visualBaseScale = totalScale;
+		scaleX = totalScale;
+		scaleY = totalScale;
+		collisionRadius *= totalScale;
+		if (useSpawnFx) {
+			scaleX = scaleY = visualBaseScale * 1.55;
+			alpha = 0;
 		}
 	}
 
@@ -288,13 +311,45 @@ class BulletEnemy extends Sprite {
 			}
 		}
 
-		// Cosmetic sprite spin from frames alive (freezes cleanly with pause).
-		rotation = salt + (ROTATION_SPEED * age / 60.0);
+		updateFacing();
+		applySpawnFlash();
+
+		// CollisionManager skips this update while Main.gamePaused, so the
+		// strip holds its current cell for the whole pause.
+		if (anim != null) anim.advance();
 	}
 
 	/** Public destroy hook (used by the Vanish command via BulletSubEmitter). */
 	public function destroy():Void {
 		despawn();
+	}
+
+	private function updateFacing():Void {
+		switch (facingMode) {
+			case SpriteLibrary.FACING_VELOCITY:
+				rotation = direction + angleOffset;
+			case SpriteLibrary.FACING_PLAYER:
+				var dx = player.Player.playerX - x;
+				var dy = player.Player.playerY - y;
+				rotation = Math.atan2(dy, dx) * 180 / Math.PI + angleOffset;
+			case SpriteLibrary.FACING_FIXED:
+				rotation = angleOffset;
+			default:
+				rotation = salt + (ROTATION_SPEED * age / 60.0);
+		}
+	}
+
+	private function applySpawnFlash():Void {
+		if (!useSpawnFx) return;
+		if (age <= SPAWN_FLASH_FRAMES) {
+			var t = age / SPAWN_FLASH_FRAMES;
+			var pop = 1.55 - 0.55 * t;
+			scaleX = scaleY = visualBaseScale * pop;
+			alpha = t;
+		} else {
+			scaleX = scaleY = visualBaseScale;
+			alpha = 1;
+		}
 	}
 
 	private function despawn():Void {

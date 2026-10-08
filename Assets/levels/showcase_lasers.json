@@ -1,0 +1,30 @@
+{
+  "name": "Showcase: lasers",
+  "waves": [
+    {
+      "startTime": 0,
+      "enemies": [
+        {
+          "spawnTime": 0,
+          "x": 900,
+          "y": 280,
+          "pattern": "lasers_showcase",
+          "patternConfig": {},
+          "health": 999,
+          "movementScript": {
+            "loop": false,
+            "actions": [
+              {
+                "type": "Stop"
+              },
+              {
+                "type": "Wait",
+                "frames": 3600
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
