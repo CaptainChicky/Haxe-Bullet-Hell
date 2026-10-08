@@ -7,59 +7,43 @@ import openfl.text.TextFormat;
 import openfl.text.TextFormatAlign;
 
 /**
- * Boss status strip across the top of the screen: boss name, dots for the
- * phases still to come, the current phase's spell card name, and the phase
- * health bar — all on a dark backing panel (the playfield is white, so
- * unbacked text/dots were unreadable). A new phase also raises a large
- * centered spell card banner that holds, then fades.
- * Poll track() every frame from Main; it hides itself when no boss is alive.
+ * Boss status strip: name, spell-phase history stars, optional capture bonus,
+ * phase timeout, and health bar. Spell card names during a spell phase are
+ * shown by SpellCardAnnounce (docked under this strip); nonspell phases omit
+ * the spell title. Poll track() every frame from Main.
  */
 class BossHealthBar extends Sprite {
 	private static inline final BAR_HEIGHT:Int = 10;
 	private static inline final ROW_HEIGHT:Int = 22;
 	private static inline final PANEL_PAD:Int = 8;
+	private static inline final STAR_ROW_Y:Int = ROW_HEIGHT + BAR_HEIGHT + 14;
 
-	// Spell card intro banner: slide/fade in, hold, fade out (frames)
-	private static inline final BANNER_IN:Int = 20;
-	private static inline final BANNER_HOLD:Int = 100;
-	private static inline final BANNER_OUT:Int = 40;
-
-	// Phase fill colors, indexed by phases REMAINING after this one
-	// (final phase red, earlier phases cooler)
 	private static final PHASE_COLORS:Array<Int> = [0xff5566, 0xffaa44, 0xffd766, 0x66ddff, 0xcc88ff];
 
 	private var barWidth:Int;
 	private var nameField:TextField;
-	private var spellField:TextField;
+	private var bonusField:TextField;
 	private var timerField:TextField;
 	private var fill:Sprite;
 	private var markers:Sprite;
 
-	// Damage ghost: a pale bar that lags behind the real fill and eases down
-	// toward it, so chunks of damage read as a visible "bite".
 	private var ghostFraction:Float = 1.0;
-
-	// Large centered spell card announcement (own panel, below the strip)
-	private var banner:Sprite;
-	private var bannerField:TextField;
-	private var bannerFrames:Int = 0;
-	private static inline final BANNER_TOTAL:Int = BANNER_IN + BANNER_HOLD + BANNER_OUT;
 
 	private var lastBoss:BossEnemy = null;
 	private var lastPhase:Int = -1;
+	private var spellMode:Bool = false;
+	private var bonusValue:Int = -1;
 
 	public function new(stageWidth:Int, fontName:String) {
 		super();
 
-		// Leave room for the FPS counter (top-left) and the HUD panel (top-right)
 		x = 70;
 		y = 8;
 		barWidth = stageWidth - 70 - 270;
 		mouseEnabled = false;
 		visible = false;
 
-		// Dark backing panel behind the whole strip (text row + bar)
-		var panelH = ROW_HEIGHT + BAR_HEIGHT + PANEL_PAD * 2;
+		var panelH = ROW_HEIGHT + BAR_HEIGHT + PANEL_PAD * 2 + 14;
 		graphics.beginFill(0x0d0d16, 0.85);
 		graphics.drawRoundRect(-PANEL_PAD, -PANEL_PAD, barWidth + PANEL_PAD * 2, panelH, 12, 12);
 		graphics.endFill();
@@ -67,19 +51,17 @@ class BossHealthBar extends Sprite {
 		graphics.drawRoundRect(-PANEL_PAD, -PANEL_PAD, barWidth + PANEL_PAD * 2, panelH, 12, 12);
 
 		var nameFormat = new TextFormat(fontName, 15, 0xffffff, true);
-		nameField = makeField(nameFormat, 0, 0, barWidth * 0.5);
+		nameField = makeField(nameFormat, 0, 0, barWidth * 0.55);
 
-		var spellFormat = new TextFormat(fontName, 15, 0xffd766, true);
-		spellFormat.align = TextFormatAlign.RIGHT;
-		spellField = makeField(spellFormat, barWidth * 0.35, 0, barWidth * 0.65 - 64);
+		var bonusFormat = new TextFormat(fontName, 14, 0xffd766, true);
+		bonusFormat.align = TextFormatAlign.RIGHT;
+		bonusField = makeField(bonusFormat, barWidth * 0.4, 0, barWidth * 0.6 - 64);
+		bonusField.visible = false;
 
-		// Phase timeout countdown (seconds), far right of the text row.
-		// Hidden when the phase has no timeout.
 		var timerFormat = new TextFormat(fontName, 15, 0xffffff, true);
 		timerFormat.align = TextFormatAlign.RIGHT;
 		timerField = makeField(timerFormat, barWidth - 58, 0, 58);
 
-		// Bar backing (inset track under the text row)
 		graphics.lineStyle();
 		graphics.beginFill(0x000000, 0.6);
 		graphics.drawRoundRect(0, ROW_HEIGHT, barWidth, BAR_HEIGHT + 4, 8, 8);
@@ -94,22 +76,6 @@ class BossHealthBar extends Sprite {
 
 		markers = new Sprite();
 		addChild(markers);
-
-		// Centered spell card banner (positions relative to this strip's x)
-		banner = new Sprite();
-		banner.visible = false;
-		banner.mouseEnabled = false;
-		addChild(banner);
-
-		var bannerFormat = new TextFormat(fontName, 28, 0xffd766, true);
-		bannerFormat.align = TextFormatAlign.CENTER;
-		bannerField = new TextField();
-		bannerField.embedFonts = true;
-		bannerField.defaultTextFormat = bannerFormat;
-		bannerField.selectable = false;
-		bannerField.width = barWidth;
-		bannerField.height = 44;
-		banner.addChild(bannerField);
 	}
 
 	private function makeField(format:TextFormat, x:Float, y:Float, width:Float):TextField {
@@ -125,14 +91,26 @@ class BossHealthBar extends Sprite {
 		return field;
 	}
 
-	/** Call once per frame with getActiveBoss() (null hides the bar). */
+	public function setSpellMode(active:Bool):Void {
+		spellMode = active;
+	}
+
+	public function setBonusDisplay(value:Int):Void {
+		bonusValue = value;
+		if (value < 0) {
+			bonusField.visible = false;
+			bonusField.text = "";
+		} else {
+			bonusField.visible = spellMode;
+			bonusField.text = formatBonus(value);
+		}
+	}
+
 	public function track(boss:BossEnemy):Void {
 		if (boss == null) {
 			visible = false;
 			lastBoss = null;
 			lastPhase = -1;
-			bannerFrames = 0;
-			banner.visible = false;
 			return;
 		}
 		visible = true;
@@ -142,15 +120,12 @@ class BossHealthBar extends Sprite {
 			lastPhase = boss.getPhaseIndex();
 			ghostFraction = 1.0;
 			refreshLabels(boss);
-			raiseBanner(boss);
 		}
 
-		updateBanner();
 		updateTimer(boss);
 		redrawFill(boss);
 	}
 
-	/** Countdown to the phase timeout; turns red in the last ten seconds. */
 	private function updateTimer(boss:BossEnemy):Void {
 		var remaining = boss.getPhaseTimeoutRemaining();
 		if (remaining < 0) {
@@ -164,81 +139,48 @@ class BossHealthBar extends Sprite {
 
 	private function refreshLabels(boss:BossEnemy):Void {
 		nameField.text = boss.getBossName();
-		spellField.text = boss.getPhaseName();
+		drawSpellStars(boss.countSpellPhasesRemaining());
+	}
 
-		// One dot per phase still to come after the current one, drawn as
-		// bright discs with dark outline rings so they read on any backdrop.
+	private function drawSpellStars(remaining:Int):Void {
 		markers.graphics.clear();
-		var remaining = boss.getPhaseCount() - boss.getPhaseIndex() - 1;
-		var dotY = ROW_HEIGHT / 2 - 1;
-		var dotX = nameField.textWidth + 16;
+		if (remaining <= 0) {
+			return;
+		}
+		var startX = nameField.textWidth + 20;
 		for (i in 0...remaining) {
-			markers.graphics.lineStyle(2, 0x0d0d16);
-			markers.graphics.beginFill(0xffd766);
-			markers.graphics.drawCircle(dotX + i * 16, dotY, 5);
-			markers.graphics.endFill();
+			drawStar(markers.graphics, startX + i * 18, STAR_ROW_Y, 6, 0xffd766, 0x0d0d16);
 		}
 	}
 
-	/** Big centered spell card announcement at the start of each phase. */
-	private function raiseBanner(boss:BossEnemy):Void {
-		var spell = boss.getPhaseName();
-		if (spell == null || spell.length == 0) {
-			banner.visible = false;
-			bannerFrames = 0;
-			return;
+	private function drawStar(g:openfl.display.Graphics, cx:Float, cy:Float, r:Float, fillColor:Int, lineColor:Int):Void {
+		g.lineStyle(2, lineColor, 1);
+		g.beginFill(fillColor, 1);
+		var points = 5;
+		var inner = r * 0.45;
+		for (i in 0...(points * 2)) {
+			var angle = (i * Math.PI / points) - Math.PI / 2;
+			var rad = (i % 2 == 0) ? r : inner;
+			var px = cx + Math.cos(angle) * rad;
+			var py = cy + Math.sin(angle) * rad;
+			if (i == 0) {
+				g.moveTo(px, py);
+			} else {
+				g.lineTo(px, py);
+			}
 		}
-		bannerField.text = spell;
-
-		// Size the panel to the text
-		var w = bannerField.textWidth + 60;
-		var h = bannerField.textHeight + 24;
-		bannerField.width = w;
-		bannerField.y = 10;
-		banner.graphics.clear();
-		banner.graphics.beginFill(0x0d0d16, 0.85);
-		banner.graphics.drawRoundRect(0, 0, w, h, 14, 14);
-		banner.graphics.endFill();
-		banner.graphics.lineStyle(2, 0xffd766, 0.8);
-		banner.graphics.drawRoundRect(0, 0, w, h, 14, 14);
-
-		banner.x = (barWidth - w) / 2;
-		banner.visible = true;
-		bannerFrames = BANNER_TOTAL;
+		g.lineTo(cx + Math.cos(-Math.PI / 2) * r, cy + Math.sin(-Math.PI / 2) * r);
+		g.endFill();
 	}
 
-	private function updateBanner():Void {
-		if (bannerFrames <= 0) {
-			return;
-		}
-		bannerFrames--;
-
-		var sinceStart = BANNER_TOTAL - bannerFrames;
-		var baseY = ROW_HEIGHT + BAR_HEIGHT + 40;
-		if (sinceStart < BANNER_IN) {
-			// Slide down + fade in
-			var t = sinceStart / BANNER_IN;
-			banner.alpha = t;
-			banner.y = baseY - 18 * (1 - t);
-		} else if (bannerFrames < BANNER_OUT) {
-			// Fade out
-			banner.alpha = bannerFrames / BANNER_OUT;
-			banner.y = baseY;
-		} else {
-			banner.alpha = 1;
-			banner.y = baseY;
-		}
-
-		if (bannerFrames == 0) {
-			banner.visible = false;
-		}
+	private function formatBonus(value:Int):String {
+		return Std.string(value);
 	}
 
 	private function redrawFill(boss:BossEnemy):Void {
 		var fraction:Float = boss.getPhaseHealth() / boss.getPhaseMaxHealth();
 		if (fraction < 0) fraction = 0;
 
-		// Ghost eases down toward the live fraction (snaps up on phase reset)
 		if (ghostFraction < fraction) ghostFraction = fraction;
 		ghostFraction += (fraction - ghostFraction) * 0.06;
 
@@ -257,7 +199,6 @@ class BossHealthBar extends Sprite {
 			fill.graphics.beginFill(color, barAlpha);
 			fill.graphics.drawRoundRect(0, 0, w, BAR_HEIGHT, 6, 6);
 			fill.graphics.endFill();
-			// Bright core strip gives the bar depth
 			fill.graphics.beginFill(0xffffff, barAlpha * 0.25);
 			fill.graphics.drawRoundRect(1, 1.5, w - 2 > 0 ? w - 2 : 0, BAR_HEIGHT * 0.35, 3, 3);
 			fill.graphics.endFill();

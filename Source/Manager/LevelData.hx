@@ -46,6 +46,9 @@ typedef BossData = {
 
 typedef BossPhaseData = {
 	@:optional var name:String; // Spell card name shown on the boss bar
+	@:optional var spell:Bool; // Touhou spell card — triggers declaration ceremony when true
+	@:optional var bonus:Int; // Starting capture bonus (decays over the phase timeout)
+	@:optional var cutIn:String; // Boss portrait asset for the cut-in slide (omit = skip portrait)
 	var health:Int; // Damage needed to clear this phase
 	@:optional var timeoutFrames:Null<Int>; // Phase auto-clears (no drops) after this many frames; absent = no timeout
 	@:optional var pattern:String; // Pattern template name (Assets/patterns/<name>.json)

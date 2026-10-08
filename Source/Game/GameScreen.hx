@@ -26,6 +26,13 @@ class GameScreen implements Screen {
 		Main.gamePaused = false;
 		main.pausedPrevMessage = null;
 
+		if (main.spellCeremony != null) {
+			main.spellCeremony.reset();
+			main.enemyManager.onBossPhaseStarted = main.spellCeremony.onBossPhaseStarted;
+			main.enemyManager.onBossPhaseEnded = main.spellCeremony.onBossPhaseEnded;
+			main.enemyManager.onBossDefeated = main.spellCeremony.onBossDefeated;
+		}
+
 		main.messagePanel.alpha = 0;
 
 		// Respawn player if they were dead
@@ -66,6 +73,10 @@ class GameScreen implements Screen {
 		Main.gamePaused = false;
 		main.pausedPrevMessage = null;
 		main.messagePanel.alpha = 1;
+
+		main.enemyManager.onBossPhaseStarted = null;
+		main.enemyManager.onBossPhaseEnded = null;
+		main.enemyManager.onBossDefeated = null;
 	}
 
 	public function update():Void {

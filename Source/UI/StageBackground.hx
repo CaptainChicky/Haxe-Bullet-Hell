@@ -31,6 +31,8 @@ class StageBackground extends Sprite {
 	private var fieldHeight:Int;
 	private var layers:Array<Layer> = [];
 	private var gradient:Sprite;
+	private var themeNumber:Int = 1;
+	private var spellMode:Bool = false;
 
 	public function new(fieldWidth:Int, fieldHeight:Int) {
 		super();
@@ -47,12 +49,35 @@ class StageBackground extends Sprite {
 
 	/** Rebuild all layers with the palette for a 1-based stage number. */
 	public function setTheme(stageNumber:Int):Void {
-		var palette = THEMES[(stageNumber - 1) % THEMES.length];
+		themeNumber = stageNumber;
+		spellMode = false;
+		rebuildTheme();
+	}
+
+	/** Darken the current stage gradient during an active spell card. */
+	public function setSpellMode(active:Bool):Void {
+		if (spellMode == active) {
+			return;
+		}
+		spellMode = active;
+		rebuildTheme();
+	}
+
+	private function rebuildTheme():Void {
+		var palette = THEMES[(themeNumber - 1) % THEMES.length];
+		var top = palette[0];
+		var bottom = palette[1];
+		var shape = palette[2];
+		if (spellMode) {
+			top = darken(top, 0.55);
+			bottom = darken(bottom, 0.55);
+			shape = darken(shape, 0.65);
+		}
 
 		gradient.graphics.clear();
 		var matrix = new Matrix();
 		matrix.createGradientBox(fieldWidth, fieldHeight, Math.PI / 2);
-		gradient.graphics.beginGradientFill(GradientType.LINEAR, [palette[0], palette[1]], [1, 1], [0, 255], matrix);
+		gradient.graphics.beginGradientFill(GradientType.LINEAR, [top, bottom], [1, 1], [0, 255], matrix);
 		gradient.graphics.drawRect(0, 0, fieldWidth, fieldHeight);
 		gradient.graphics.endFill();
 
@@ -62,9 +87,16 @@ class StageBackground extends Sprite {
 		layers = [];
 
 		// Back to front: big slow soft blobs, mid drifters, fast small flecks
-		addLayer(palette[2], 0.4, 6, 60, 110, 0.20);
-		addLayer(palette[2], 1.0, 9, 24, 46, 0.16);
-		addLayer(palette[2], 2.2, 14, 4, 9, 0.22);
+		addLayer(shape, 0.4, 6, 60, 110, spellMode ? 0.14 : 0.20);
+		addLayer(shape, 1.0, 9, 24, 46, spellMode ? 0.11 : 0.16);
+		addLayer(shape, 2.2, 14, 4, 9, spellMode ? 0.15 : 0.22);
+	}
+
+	private function darken(color:Int, factor:Float):Int {
+		var r = Std.int(((color >> 16) & 0xff) * factor);
+		var g = Std.int(((color >> 8) & 0xff) * factor);
+		var b = Std.int((color & 0xff) * factor);
+		return (r << 16) | (g << 8) | b;
 	}
 
 	/** Build one wrapping layer of `count` random circles per tile. */

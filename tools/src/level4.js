@@ -97,6 +97,8 @@ const seneschalScript = [
 
 // ------------------------------------------------------------------ the boss
 
+const AURELIA_CUTIN = "assets/Enemy(second).png";
+
 // P1 — nonspell: aimed fan volleys trading with slow full rings. Classic
 // opener: teaches the "sidestep the fans, weave the ring" rhythm.
 const phase1 = phase({
@@ -123,6 +125,9 @@ const phase1 = phase({
 // "breathing" read), with aimed feather darts forcing repositioning.
 const phase2 = phase({
 	name: "Feather Sign - Moulting Cyclone",
+	spell: true,
+	bonus: 500000,
+	cutIn: AURELIA_CUTIN,
 	health: 900,
 	timeout: 55,
 	script: [
@@ -174,6 +179,9 @@ const phase3 = phase({
 // slow giant orbs (size 2.4) force the player to keep choosing new cells.
 const phase4 = phase({
 	name: "Cage Sign - Gilded Aviary",
+	spell: true,
+	bonus: 600000,
+	cutIn: AURELIA_CUTIN,
 	health: 950,
 	timeout: 60,
 	script: [
@@ -216,6 +224,9 @@ function bloom(curl) {
 
 const phase5 = phase({
 	name: "Wing Sign - Thousand-Feather Bloom",
+	spell: true,
+	bonus: 700000,
+	cutIn: AURELIA_CUTIN,
 	health: 1000,
 	timeout: 65,
 	script: [
@@ -237,6 +248,9 @@ const phase5 = phase({
 // aimed spear fans on a long cadence.
 const phase6 = phase({
 	name: "Last Word - Empress of the Endless Sky",
+	spell: true,
+	bonus: 1000000,
+	cutIn: AURELIA_CUTIN,
 	health: 1200,
 	timeout: 90,
 	script: [

@@ -26,6 +26,9 @@ class BossEnemy extends Enemy {
 	// so transition mercy time doesn't eat into a phase's timeout).
 	private var phaseFrames:Int = 0;
 
+	/** True when the last phase ended via timeout rather than damage. */
+	private var lastPhaseEndWasTimeout:Bool = false;
+
 	// Difficulty-scaled copies of the authored phase healths (the shared
 	// BossData must never be mutated).
 	private var phaseHealths:Array<Int>;
@@ -57,8 +60,11 @@ class BossEnemy extends Enemy {
 		}
 		phaseHealth -= damage;
 		currentHealth -= damage;
-		if (phaseHealth <= 0 && onPhaseDepleted != null) {
-			onPhaseDepleted();
+		if (phaseHealth <= 0) {
+			lastPhaseEndWasTimeout = false;
+			if (onPhaseDepleted != null) {
+				onPhaseDepleted();
+			}
 		}
 	}
 
@@ -94,6 +100,7 @@ class BossEnemy extends Enemy {
 				var remaining = phaseHealth;
 				phaseHealth = 0;
 				currentHealth -= remaining;
+				lastPhaseEndWasTimeout = true;
 				if (onPhaseDepleted != null) {
 					onPhaseDepleted();
 				}
@@ -130,6 +137,30 @@ class BossEnemy extends Enemy {
 	public function getPhaseName():String {
 		var name = data.phases[phaseIndex].name;
 		return (name != null) ? name : "";
+	}
+
+	public function isSpellPhase(?index:Int):Bool {
+		var i = index != null ? index : phaseIndex;
+		var spell = data.phases[i].spell;
+		return spell == true;
+	}
+
+	public function countSpellPhasesRemaining():Int {
+		var n = 0;
+		for (i in (phaseIndex + 1)...data.phases.length) {
+			if (data.phases[i].spell == true) {
+				n++;
+			}
+		}
+		return n;
+	}
+
+	public function wasLastPhaseEndTimeout():Bool {
+		return lastPhaseEndWasTimeout;
+	}
+
+	public function getPhaseElapsedFrames():Int {
+		return phaseFrames;
 	}
 
 	public function getPhaseHealth():Int {

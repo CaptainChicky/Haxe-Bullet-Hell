@@ -14,6 +14,8 @@ import ui.ScreenManager;
 import ui.LegacyTitleScreen;
 import ui.MenuList;
 import game.GameScreen;
+import game.SpellCeremony;
+import ui.SpellCardAnnounce;
 import openfl.ui.Keyboard;
 import openfl.events.KeyboardEvent;
 import openfl.text.Font;
@@ -28,6 +30,7 @@ import openfl.Assets;
 import openfl.Lib;
 
 @:allow(game.GameScreen)
+@:allow(game.SpellCeremony)
 @:allow(ui.LegacyTitleScreen)
 class Main extends Sprite {
 	var inited:Bool;
@@ -123,6 +126,7 @@ class Main extends Sprite {
 	private var power:Float = 0;
 	private var hud:HUD;
 	private var bossBar:BossHealthBar;
+	public var spellCeremony(default, null):SpellCeremony;
 	private var bombFlash:Sprite;
 	private var dialogueManager:DialogueManager;
 
@@ -298,6 +302,10 @@ class Main extends Sprite {
 		// Boss status strip (hidden until a boss fight starts)
 		bossBar = new BossHealthBar(stageWidth, uiFont.fontName);
 		addChild(bossBar);
+
+		var spellAnnounce = new SpellCardAnnounce(stageWidth, uiFont.fontName);
+		addChild(spellAnnounce);
+		spellCeremony = new SpellCeremony(this, bossBar, background, spellAnnounce, stageManager);
 
 		// Dialogue overlay (hidden until a stage plays a conversation)
 		dialogueManager = new DialogueManager(stageWidth, stageHeight, uiFont.fontName);
@@ -520,6 +528,9 @@ class Main extends Sprite {
 		collisionManager.clearAllBullets();
 		enemyManager.clearAllEnemies();
 		itemManager.clear();
+		if (spellCeremony != null) {
+			spellCeremony.reset();
+		}
 
 		showPanelScreen(titleText());
 	}
@@ -619,7 +630,7 @@ class Main extends Sprite {
 		}
 	}
 
-	private function addScore(points:Int):Void {
+	public function addScore(points:Int):Void {
 		score += points;
 		hud.setScore(score);
 	}
@@ -659,6 +670,9 @@ class Main extends Sprite {
 		bombs--;
 		hud.setBombs(bombs);
 		AudioManager.sfxBomb();
+		if (spellCeremony != null) {
+			spellCeremony.onBomb();
+		}
 
 		// Wipe every enemy bullet, damage everything on screen, and give the
 		// player breathing room
@@ -781,6 +795,9 @@ class Main extends Sprite {
 	}
 
 	private function onPlayerDeath():Void {
+		if (spellCeremony != null) {
+			spellCeremony.onPlayerDeath();
+		}
 		lives--;
 		hud.setLives(lives);
 		AudioManager.sfxPlayerDeath();
@@ -842,7 +859,11 @@ class Main extends Sprite {
 		enemyManager.update();
 
 		// Boss bar follows whichever boss (if any) is alive
-		bossBar.track(enemyManager.getActiveBoss());
+		var boss = enemyManager.getActiveBoss();
+		if (spellCeremony != null) {
+			spellCeremony.update(boss);
+		}
+		bossBar.track(boss);
 
 		// HUD steps aside when the player fights underneath it
 		hud.trackPlayer(player.x, player.y);

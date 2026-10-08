@@ -16,6 +16,15 @@ class EnemyManager extends Sprite {
 	private var enemyPatterns:Array<EnemyShootingPattern>;
 	private var movementScripts:Array<MovementScript>;
 
+	/** Fired when a boss phase's pattern opens (including phase 0 on spawn). */
+	public var onBossPhaseStarted:(BossEnemy, Int) -> Void = null;
+
+	/** Fired when a phase ends. `cleared` is true if damage emptied the bar,
+	 *  false if the phase timed out. */
+	public var onBossPhaseEnded:(BossEnemy, Int, Bool) -> Void = null;
+
+	public var onBossDefeated:BossEnemy -> Void = null;
+
 	// Boss fight state (one boss at a time)
 	private var activeBoss:BossEnemy = null;
 	private var bossPattern:EnemyShootingPattern = null;
@@ -149,6 +158,10 @@ class EnemyManager extends Sprite {
 		if (phase.movementScript != null) {
 			attachMovement(boss, phase.movementScript);
 		}
+
+		if (onBossPhaseStarted != null) {
+			onBossPhaseStarted(boss, index);
+		}
 	}
 
 	private function onBossPhaseDepleted(boss:BossEnemy):Void {
@@ -163,9 +176,18 @@ class EnemyManager extends Sprite {
 			collisionManager.clearEnemyBullets();
 		}
 
+		var phaseIndex = boss.getPhaseIndex();
+		var cleared = !boss.wasLastPhaseEndTimeout();
+		if (onBossPhaseEnded != null) {
+			onBossPhaseEnded(boss, phaseIndex, cleared);
+		}
+
 		if (boss.getPhaseIndex() >= boss.getPhaseCount() - 1) {
 			// Last phase cleared: the boss is done
 			activeBoss = null;
+			if (onBossDefeated != null) {
+				onBossDefeated(boss);
+			}
 			boss.defeat();
 			return;
 		}

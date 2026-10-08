@@ -165,7 +165,9 @@ spawn({
 Phases are fought in order. Clearing a phase wipes the bullet field, swaps
 the pattern (and movement, if the phase has `move`), and grants the boss brief
 invincibility; clearing the last phase kills the boss. `name` is the spell
-card title shown on the boss health bar.
+card title shown on the boss health bar. Set `spell: true` for a spell card
+(with optional `bonus` capture points and `cutIn` portrait path); omit `name`
+and `spell` for a nonspell phase.
 
 ## Patterns
 

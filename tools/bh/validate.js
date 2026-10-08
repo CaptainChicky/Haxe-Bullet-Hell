@@ -425,7 +425,7 @@ function checkBoss(ctx, p, boss) {
 	boss.phases.forEach((ph, i) => {
 		const pp = `${p}.phases[${i}]`;
 		for (const key of Object.keys(ph)) {
-			if (!["name", "health", "timeoutFrames", "pattern", "patternConfig", "script", "movementScript"].includes(key)) {
+			if (!["name", "health", "timeoutFrames", "pattern", "patternConfig", "script", "movementScript", "spell", "bonus", "cutIn"].includes(key)) {
 				ctx.warn(pp, `boss phase does not use field "${key}"`);
 			}
 		}

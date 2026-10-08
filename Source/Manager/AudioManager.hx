@@ -43,6 +43,9 @@ class AudioManager {
 	private static var sfxDeathSound:Sound;
 	private static var sfxBombSound:Sound;
 	private static var sfxPickupSound:Sound;
+	private static var sfxSpellDeclareSound:Sound;
+	private static var sfxSpellCaptureSound:Sound;
+	private static var sfxSpellFailSound:Sound;
 
 	private static var fireCooldown:Int = 0;
 
@@ -74,6 +77,20 @@ class AudioManager {
 			{freq: 82, seconds: 0.35}
 		], 0.9);
 		sfxPickupSound = makeSequence([{freq: 1320, seconds: 0.06}], 0.5);
+		sfxSpellDeclareSound = makeSequence([
+			{freq: 523, seconds: 0.08},
+			{freq: 659, seconds: 0.12},
+			{freq: 784, seconds: 0.18}
+		], 0.55);
+		sfxSpellCaptureSound = makeSequence([
+			{freq: 880, seconds: 0.1},
+			{freq: 1175, seconds: 0.14},
+			{freq: 1568, seconds: 0.22}
+		], 0.6);
+		sfxSpellFailSound = makeSequence([
+			{freq: 330, seconds: 0.14},
+			{freq: 262, seconds: 0.22}
+		], 0.5);
 	}
 
 	/** Synthesize a note sequence into a playable Sound. Each note gets a
@@ -208,6 +225,18 @@ class AudioManager {
 
 	public static function sfxItemPickup():Void {
 		play(sfxPickupSound, SFX_VOLUME * 0.6);
+	}
+
+	public static function sfxSpellDeclare():Void {
+		play(sfxSpellDeclareSound, SFX_VOLUME * 0.7);
+	}
+
+	public static function sfxSpellCapture():Void {
+		play(sfxSpellCaptureSound, SFX_VOLUME * 0.75);
+	}
+
+	public static function sfxSpellFail():Void {
+		play(sfxSpellFailSound, SFX_VOLUME * 0.55);
 	}
 
 	private static function play(sound:Sound, volume:Float):Void {

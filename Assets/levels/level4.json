@@ -1687,6 +1687,9 @@
               {
                 "health": 900,
                 "name": "Feather Sign - Moulting Cyclone",
+                "spell": true,
+                "bonus": 500000,
+                "cutIn": "assets/Enemy(second).png",
                 "timeoutFrames": 3300,
                 "script": [
                   {
@@ -2394,6 +2397,9 @@
               {
                 "health": 950,
                 "name": "Cage Sign - Gilded Aviary",
+                "spell": true,
+                "bonus": 600000,
+                "cutIn": "assets/Enemy(second).png",
                 "timeoutFrames": 3600,
                 "script": [
                   {
@@ -2566,6 +2572,9 @@
               {
                 "health": 1000,
                 "name": "Wing Sign - Thousand-Feather Bloom",
+                "spell": true,
+                "bonus": 700000,
+                "cutIn": "assets/Enemy(second).png",
                 "timeoutFrames": 3900,
                 "script": [
                   {
@@ -2751,6 +2760,9 @@
               {
                 "health": 1200,
                 "name": "Last Word - Empress of the Endless Sky",
+                "spell": true,
+                "bonus": 1000000,
+                "cutIn": "assets/Enemy(second).png",
                 "timeoutFrames": 5400,
                 "script": [
                   {

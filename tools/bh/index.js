@@ -237,8 +237,11 @@ function boss(name, ...phases) {
 }
 
 /**
- * phase({name, health, timeout, pattern, config, script, move})
+ * phase({name, health, timeout, spell, bonus, cutIn, pattern, config, script, move})
  * name    spell card title shown on the boss bar (omit for a "nonspell")
+ * spell   true for a spell card (declaration ceremony + capture bonus)
+ * bonus   starting capture bonus (decays over timeout; omit with spell for 0)
+ * cutIn   boss portrait asset for the cut-in slide (omit to skip the portrait)
  * health  damage needed to clear the phase
  * timeout seconds until the phase auto-clears with no drops (Touhou-style);
  *         omit for no timeout. The boss bar shows the countdown.
@@ -248,6 +251,9 @@ function boss(name, ...phases) {
 function phase(o) {
 	const p = { health: o.health };
 	if (o.name) p.name = o.name;
+	if (o.spell) p.spell = true;
+	if (o.bonus != null) p.bonus = o.bonus;
+	if (o.cutIn) p.cutIn = o.cutIn;
 	if (o.timeout) p.timeoutFrames = Math.round(o.timeout * 60);
 	if (o.pattern) p.pattern = o.pattern;
 	if (o.config) p.patternConfig = { ...o.config };
